@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roster Admin">
+<meta name="theme-color" content="#0f1117">
+<title>Roster Manager — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #181b24;
+  --bg3: #1e2130;
+  --bg4: #252840;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8eaf2;
+  --text2: #8b90a8;
+  --text3: #555a72;
+  --accent: #6c8bff;
+  --accent2: #3d5cff;
+  --day: #3a6bbd;
+  --day-bg: #1a2e4a;
+  --day-text: #90bcff;
+  --aft: #3a7a4f;
+  --aft-bg: #1a3526;
+  --aft-text: #7ed4a0;
+  --sector: #4a3a7a;
+  --sector-bg: #1e1a35;
+  --sector-text: #b8a8ff;
+  --station: #3a5a6a;
+  --station-bg: #192430;
+  --station-text: #8acfdf;
+  --unit: #6a4a2a;
+  --unit-bg: #2e1e0e;
+  --unit-text: #e0b070;
+  --danger: #c0392b;
+  --warn: #e67e22;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font-ui: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+.save-indicator{
+  font-size:11px;font-family:var(--font-mono);
+  color:var(--text3);display:flex;align-items:center;gap:5px;
+  transition:color .3s;
+}
+.save-indicator.saved{color:var(--aft-text);}
+.save-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--text3);transition:background .3s;
+}
+.save-indicator.saved .save-dot{background:var(--aft-text);}
+.btn-reset{color:var(--danger);border-color:var(--danger);}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);}
+body{display:flex;flex-direction:column;min-height:100vh;}
+
+/* HEADER */
+.app-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.app-logo{
+  font-size:18px;font-weight:700;letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#6c8bff,#a78bff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.app-sub{font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+/* TABS */
+.tabs{
+  display:flex;gap:0;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  overflow-x:auto;
+}
+.tab{
+  font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;
+  padding:12px 18px;cursor:pointer;
+  border-bottom:2px solid transparent;
+  color:var(--text3);white-space:nowrap;
+  transition:color .2s,border-color .2s;
+}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* MAIN */
+.main{flex:1;padding:16px 20px;max-width:100%;overflow:hidden;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* TOOLBAR */
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin-bottom:14px;
+  padding:12px 14px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+}
+input[type=text],input[type=date],select{
+  font-size:12px;font-family:var(--font-ui);
+  padding:7px 10px;
+  border-radius:var(--radius);
+  border:1px solid var(--border2);
+  background:var(--bg3);
+  color:var(--text);
+  outline:none;
+  transition:border-color .2s;
+}
+input[type=text]:focus,input[type=date]:focus,select:focus{border-color:var(--accent);}
+input[type=text]::placeholder{color:var(--text3);}
+select option{background:var(--bg3);}
+label{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;}
+
+.btn{
+  font-size:12px;font-family:var(--font-ui);font-weight:600;letter-spacing:0.3px;
+  padding:7px 13px;
+  border-radius:var(--radius);
+  border:1px solid var(--border2);
+  background:var(--bg3);
+  color:var(--text2);
+  cursor:pointer;white-space:nowrap;
+  transition:all .15s;
+}
+.btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2);}
+.btn-accent{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.btn-accent:hover{background:var(--accent);border-color:var(--accent);}
+.btn-day{background:var(--day-bg);color:var(--day-text);border-color:var(--day);}
+.btn-aft{background:var(--aft-bg);color:var(--aft-text);border-color:var(--aft);}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger);}
+.btn-sm{font-size:11px;padding:4px 9px;}
+
+/* STATS */
+.stats{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  margin-bottom:14px;
+}
+@media(max-width:700px){.stats{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:400px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:10px 14px;
+}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+.stat-val{font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--text);}
+
+/* LEGEND */
+.legend{
+  display:flex;gap:14px;font-size:11px;color:var(--text3);
+  margin-bottom:10px;flex-wrap:wrap;align-items:center;
+  font-family:var(--font-mono);
+}
+.leg-sq{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-2px;margin-right:4px;}
+
+/* ROSTER TABLE */
+.roster-wrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  max-height:calc(100vh - 340px);
+}
+table{border-collapse:collapse;width:100%;font-size:11px;font-family:var(--font-mono);}
+thead th{
+  position:sticky;top:0;
+  background:var(--bg2);
+  z-index:10;
+  padding:6px 4px;
+  border-bottom:1px solid var(--border2);
+  font-weight:500;text-align:center;white-space:nowrap;
+  color:var(--text2);
+}
+thead th.user-col{
+  left:0;z-index:22;text-align:left;padding-left:10px;
+  min-width:130px;font-family:var(--font-ui);font-size:11px;
+  background:var(--bg2);
+}
+thead th.info-col{
+  left:130px;z-index:21;
+  min-width:72px;
+  background:var(--bg2);
+}
+thead th.weekend{background:var(--bg3)!important;}
+tbody th.user-col{
+  position:sticky;left:0;z-index:6;
+  background:var(--bg);
+  padding:5px 10px;
+  border-right:1px solid var(--border);
+  font-weight:400;white-space:nowrap;min-width:130px;
+  font-family:var(--font-ui);font-size:11px;color:var(--text);
+}
+tbody td.info-col{
+  position:sticky;left:130px;z-index:5;
+  background:var(--bg);
+  border-right:1px solid var(--border2);
+  padding:3px 5px;min-width:72px;cursor:default;
+}
+tbody tr:hover th.user-col,tbody tr:hover td.info-col{background:var(--bg2);}
+tbody tr:hover td:not(.info-col){filter:brightness(1.1);}
+td{
+  padding:2px 2px;
+  border:1px solid var(--border);
+  text-align:center;cursor:pointer;
+  min-width:30px;
+  transition:filter .1s;
+  color:var(--text2);
+}
+td.shift-d{background:var(--day-bg);color:var(--day-text);}
+td.shift-a{background:var(--aft-bg);color:var(--aft-text);}
+td.day-off{background:transparent;}
+td.weekend{background:var(--bg3)!important;}
+td.shift-d.weekend{background:#152239!important;}
+td.shift-a.weekend{background:#132b1c!important;}
+td.shift-d:hover{background:var(--day)!important;color:#fff;}
+td.shift-a:hover{background:var(--aft)!important;color:#fff;}
+td.day-off:hover{background:var(--bg4)!important;}
+.day-hdr{font-size:9px;color:var(--text3);display:block;font-family:var(--font-ui);}
+
+/* BADGES */
+.badge{
+  display:inline-block;font-size:9px;font-family:var(--font-mono);
+  padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap;
+}
+.b-sector{background:var(--sector-bg);color:var(--sector-text);border:1px solid var(--sector);}
+.b-station{background:var(--station-bg);color:var(--station-text);border:1px solid var(--station);}
+.b-unit{background:var(--unit-bg);color:var(--unit-text);border:1px solid var(--unit);}
+.meta-row{display:flex;gap:2px;flex-wrap:wrap;}
+
+/* CONFIG */
+.config-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+@media(max-width:700px){.config-grid{grid-template-columns:1fr;}}
+.config-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;
+}
+.config-card h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.config-list{list-style:none;margin-bottom:10px;max-height:200px;overflow-y:auto;}
+.config-list li{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);
+}
+.config-list li:last-child{border-bottom:none;}
+.del-btn{
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:16px;padding:0 4px;line-height:1;transition:color .15s;
+}
+.del-btn:hover{color:var(--danger);}
+.add-row{display:flex;gap:6px;}
+.add-row input{flex:1;}
+.config-tip{font-size:11px;color:var(--text3);padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);}
+
+/* USERS TABLE */
+.users-table-wrap{
+  overflow:auto;border:1px solid var(--border);border-radius:var(--radius-lg);
+  max-height:calc(100vh - 270px);
+}
+.users-table{width:100%;border-collapse:collapse;font-size:12px;}
+.users-table thead th{
+  position:sticky;top:0;z-index:5;
+  background:var(--bg2);padding:9px 10px;
+  border-bottom:1px solid var(--border2);
+  font-size:11px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;
+  color:var(--text3);text-align:left;
+}
+.users-table tbody td{
+  padding:7px 10px;border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.users-table tbody tr:hover td{background:var(--bg2);}
+.users-table tbody tr:last-child td{border-bottom:none;}
+
+/* MODAL */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  z-index:100;align-items:center;justify-content:center;
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);padding:22px;
+  min-width:280px;max-width:380px;width:92%;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);}
+.mrow{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.mrow label{font-size:11px;color:var(--text3);letter-spacing:0.4px;text-transform:uppercase;}
+.mrow input,.mrow select{width:100%;font-size:13px;padding:8px 10px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+
+/* SEARCH */
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap input{padding-left:28px;}
+.search-icon{position:absolute;left:9px;color:var(--text3);font-size:13px;pointer-events:none;}
+
+/* SHIFT BADGE */
+.shift-badge{
+  display:inline-block;font-size:10px;font-family:var(--font-mono);
+  padding:2px 7px;border-radius:4px;font-weight:500;
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <div class="app-logo">ROSTER</div>
+    <div class="app-sub">56-DAY SHIFT MANAGER &nbsp;<span style="background:#3d5cff;color:#fff;font-size:9px;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);letter-spacing:1px;">ADMIN</span></div>
+  </div>
+  <div class="header-right" style="gap:10px;">
+    <div class="save-indicator" id="saveIndicator">
+      <span class="save-dot"></span><span id="saveLabel">No saved data</span>
+    </div>
+    <button class="btn btn-accent" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-reset btn-sm" onclick="resetData()" title="Clear all saved data and reset to defaults">↺ Reset</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
+  <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
+  <div class="tab" onclick="switchTab('users')">👥 Users</div>
+</nav>
+
+<main class="main">
+
+  <!-- ROSTER PANEL -->
+  <div id="panel-roster" class="panel active">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search user…" style="width:130px;" oninput="buildBody()">
+      </div>
+      <label>Start <input type="date" id="startDate" onchange="onDateChange()"></label>
+      <select id="filterSector" onchange="buildBody()"><option value="">All sectors</option></select>
+      <select id="filterStation" onchange="buildBody()"><option value="">All stations</option></select>
+      <select id="filterUnit" onchange="buildBody()"><option value="">All units</option></select>
+      <select id="filterShift" onchange="buildBody()">
+        <option value="">All shifts</option>
+        <option value="D">Day only</option>
+        <option value="A">Afternoon only</option>
+        <option value="O">Off only</option>
+      </select>
+      <button class="btn btn-day" onclick="fillFiltered('D')">☀ Day</button>
+      <button class="btn btn-aft" onclick="fillFiltered('A')">🌙 Afternoon</button>
+      <button class="btn" onclick="fillFiltered('O')">✕ Clear</button>
+    </div>
+
+    <div class="legend">
+      <span><span class="leg-sq" style="background:var(--day-bg);border:1px solid var(--day);"></span>Day (D)</span>
+      <span><span class="leg-sq" style="background:var(--aft-bg);border:1px solid var(--aft);"></span>Afternoon (A)</span>
+      <span><span class="leg-sq" style="background:var(--bg3);border:1px solid var(--border2);"></span>Off</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);">Click cell → cycle off › D › A › off</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Users</div><div class="stat-val" id="s-users">70</div></div>
+      <div class="stat"><div class="stat-label">Day shifts</div><div class="stat-val" id="s-day" style="color:var(--day-text);">0</div></div>
+      <div class="stat"><div class="stat-label">Afternoon</div><div class="stat-val" id="s-aft" style="color:var(--aft-text);">0</div></div>
+      <div class="stat"><div class="stat-label">Days off</div><div class="stat-val" id="s-off">0</div></div>
+      <div class="stat"><div class="stat-label">Coverage</div><div class="stat-val" id="s-cov" style="color:var(--accent);">0%</div></div>
+    </div>
+
+    <div class="roster-wrap">
+      <table id="rosterTable">
+        <thead id="rosterHead"></thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONFIG PANEL -->
+  <div id="panel-config" class="panel">
+    <div class="config-grid">
+      <div class="config-card">
+        <h3><span class="badge b-sector">S</span> Sectors</h3>
+        <ul class="config-list" id="sectorList"></ul>
+        <div class="add-row">
+          <input type="text" id="newSector" placeholder="Sector name…" onkeydown="if(event.key==='Enter')addItem('sector')">
+          <button class="btn btn-accent btn-sm" onclick="addItem('sector')">+ Add</button>
+        </div>
+      </div>
+      <div class="config-card">
+        <h3><span class="badge b-station">ST</span> Stations</h3>
+        <ul class="config-list" id="stationList"></ul>
+        <div class="add-row">
+          <input type="text" id="newStation" placeholder="Station name…" onkeydown="if(event.key==='Enter')addItem('station')">
+          <button class="btn btn-accent btn-sm" onclick="addItem('station')">+ Add</button>
+        </div>
+      </div>
+      <div class="config-card">
+        <h3><span class="badge b-unit">U</span> Units</h3>
+        <ul class="config-list" id="unitList"></ul>
+        <div class="add-row">
+          <input type="text" id="newUnit" placeholder="Unit name…" onkeydown="if(event.key==='Enter')addItem('unit')">
+          <button class="btn btn-accent btn-sm" onclick="addItem('unit')">+ Add</button>
+        </div>
+      </div>
+    </div>
+    <p class="config-tip">✦ After adding sectors, stations, and units here — go to the <strong>Users</strong> tab to assign them to each staff member.</p>
+  </div>
+
+  <!-- USERS PANEL -->
+  <div id="panel-users" class="panel">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="userSearch" placeholder="Search user…" style="width:130px;" oninput="buildUserTable()">
+      </div>
+      <select id="uFilterSector" onchange="buildUserTable()"><option value="">All sectors</option></select>
+      <select id="uFilterStation" onchange="buildUserTable()"><option value="">All stations</option></select>
+      <select id="uFilterUnit" onchange="buildUserTable()"><option value="">All units</option></select>
+      <button class="btn btn-accent" onclick="openAddUser()">+ Add user</button>
+    </div>
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Sector</th>
+            <th>Station</th>
+            <th>Unit</th>
+            <th>Default</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ADD/EDIT USER MODAL -->
+<div class="modal-bg" id="addUserModal">
+  <div class="modal">
+    <h3 id="modalTitle">Add user</h3>
+    <div class="mrow"><label>Full name</label><input type="text" id="newUserName" placeholder="e.g. Jane Smith"></div>
+    <div class="mrow"><label>Sector</label><select id="newUserSector"><option value="">— none —</option></select></div>
+    <div class="mrow"><label>Station</label><select id="newUserStation"><option value="">— none —</option></select></div>
+    <div class="mrow"><label>Unit</label><select id="newUserUnit"><option value="">— none —</option></select></div>
+    <div class="mrow"><label>Default shift</label>
+      <select id="newUserShift">
+        <option value="O">Day off</option>
+        <option value="D">Day shift</option>
+        <option value="A">Afternoon shift</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="confirmSaveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS=56,SHIFTS=['O','D','A'],LABELS={O:'',D:'D',A:'A'};
+let users=[],roster={},startDate=new Date();
+let sectors=[],stations=[],units=[];
+let editingUserId=null;
+
+const FIRST=['Alex','Jordan','Morgan','Taylor','Casey','Riley','Quinn','Avery','Blake','Cameron','Dana','Ellis','Finley','Gray','Harper','Indigo','Jesse','Kai','Lane','Loren','Madi','Noel','Oakley','Peyton','Reed','Sage','Shay','Skyler','Tatum','Val','Wren','Zara','Adrian','Brynn','Colin','Drew','Eden','Flynn','Gwen','Hale','Ivy','Jace','Kira','Leo','Mira','Nico','Ora','Piper','Rhys','Sam','Chris','Jamie','Reese','Emery','Rowan','Hayden','Parker','River','Sloane','Kendall'];
+const LAST=['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Martinez','Wilson','Anderson','Taylor','Thomas','Jackson','White','Harris','Clark','Lewis','Lee','Walker','Hall','Allen','Young','King','Wright','Scott','Torres','Green','Adams','Nelson'];
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function initData(){
+  sectors=['Alpha','Bravo','Charlie','Delta'];
+  stations=['North','South','East','West','Central'];
+  units=['Unit 1','Unit 2','Unit 3','Unit 4','Unit 5','Unit 6'];
+  for(let i=0;i<70;i++){
+    const id='u'+i;
+    users.push({
+      id,
+      name:FIRST[i%FIRST.length]+' '+LAST[i%LAST.length],
+      sector:sectors[i%sectors.length],
+      station:stations[i%stations.length],
+      unit:units[i%units.length],
+      defaultShift:'O'
+    });
+    roster[id]=Array(DAYS).fill('O');
+  }
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['roster','config','users'][i]===t));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='config')buildConfigLists();
+  if(t==='users'){populateFilterSelects();buildUserTable();}
+}
+
+// ─── ROSTER HEAD ─────────────────────────────────────────────────────────────
+function buildHead(){
+  const head=document.getElementById('rosterHead');
+  const d=new Date(startDate);
+  let html='<tr><th class="user-col" rowspan="1">User</th><th class="info-col" style="position:sticky;left:130px;z-index:21;background:var(--bg2);min-width:72px;">Info</th>';
+  for(let i=0;i<DAYS;i++){
+    const day=new Date(d);day.setDate(d.getDate()+i);
+    const wd=day.getDay(),isWe=wd===0||wd===6;
+    const lbl=day.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    const dn=day.toLocaleDateString('en-GB',{weekday:'short'});
+    html+=`<th class="${isWe?'weekend':''}" title="${lbl}"><span class="day-hdr">${dn}</span>${i+1}</th>`;
+  }
+  html+='</tr>';
+  head.innerHTML=html;
+}
+
+// ─── FILTER ──────────────────────────────────────────────────────────────────
+function getFiltered(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const fs=document.getElementById('filterSector').value;
+  const fst=document.getElementById('filterStation').value;
+  const fu=document.getElementById('filterUnit').value;
+  const fsh=document.getElementById('filterShift').value;
+  return users.filter(u=>{
+    if(search&&!u.name.toLowerCase().includes(search))return false;
+    if(fs&&u.sector!==fs)return false;
+    if(fst&&u.station!==fst)return false;
+    if(fu&&u.unit!==fu)return false;
+    if(fsh&&!roster[u.id].some(s=>s===fsh))return false;
+    return true;
+  });
+}
+
+// ─── ROSTER BODY ─────────────────────────────────────────────────────────────
+function buildBody(){
+  const tbody=document.getElementById('rosterBody');
+  const d=new Date(startDate);
+  const filtered=getFiltered();
+  let html='';
+  filtered.forEach(u=>{
+    html+=`<tr>
+      <th class="user-col">${escHtml(u.name)}</th>
+      <td class="info-col">
+        <div class="meta-row">
+          ${u.sector?`<span class="badge b-sector">${escHtml(u.sector)}</span>`:''}
+          ${u.station?`<span class="badge b-station">${escHtml(u.station)}</span>`:''}
+          ${u.unit?`<span class="badge b-unit">${escHtml(u.unit)}</span>`:''}
+        </div>
+      </td>`;
+    for(let i=0;i<DAYS;i++){
+      const day=new Date(d);day.setDate(d.getDate()+i);
+      const wd=day.getDay(),isWe=wd===0||wd===6;
+      const s=roster[u.id][i];
+      const cls=s==='D'?'shift-d':s==='A'?'shift-a':'day-off';
+      html+=`<td class="${cls}${isWe?' weekend':''}" data-uid="${u.id}" data-day="${i}">${LABELS[s]}</td>`;
+    }
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+  tbody.querySelectorAll('td[data-uid]').forEach(td=>{
+    td.addEventListener('click',()=>{
+      const uid=td.dataset.uid,day=parseInt(td.dataset.day);
+      roster[uid][day]=SHIFTS[(SHIFTS.indexOf(roster[uid][day])+1)%SHIFTS.length];
+      const s=roster[uid][day];
+      td.className=(s==='D'?'shift-d':s==='A'?'shift-a':'day-off');
+      const dd=new Date(startDate);dd.setDate(dd.getDate()+day);
+      if([0,6].includes(dd.getDay()))td.classList.add('weekend');
+      td.textContent=LABELS[s];
+      updateStats(filtered);
+    });
+  });
+  updateStats(filtered);
+}
+
+function updateStats(filtered){
+  const f=filtered||getFiltered();
+  let day=0,aft=0,off=0;
+  f.forEach(u=>{roster[u.id].forEach(s=>{if(s==='D')day++;else if(s==='A')aft++;else off++;});});
+  const total=day+aft+off;
+  document.getElementById('s-users').textContent=f.length;
+  document.getElementById('s-day').textContent=day;
+  document.getElementById('s-aft').textContent=aft;
+  document.getElementById('s-off').textContent=off;
+  document.getElementById('s-cov').textContent=total?Math.round((day+aft)/total*100)+'%':'0%';
+}
+
+function fillFiltered(shift){
+  getFiltered().forEach(u=>{roster[u.id]=Array(DAYS).fill(shift);});
+  buildBody();
+}
+
+// ─── FILTER SELECTS ──────────────────────────────────────────────────────────
+function populateFilterSelects(){
+  const maps=[
+    ['filterSector','sector',sectors],['filterStation','station',stations],['filterUnit','unit',units],
+    ['uFilterSector','sector',sectors],['uFilterStation','station',stations],['uFilterUnit','unit',units]
+  ];
+  maps.forEach(([id,type,list])=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=`<option value="">All ${type}s</option>`+list.map(v=>`<option value="${v}"${v===cur?' selected':''}>${escHtml(v)}</option>`).join('');
+  });
+  ['newUserSector','newUserStation','newUserUnit'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const type=id.includes('Sector')?'sector':id.includes('Station')?'station':'unit';
+    const list=type==='sector'?sectors:type==='station'?stations:units;
+    el.innerHTML='<option value="">— none —</option>'+list.map(v=>`<option value="${v}">${escHtml(v)}</option>`).join('');
+  });
+}
+
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+function buildConfigLists(){
+  ['sector','station','unit'].forEach(type=>{
+    const list=type==='sector'?sectors:type==='station'?stations:units;
+    const el=document.getElementById(type+'List');
+    el.innerHTML=list.length
+      ?list.map((v,i)=>`<li><span>${escHtml(v)}</span><button class="del-btn" onclick="removeItem('${type}',${i})">×</button></li>`).join('')
+      :'<li style="color:var(--text3);font-size:11px;font-style:italic;">No items yet</li>';
+  });
+}
+
+function addItem(type){
+  const input=document.getElementById('new'+cap(type));
+  const val=input.value.trim();if(!val)return;
+  if(type==='sector')sectors.push(val);
+  else if(type==='station')stations.push(val);
+  else units.push(val);
+  input.value='';
+  buildConfigLists();populateFilterSelects();
+}
+
+function removeItem(type,idx){
+  if(type==='sector')sectors.splice(idx,1);
+  else if(type==='station')stations.splice(idx,1);
+  else units.splice(idx,1);
+  buildConfigLists();populateFilterSelects();
+}
+
+// ─── USERS TABLE ─────────────────────────────────────────────────────────────
+function buildUserTable(){
+  const search=document.getElementById('userSearch').value.toLowerCase();
+  const fs=document.getElementById('uFilterSector').value;
+  const fst=document.getElementById('uFilterStation').value;
+  const fu=document.getElementById('uFilterUnit').value;
+  const filtered=users.filter(u=>{
+    if(search&&!u.name.toLowerCase().includes(search))return false;
+    if(fs&&u.sector!==fs)return false;
+    if(fst&&u.station!==fst)return false;
+    if(fu&&u.unit!==fu)return false;
+    return true;
+  });
+  const shiftStyle={
+    D:`background:var(--day-bg);color:var(--day-text);border:1px solid var(--day);`,
+    A:`background:var(--aft-bg);color:var(--aft-text);border:1px solid var(--aft);`,
+    O:`background:var(--bg3);color:var(--text3);border:1px solid var(--border2);`
+  };
+  const shiftLabel={D:'Day',A:'Afternoon',O:'Off'};
+  document.getElementById('userTableBody').innerHTML=filtered.map(u=>`<tr>
+    <td style="font-weight:500;">${escHtml(u.name)}</td>
+    <td>${u.sector?`<span class="badge b-sector">${escHtml(u.sector)}</span>`:'-'}</td>
+    <td>${u.station?`<span class="badge b-station">${escHtml(u.station)}</span>`:'-'}</td>
+    <td>${u.unit?`<span class="badge b-unit">${escHtml(u.unit)}</span>`:'-'}</td>
+    <td><span class="shift-badge" style="${shiftStyle[u.defaultShift||'O']}">${shiftLabel[u.defaultShift||'O']}</span></td>
+    <td style="white-space:nowrap;">
+      <button class="btn btn-sm" onclick="openEditUser('${u.id}')">✏ Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openAddUser(){
+  editingUserId=null;
+  document.getElementById('modalTitle').textContent='Add user';
+  document.getElementById('newUserName').value='';
+  document.getElementById('newUserShift').value='O';
+  populateFilterSelects();
+  document.getElementById('newUserSector').value='';
+  document.getElementById('newUserStation').value='';
+  document.getElementById('newUserUnit').value='';
+  document.getElementById('addUserModal').classList.add('open');
+}
+
+function openEditUser(id){
+  editingUserId=id;
+  const u=users.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent='Edit user';
+  document.getElementById('newUserName').value=u.name;
+  document.getElementById('newUserShift').value=u.defaultShift||'O';
+  populateFilterSelects();
+  setTimeout(()=>{
+    document.getElementById('newUserSector').value=u.sector||'';
+    document.getElementById('newUserStation').value=u.station||'';
+    document.getElementById('newUserUnit').value=u.unit||'';
+  },10);
+  document.getElementById('addUserModal').classList.add('open');
+}
+
+function confirmSaveUser(){
+  const name=document.getElementById('newUserName').value.trim();if(!name)return;
+  const sector=document.getElementById('newUserSector').value;
+  const station=document.getElementById('newUserStation').value;
+  const unit=document.getElementById('newUserUnit').value;
+  const defaultShift=document.getElementById('newUserShift').value;
+  if(editingUserId){
+    const u=users.find(x=>x.id===editingUserId);
+    Object.assign(u,{name,sector,station,unit,defaultShift});
+  } else {
+    const id='u'+Date.now();
+    users.push({id,name,sector,station,unit,defaultShift});
+    roster[id]=Array(DAYS).fill(defaultShift);
+  }
+  closeModal();buildUserTable();buildBody();
+}
+
+function deleteUser(id){
+  if(!confirm('Remove this user from the roster?'))return;
+  users=users.filter(u=>u.id!==id);
+  delete roster[id];
+  buildUserTable();buildBody();
+}
+
+function closeModal(){document.getElementById('addUserModal').classList.remove('open');}
+
+// ─── DATE ────────────────────────────────────────────────────────────────────
+function onDateChange(){
+  const v=document.getElementById('startDate').value;
+  startDate=v?new Date(v):new Date();
+  buildHead();buildBody();
+}
+
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function exportCSV(){
+  const d=new Date(startDate);
+  let csv='Name,Sector,Station,Unit';
+  for(let i=0;i<DAYS;i++){
+    const dd=new Date(d);dd.setDate(d.getDate()+i);
+    csv+=','+dd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  }
+  csv+='\n';
+  users.forEach(u=>{
+    csv+=`"${u.name}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
+    roster[u.id].forEach(s=>csv+=','+s);
+    csv+='\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='roster_56days.csv';a.click();
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ─── LOCALSTORAGE PERSISTENCE ─────────────────────────────────────────────────
+const STORAGE_KEY='roster_manager_v1';
+let saveTimeout=null;
+
+function saveData(){
+  clearTimeout(saveTimeout);
+  saveTimeout=setTimeout(()=>{
+    try{
+      const payload={
+        version:1,
+        savedAt:new Date().toISOString(),
+        startDate:document.getElementById('startDate').value,
+        sectors,stations,units,users,roster
+      };
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
+      showSaved();
+    } catch(e){
+      console.warn('Save failed:',e);
+    }
+  },400);
+}
+
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const payload=JSON.parse(raw);
+    if(!payload||payload.version!==1)return false;
+    sectors=payload.sectors||[];
+    stations=payload.stations||[];
+    units=payload.units||[];
+    users=payload.users||[];
+    roster=payload.roster||{};
+    if(payload.startDate){
+      startDate=new Date(payload.startDate);
+      document.getElementById('startDate').value=payload.startDate;
+    }
+    return true;
+  } catch(e){
+    console.warn('Load failed:',e);
+    return false;
+  }
+}
+
+function showSaved(){
+  const ind=document.getElementById('saveIndicator');
+  const lbl=document.getElementById('saveLabel');
+  const now=new Date();
+  lbl.textContent='Saved '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  ind.classList.add('saved');
+  setTimeout(()=>ind.classList.remove('saved'),2500);
+}
+
+function resetData(){
+  if(!confirm('Reset everything? This will delete all saved roster data and restore the defaults.'))return;
+  localStorage.removeItem(STORAGE_KEY);
+  users=[];roster={};sectors=[];stations=[];units=[];
+  const today=new Date();
+  startDate=today;
+  document.getElementById('startDate').value=today.toISOString().slice(0,10);
+  initData();
+  populateFilterSelects();
+  buildHead();buildBody();
+  document.getElementById('saveLabel').textContent='Reset — no saved data';
+  document.getElementById('saveIndicator').classList.remove('saved');
+}
+
+// Wrap all mutating actions to auto-save
+const _origFillFiltered=fillFiltered;
+fillFiltered=function(s){_origFillFiltered(s);saveData();};
+const _origConfirmSave=confirmSaveUser;
+confirmSaveUser=function(){_origConfirmSave();saveData();};
+const _origDeleteUser=deleteUser;
+deleteUser=function(id){_origDeleteUser(id);saveData();};
+const _origAddItem=addItem;
+addItem=function(t){_origAddItem(t);saveData();};
+const _origRemoveItem=removeItem;
+removeItem=function(t,i){_origRemoveItem(t,i);saveData();};
+const _origOnDateChange=onDateChange;
+onDateChange=function(){_origOnDateChange();saveData();};
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+function init(){
+  const today=new Date();
+  startDate=today;
+  document.getElementById('startDate').value=today.toISOString().slice(0,10);
+
+  const loaded=loadData();
+  if(!loaded){
+    initData();
+    document.getElementById('saveLabel').textContent='No saved data';
+  } else {
+    document.getElementById('saveLabel').textContent='Loaded ✓';
+    document.getElementById('saveIndicator').classList.add('saved');
+    setTimeout(()=>document.getElementById('saveIndicator').classList.remove('saved'),2000);
+  }
+
+  populateFilterSelects();
+  buildHead();buildBody();
+
+  // Auto-save on every cell click by patching the tbody listener
+  document.getElementById('rosterBody').addEventListener('click',()=>{
+    saveData();
+  });
+}
+init();
+
+// ─── CLOSE MODAL ON BACKDROP CLICK ───────────────────────────────────────────
+document.getElementById('addUserModal').addEventListener('click',function(e){
+  if(e.target===this)closeModal();
+});
+</script>
+</body>
+</html>

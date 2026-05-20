@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roster View">
+<meta name="theme-color" content="#0f1117">
+<title>Roster — Viewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181b24;--bg3:#1e2130;--bg4:#252840;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.13);
+  --text:#e8eaf2;--text2:#8b90a8;--text3:#555a72;
+  --accent:#6c8bff;--accent2:#3d5cff;
+  --day:#3a6bbd;--day-bg:#1a2e4a;--day-text:#90bcff;
+  --aft:#3a7a4f;--aft-bg:#1a3526;--aft-text:#7ed4a0;
+  --sector:#4a3a7a;--sector-bg:#1e1a35;--sector-text:#b8a8ff;
+  --station:#3a5a6a;--station-bg:#192430;--station-text:#8acfdf;
+  --unit:#6a4a2a;--unit-bg:#2e1e0e;--unit-text:#e0b070;
+  --radius:8px;--radius-lg:12px;
+  --font-ui:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);}
+body{display:flex;flex-direction:column;min-height:100vh;}
+
+.app-header{
+  display:flex;align-items:center;gap:12px;padding:14px 20px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.app-logo{
+  font-size:18px;font-weight:700;letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#6c8bff,#a78bff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.app-sub{font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+
+.last-updated{
+  font-size:11px;font-family:var(--font-mono);color:var(--text3);
+  display:flex;align-items:center;gap:5px;
+}
+.last-updated .dot{width:7px;height:7px;border-radius:50%;background:var(--aft-text);}
+
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin-bottom:14px;padding:12px 14px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);
+}
+input[type=text],select{
+  font-size:12px;font-family:var(--font-ui);padding:7px 10px;
+  border-radius:var(--radius);border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text);outline:none;transition:border-color .2s;
+}
+input[type=text]:focus,select:focus{border-color:var(--accent);}
+input[type=text]::placeholder{color:var(--text3);}
+select option{background:var(--bg3);}
+
+.btn{
+  font-size:12px;font-family:var(--font-ui);font-weight:600;letter-spacing:0.3px;
+  padding:7px 13px;border-radius:var(--radius);border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;
+}
+.btn:hover{background:var(--bg4);color:var(--text);}
+.btn-accent{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.btn-accent:hover{background:var(--accent);border-color:var(--accent);}
+.btn-sm{font-size:11px;padding:4px 9px;}
+
+.main{flex:1;padding:16px 20px;max-width:100%;overflow:hidden;}
+
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:700px){.stats{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:400px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+.stat-val{font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--text);}
+
+.legend{
+  display:flex;gap:14px;font-size:11px;color:var(--text3);
+  margin-bottom:10px;flex-wrap:wrap;align-items:center;font-family:var(--font-mono);
+}
+.leg-sq{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-2px;margin-right:4px;}
+
+.roster-wrap{
+  overflow:auto;border:1px solid var(--border);border-radius:var(--radius-lg);
+  max-height:calc(100vh - 310px);
+}
+table{border-collapse:collapse;width:100%;font-size:11px;font-family:var(--font-mono);}
+thead th{
+  position:sticky;top:0;background:var(--bg2);z-index:10;
+  padding:6px 4px;border-bottom:1px solid var(--border2);
+  font-weight:500;text-align:center;white-space:nowrap;color:var(--text2);
+}
+thead th.user-col{left:0;z-index:22;text-align:left;padding-left:10px;min-width:130px;font-family:var(--font-ui);font-size:11px;background:var(--bg2);}
+thead th.info-col{left:130px;z-index:21;min-width:72px;background:var(--bg2);}
+thead th.weekend{background:var(--bg3)!important;}
+tbody th.user-col{
+  position:sticky;left:0;z-index:6;background:var(--bg);
+  padding:5px 10px;border-right:1px solid var(--border);
+  font-weight:400;white-space:nowrap;min-width:130px;
+  font-family:var(--font-ui);font-size:11px;color:var(--text);
+}
+tbody td.info-col{
+  position:sticky;left:130px;z-index:5;background:var(--bg);
+  border-right:1px solid var(--border2);padding:3px 5px;min-width:72px;cursor:default;
+}
+tbody tr:hover th.user-col,tbody tr:hover td.info-col{background:var(--bg2);}
+tbody tr:hover td:not(.info-col){filter:brightness(1.08);}
+td{
+  padding:2px 2px;border:1px solid var(--border);
+  text-align:center;cursor:default;min-width:30px;color:var(--text2);
+}
+td.shift-d{background:var(--day-bg);color:var(--day-text);}
+td.shift-a{background:var(--aft-bg);color:var(--aft-text);}
+td.day-off{background:transparent;}
+td.weekend{background:var(--bg3)!important;}
+td.shift-d.weekend{background:#152239!important;}
+td.shift-a.weekend{background:#132b1c!important;}
+.day-hdr{font-size:9px;color:var(--text3);display:block;font-family:var(--font-ui);}
+
+.badge{display:inline-block;font-size:9px;font-family:var(--font-mono);padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap;}
+.b-sector{background:var(--sector-bg);color:var(--sector-text);border:1px solid var(--sector);}
+.b-station{background:var(--station-bg);color:var(--station-text);border:1px solid var(--station);}
+.b-unit{background:var(--unit-bg);color:var(--unit-text);border:1px solid var(--unit);}
+.meta-row{display:flex;gap:2px;flex-wrap:wrap;}
+
+.no-data{
+  text-align:center;padding:60px 20px;color:var(--text3);
+  font-family:var(--font-mono);font-size:13px;
+}
+.no-data .icon{font-size:40px;margin-bottom:14px;}
+.no-data strong{color:var(--text2);}
+
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap input{padding-left:28px;}
+.search-icon{position:absolute;left:9px;color:var(--text3);font-size:13px;pointer-events:none;}
+
+.my-shift-banner{
+  display:none;
+  margin-bottom:12px;padding:12px 16px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  font-size:12px;color:var(--text2);
+}
+.my-shift-banner.visible{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.my-shift-banner strong{color:var(--text);}
+
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <div class="app-logo">ROSTER</div>
+    <div class="app-sub">56-DAY SHIFT MANAGER &nbsp;<span style="background:#2a4a2e;color:var(--aft-text);font-size:9px;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);letter-spacing:1px;border:1px solid var(--aft);">VIEW ONLY</span></div>
+  </div>
+  <div class="header-right">
+    <div class="last-updated"><span class="dot"></span><span id="lastUpdated">—</span></div>
+    <button class="btn btn-accent btn-sm" onclick="refresh()">↻ Refresh</button>
+    <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search user…" style="width:140px;" oninput="buildBody()">
+    </div>
+    <select id="filterSector" onchange="buildBody()"><option value="">All sectors</option></select>
+    <select id="filterStation" onchange="buildBody()"><option value="">All stations</option></select>
+    <select id="filterUnit" onchange="buildBody()"><option value="">All units</option></select>
+    <select id="filterShift" onchange="buildBody()">
+      <option value="">All shifts</option>
+      <option value="D">Day only</option>
+      <option value="A">Afternoon only</option>
+      <option value="O">Off only</option>
+    </select>
+    <label style="font-size:11px;color:var(--text3);margin-left:auto;">
+      My name:
+      <input type="text" id="myName" placeholder="Type your name…" style="width:150px;" oninput="highlightMyRow()">
+    </label>
+  </div>
+
+  <div class="my-shift-banner" id="myBanner"></div>
+
+  <div class="legend">
+    <span><span class="leg-sq" style="background:var(--day-bg);border:1px solid var(--day);"></span>Day (D)</span>
+    <span><span class="leg-sq" style="background:var(--aft-bg);border:1px solid var(--aft);"></span>Afternoon (A)</span>
+    <span><span class="leg-sq" style="background:var(--bg3);border:1px solid var(--border2);"></span>Off</span>
+    <span style="margin-left:auto;font-size:10px;color:var(--text3);">Read-only view · Use the Admin file to make changes</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Users</div><div class="stat-val" id="s-users">—</div></div>
+    <div class="stat"><div class="stat-label">Day shifts</div><div class="stat-val" id="s-day" style="color:var(--day-text);">—</div></div>
+    <div class="stat"><div class="stat-label">Afternoon</div><div class="stat-val" id="s-aft" style="color:var(--aft-text);">—</div></div>
+    <div class="stat"><div class="stat-label">Days off</div><div class="stat-val" id="s-off">—</div></div>
+    <div class="stat"><div class="stat-label">Coverage</div><div class="stat-val" id="s-cov" style="color:var(--accent);">—</div></div>
+  </div>
+
+  <div id="noDataMsg" class="no-data" style="display:none;">
+    <div class="icon">📋</div>
+    <div><strong>No roster data found.</strong><br><br>
+    The admin hasn't saved any data yet, or you need to open<br>
+    both files from the same browser on the same device.</div>
+  </div>
+
+  <div class="roster-wrap" id="rosterWrap">
+    <table id="rosterTable">
+      <thead id="rosterHead"></thead>
+      <tbody id="rosterBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const DAYS=56,LABELS={O:'',D:'D',A:'A'};
+const STORAGE_KEY='roster_manager_v1';
+let users=[],roster={},sectors=[],stations=[],units=[],startDate=new Date();
+
+// ─── LOAD ────────────────────────────────────────────────────────────────────
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const p=JSON.parse(raw);
+    if(!p||p.version!==1)return false;
+    sectors=p.sectors||[];stations=p.stations||[];units=p.units||[];
+    users=p.users||[];roster=p.roster||{};
+    if(p.startDate)startDate=new Date(p.startDate);
+    if(p.savedAt){
+      const d=new Date(p.savedAt);
+      document.getElementById('lastUpdated').textContent=
+        'Updated '+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    }
+    return true;
+  }catch(e){return false;}
+}
+
+function refresh(){
+  const ok=loadData();
+  if(!ok){
+    document.getElementById('noDataMsg').style.display='block';
+    document.getElementById('rosterWrap').style.display='none';
+    document.getElementById('lastUpdated').textContent='No data found';
+    return;
+  }
+  document.getElementById('noDataMsg').style.display='none';
+  document.getElementById('rosterWrap').style.display='';
+  populateFilterSelects();
+  buildHead();buildBody();
+}
+
+// ─── SELECTS ─────────────────────────────────────────────────────────────────
+function populateFilterSelects(){
+  [['filterSector','sector',sectors],['filterStation','station',stations],['filterUnit','unit',units]].forEach(([id,type,list])=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=`<option value="">All ${type}s</option>`+list.map(v=>`<option value="${v}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+  });
+}
+
+// ─── HEAD ────────────────────────────────────────────────────────────────────
+function buildHead(){
+  const d=new Date(startDate);
+  let html='<tr><th class="user-col">User</th><th class="info-col" style="position:sticky;left:130px;z-index:21;background:var(--bg2);min-width:72px;">Info</th>';
+  for(let i=0;i<DAYS;i++){
+    const day=new Date(d);day.setDate(d.getDate()+i);
+    const wd=day.getDay(),isWe=wd===0||wd===6;
+    const lbl=day.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    const dn=day.toLocaleDateString('en-GB',{weekday:'short'});
+    html+=`<th class="${isWe?'weekend':''}" title="${lbl}"><span class="day-hdr">${dn}</span>${i+1}</th>`;
+  }
+  html+='</tr>';
+  document.getElementById('rosterHead').innerHTML=html;
+}
+
+// ─── BODY ────────────────────────────────────────────────────────────────────
+function getFiltered(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const fs=document.getElementById('filterSector').value;
+  const fst=document.getElementById('filterStation').value;
+  const fu=document.getElementById('filterUnit').value;
+  const fsh=document.getElementById('filterShift').value;
+  return users.filter(u=>{
+    if(search&&!u.name.toLowerCase().includes(search))return false;
+    if(fs&&u.sector!==fs)return false;
+    if(fst&&u.station!==fst)return false;
+    if(fu&&u.unit!==fu)return false;
+    if(fsh&&!roster[u.id]?.some(s=>s===fsh))return false;
+    return true;
+  });
+}
+
+function buildBody(){
+  const d=new Date(startDate);
+  const myName=document.getElementById('myName').value.trim().toLowerCase();
+  const filtered=getFiltered();
+  let html='';
+  filtered.forEach(u=>{
+    const isMe=myName&&u.name.toLowerCase().includes(myName);
+    const rowStyle=isMe?'background:var(--bg3);outline:1px solid var(--accent);':'';
+    html+=`<tr style="${rowStyle}">
+      <th class="user-col" style="${isMe?'color:var(--accent);font-weight:600;':''}">${esc(u.name)}</th>
+      <td class="info-col">
+        <div class="meta-row">
+          ${u.sector?`<span class="badge b-sector">${esc(u.sector)}</span>`:''}
+          ${u.station?`<span class="badge b-station">${esc(u.station)}</span>`:''}
+          ${u.unit?`<span class="badge b-unit">${esc(u.unit)}</span>`:''}
+        </div>
+      </td>`;
+    const shifts=roster[u.id]||Array(DAYS).fill('O');
+    for(let i=0;i<DAYS;i++){
+      const day=new Date(d);day.setDate(d.getDate()+i);
+      const wd=day.getDay(),isWe=wd===0||wd===6;
+      const s=shifts[i];
+      const cls=s==='D'?'shift-d':s==='A'?'shift-a':'day-off';
+      html+=`<td class="${cls}${isWe?' weekend':''}">${LABELS[s]}</td>`;
+    }
+    html+='</tr>';
+  });
+  document.getElementById('rosterBody').innerHTML=html;
+  updateStats(filtered);
+  highlightMyRow();
+}
+
+function updateStats(filtered){
+  let day=0,aft=0,off=0;
+  filtered.forEach(u=>{(roster[u.id]||[]).forEach(s=>{if(s==='D')day++;else if(s==='A')aft++;else off++;});});
+  const total=day+aft+off;
+  document.getElementById('s-users').textContent=filtered.length;
+  document.getElementById('s-day').textContent=day;
+  document.getElementById('s-aft').textContent=aft;
+  document.getElementById('s-off').textContent=off;
+  document.getElementById('s-cov').textContent=total?Math.round((day+aft)/total*100)+'%':'0%';
+}
+
+// ─── MY SHIFTS HIGHLIGHT ─────────────────────────────────────────────────────
+function highlightMyRow(){
+  const myName=document.getElementById('myName').value.trim().toLowerCase();
+  const banner=document.getElementById('myBanner');
+  if(!myName){banner.className='my-shift-banner';return;}
+  const me=users.find(u=>u.name.toLowerCase().includes(myName));
+  if(!me){banner.className='my-shift-banner';return;}
+
+  // Count upcoming shifts from today
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=new Date(startDate);
+  let nextDay=null,dayCount=0,aftCount=0,offCount=0;
+  const shifts=roster[me.id]||[];
+  for(let i=0;i<DAYS;i++){
+    const day=new Date(d);day.setDate(d.getDate()+i);
+    if(day<today)continue;
+    const s=shifts[i];
+    if(s==='D'){dayCount++;if(!nextDay)nextDay={date:day,shift:'Day'};}
+    else if(s==='A'){aftCount++;if(!nextDay)nextDay={date:day,shift:'Afternoon'};}
+    else offCount++;
+  }
+  const nextTxt=nextDay
+    ?`Next shift: <strong>${nextDay.shift}</strong> on <strong>${nextDay.date.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})}</strong> &nbsp;·&nbsp;`
+    :'No upcoming shifts &nbsp;·&nbsp;';
+  banner.innerHTML=`👤 <strong>${esc(me.name)}</strong> &nbsp;·&nbsp; ${nextTxt} Day: <strong>${dayCount}</strong> &nbsp;Afternoon: <strong>${aftCount}</strong> &nbsp;Off: <strong>${offCount}</strong>`;
+  banner.className='my-shift-banner visible';
+}
+
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function exportCSV(){
+  const d=new Date(startDate);
+  let csv='Name,Sector,Station,Unit';
+  for(let i=0;i<DAYS;i++){const dd=new Date(d);dd.setDate(d.getDate()+i);csv+=','+dd.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+  csv+='\n';
+  users.forEach(u=>{
+    csv+=`"${u.name}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
+    (roster[u.id]||[]).forEach(s=>csv+=','+s);csv+='\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='roster_view.csv';a.click();
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+refresh();
+</script>
+</body>
+</html>
