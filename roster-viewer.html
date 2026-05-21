@@ -78,7 +78,7 @@ tbody tr:hover th.uc,tbody tr:hover td.ic{background:#eff3ff}
 tbody tr.myrow th.uc{color:var(--accent);font-weight:700}
 tbody tr.myrow td,tbody tr.myrow th.uc,tbody tr.myrow td.ic{background:#eff6ff!important}
 tbody tr.myrow{outline:1px solid #bfdbfe}
-td{padding:1px 2px;border:1px solid var(--border);text-align:center;cursor:default;min-width:34px}
+td{border:1px solid var(--border);text-align:center;cursor:default;min-width:46px;vertical-align:middle}
 td.sd{background:var(--d-bg);color:var(--d-t);font-weight:600}
 td.sa{background:var(--a-bg);color:var(--a-t);font-weight:600}
 td.srd{background:var(--rd-bg);color:var(--rd-t);font-weight:600}
@@ -89,7 +89,11 @@ td.sd.we{background:#bfdbfe!important}
 td.sa.we{background:#bbf7d0!important}
 td.srd.we{background:#fef08a!important}
 td.sal.we{background:#fbcfe8!important}
-.dhdr{font-size:9px;color:var(--text3);display:block;font-family:var(--ui)}
+.dhdr-num{display:block;font-size:11px;font-weight:700;color:var(--text);line-height:1.2}
+.dhdr-date{display:block;font-size:9px;color:var(--text3);font-family:var(--ui);white-space:nowrap;line-height:1.2}
+thead th.we .dhdr-num,thead th.we .dhdr-date{color:var(--text3)}
+.cell-shift{display:block;font-size:11px;font-weight:700;line-height:1.3}
+.cell-date{display:block;font-size:9px;font-family:var(--ui);opacity:.75;line-height:1.2;white-space:nowrap}
 .badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap}
 .bsec{background:var(--sbg);color:var(--st);border:1px solid var(--sb)}
 .bsta{background:var(--stbg);color:var(--stt);border:1px solid var(--stb)}
@@ -302,8 +306,11 @@ function buildHead(){
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
     const we=d.getDay()===0||d.getDay()===6;
-    h+=`<th class="${we?'we':''}" title="${d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}">
-      <span class="dhdr">${d.toLocaleDateString('en-GB',{weekday:'short'})}</span>${i+1}</th>`;
+    const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    h+=`<th class="${we?'we':''}" title="${dateStr}">`
+      +`<span class="dhdr-num">${i+1}</span>`
+      +`<span class="dhdr-date">${dateStr}</span>`
+      +`</th>`;
   }
   document.getElementById('rHead').innerHTML=h+'</tr>';
 }
@@ -343,7 +350,11 @@ function buildBody(){
       const d=new Date(base);d.setDate(base.getDate()+i);
       const we=d.getDay()===0||d.getDay()===6;
       const s=shifts[i]||'OFF';
-      h+=`<td class="${CLS[s]}${we?' we':''}">${LBL[s]}</td>`;
+      const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+      h+=`<td class="${CLS[s]}${we?' we':''}">`
+        +(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+        +`<span class="cell-date">${dateStr}</span>`
+        +`</td>`;
     }
     h+='</tr>';
   });
