@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:59:10.586Z",
+  "savedAt": "2026-05-21T05:59:55.816Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -103,9 +103,9 @@
     {
       "id": "u9",
       "name": "Ala a KHLEIF",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "SECTOR 1",
+      "station": "Linou",
+      "unit": "S1-LINOU-A",
       "defaultShift": "OFF"
     },
     {
