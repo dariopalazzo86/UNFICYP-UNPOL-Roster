@@ -4184,5 +4184,39 @@
       "OFF",
       "OFF"
     ]
-  }
+  },
+  "shiftDefs": [
+    {
+      "key": "D",
+      "label": "D",
+      "name": "Day",
+      "bg": "#dbeafe",
+      "fg": "#1e40af",
+      "border": "#93c5fd"
+    },
+    {
+      "key": "A",
+      "label": "A",
+      "name": "Afternoon",
+      "bg": "#dcfce7",
+      "fg": "#166534",
+      "border": "#86efac"
+    },
+    {
+      "key": "RD",
+      "label": "RD",
+      "name": "Rest Day",
+      "bg": "#fef9c3",
+      "fg": "#854d0e",
+      "border": "#fde047"
+    },
+    {
+      "key": "AL",
+      "label": "AL",
+      "name": "Annual Leave",
+      "bg": "#fce7f3",
+      "fg": "#9d174d",
+      "border": "#f9a8d4"
+    }
+  ]
 }
