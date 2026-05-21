@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T11:21:47.373Z",
+  "savedAt": "2026-05-21T11:32:20.825Z",
   "startDate": "2026-07-01",
   "sectors": [
     "SECTOR 1",
@@ -4203,20 +4203,20 @@
       "border": "#111212"
     },
     {
-      "key": "RD",
-      "label": "RD",
-      "name": "Rest Day",
-      "bg": "#fef9c3",
-      "fg": "#854d0e",
-      "border": "#fde047"
-    },
-    {
       "key": "AL",
       "label": "AL",
       "name": "Annual Leave",
       "bg": "#25cb30",
       "fg": "#222021",
       "border": "#222021"
+    },
+    {
+      "key": "RD",
+      "label": "RD",
+      "name": "Rest Day",
+      "bg": "#fef9c3",
+      "fg": "#854d0e",
+      "border": "#fde047"
     },
     {
       "key": "S2619",
