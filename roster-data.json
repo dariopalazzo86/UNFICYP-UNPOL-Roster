@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:55:31.248Z",
+  "savedAt": "2026-05-21T05:55:46.368Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -39,9 +39,9 @@
     {
       "id": "u1",
       "name": "Maja SMAJLOVIC",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
