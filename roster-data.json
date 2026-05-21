@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T06:00:26.265Z",
+  "savedAt": "2026-05-21T06:00:53.899Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -111,9 +111,9 @@
     {
       "id": "u10",
       "name": "Bodha REGMI",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "SECTOR 1",
+      "station": "Dhenia",
+      "unit": "S1-DHENIA-A",
       "defaultShift": "OFF"
     },
     {
