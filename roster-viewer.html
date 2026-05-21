@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Roster — Viewer</title>
+<title>UNPOL Roster — Viewer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -152,7 +152,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <header>
   <div>
-    <div class="logo">ROSTER MANAGER</div>
+    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
     <div class="sub" id="repoLabel">Not configured — fill in setup above</div>
   </div>
   <div class="hright">
@@ -166,7 +166,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <main>
   <div class="toolbar">
-    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
+    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
     <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
     <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
     <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
@@ -193,7 +193,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
+    <div class="stat"><div class="slbl">IPOs</div><div class="sval" id="su">—</div></div>
     <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
     <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
     <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
@@ -301,7 +301,7 @@ function populateSelects(){
 
 function buildHead(){
   const base=new Date(startDate);
-  let h='<tr><th class="uc">User</th>'
+  let h='<tr><th class="uc">IPO Name</th>'
     +'<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:78px;text-align:center">Info</th>';
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
