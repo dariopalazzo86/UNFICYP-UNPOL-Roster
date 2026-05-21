@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:22:15.797Z",
+  "savedAt": "2026-05-21T09:22:28.223Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -125,7 +125,7 @@
       "station": "Dhenia",
       "unit": "S1-DHENIA-A",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Nepal"
     },
     {
       "id": "u11",
