@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:55:46.368Z",
+  "savedAt": "2026-05-21T05:58:26.248Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -39,7 +39,7 @@
     {
       "id": "u1",
       "name": "Maja SMAJLOVIC",
-        "sector": "HQ",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -47,7 +47,7 @@
     {
       "id": "u2",
       "name": "Heiko TROSS",
-       "sector": "HQ",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -55,7 +55,7 @@
     {
       "id": "u3",
       "name": "Edoardo PETRONCINI",
-       "sector": "HQ",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -63,15 +63,15 @@
     {
       "id": "u4",
       "name": "Aoife REILLY",
-       "sector": "HQ",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u5",
-       "name": "Raghu BISHT",
-       "sector": "HQ",
+      "name": "Raghu BISHT",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -87,7 +87,7 @@
     {
       "id": "u7",
       "name": "Indri WIDIASIH",
-     "sector": "HQ",
+      "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -519,7 +519,7 @@
   ],
   "roster": {
     "u0": [
-      "D",
+      "OFF",
       "D",
       "OFF",
       "OFF",
