@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:21:12.399Z",
+  "savedAt": "2026-05-21T10:21:47.799Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4233,6 +4233,14 @@
       "bg": "#2a9ae5",
       "fg": "#f0f3f5",
       "border": "#f0f3f5"
+    },
+    {
+      "key": "S6394",
+      "label": "S6394",
+      "name": "New Shift",
+      "bg": "#e0f2fe",
+      "fg": "#075985",
+      "border": "#7dd3fc"
     }
   ]
 }
