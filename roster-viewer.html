@@ -124,7 +124,8 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <div class="hright">
     <div class="upd"><span class="udot"></span><span id="updlbl">Loading…</span></div>
     <button class="btn sm acc" onclick="loadAndRender()">↻ Refresh</button>
-    <button class="btn sm" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn sm" onclick="exportCSV()" title="Exports only the users and shifts visible with current filters">⬇ CSV</button>
+    <button class="btn sm" onclick="exportImage()" title="Export current filtered grid as PNG image">🖼 PNG</button>
     <span class="rbadge">VIEW ONLY</span>
   </div>
 </header>
@@ -385,16 +386,107 @@ function updateMyBanner(myname){
 }
 
 function exportCSV(){
-  const base=new Date(startDate); let csv='Name,Sector,Station,Unit';
-  for(let i=0;i<DAYS;i++){const d=new Date(base);d.setDate(base.getDate()+i);csv+=','+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+  const base=new Date(startDate);
+  const list=filtered(); // respects all active filters
+  const fShift=document.getElementById('fShift').value;
+
+  let csv='Name,Nationality,Sector,Station,Unit';
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(base);d.setDate(base.getDate()+i);
+    csv+=',Day '+(i+1)+' ('+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+')';
+  }
   csv+='\n';
-  users.forEach(u=>{
-    csv+=`"${u.name}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
-    (roster[u.id]||[]).forEach(s=>csv+=','+s); csv+='\n';
+
+  list.forEach(u=>{
+    const shifts=roster[u.id]||Array(DAYS).fill('OFF');
+    csv+=`"${u.name}","${u.nationality||''}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
+    shifts.forEach(s=>{ csv+=','+(s==='OFF'?'Off':(_NAME[s]||s)); });
+    csv+='\n';
   });
+
+  // descriptive filename
+  const parts=['roster'];
+  const secF=document.getElementById('fSec').value;
+  const staF=document.getElementById('fSta').value;
+  const uniF=document.getElementById('fUni').value;
+  const natF=document.getElementById('fNat').value;
+  if(secF)parts.push(secF.replace(/\s+/g,'_'));
+  if(staF)parts.push(staF.replace(/\s+/g,'_'));
+  if(uniF)parts.push(uniF.replace(/\s+/g,'_'));
+  if(natF)parts.push(natF.replace(/\s+/g,'_'));
+  if(fShift)parts.push(fShift);
+  if(list.length!==users.length)parts.push(list.length+'users');
+  parts.push(base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/\s/g,''));
+  const filename=parts.join('_')+'.csv';
+
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='roster_view.csv'; a.click();
+  a.download=filename; a.click();
+}
+
+function exportImage(){
+  const list=filtered();
+  if(!list.length){alert('No users to export with current filters.');return;}
+  const base=new Date(startDate);
+  const SCALE=2,ROW_H=28,HEAD_H=44,NAME_W=160,INFO_W=80,DAY_W=46,PAD=4,TITLE_H=36,LEGEND_H=26;
+  const totalW=NAME_W+INFO_W+DAY_W*DAYS;
+  const totalH=TITLE_H+LEGEND_H+HEAD_H+ROW_H*list.length+2;
+  const canvas=document.createElement('canvas');
+  canvas.width=totalW*SCALE;canvas.height=totalH*SCALE;
+  const ctx=canvas.getContext('2d');ctx.scale(SCALE,SCALE);
+  const BG2='#ffffff',BORDER='#dde2ec',TEXT='#1a1f36',TEXT2='#4a5170',TEXT3='#8890aa',WE_BG='#f1f5f9',ACCENT='#3b5bdb';
+  function fillRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h);}
+  function strokeLine(x1,y1,x2,y2){ctx.strokeStyle=BORDER;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+  function txt(s,x,y,{font='12px Inter,sans-serif',color=TEXT,align='left',maxW}={}){ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='middle';if(maxW)ctx.fillText(s,x,y,maxW);else ctx.fillText(s,x,y);}
+  // title
+  fillRect(0,0,totalW,TITLE_H,ACCENT);
+  const parts=['ROSTER'];
+  const secF=document.getElementById('fSec').value,staF=document.getElementById('fSta').value;
+  const uniF=document.getElementById('fUni').value,natF=document.getElementById('fNat').value;
+  const shF=document.getElementById('fShift').value;
+  if(secF)parts.push(secF);if(staF)parts.push(staF);if(uniF)parts.push(uniF);if(natF)parts.push(natF);
+  if(shF)parts.push(_NAME[shF]||shF);
+  txt(parts.join(' · ')+' — '+base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' ('+list.length+' users)',12,TITLE_H/2,{font:'bold 13px Inter,sans-serif',color:'#fff'});
+  // legend
+  fillRect(0,TITLE_H,totalW,LEGEND_H,'#eef1f6');strokeLine(0,TITLE_H+LEGEND_H-.25,totalW,TITLE_H+LEGEND_H-.25);
+  let lx=10;
+  shiftDefs.forEach(s=>{fillRect(lx,TITLE_H+7,12,12,s.bg);ctx.strokeStyle=s.border;ctx.lineWidth=.5;ctx.strokeRect(lx+.25,TITLE_H+7.25,11.5,11.5);txt(s.label+' = '+s.name,lx+16,TITLE_H+LEGEND_H/2,{font:'10px Inter,sans-serif',color:TEXT2});lx+=ctx.measureText(s.label+' = '+s.name).width+30;});
+  fillRect(lx,TITLE_H+7,12,12,'#f8fafc');ctx.strokeStyle='#e2e8f0';ctx.lineWidth=.5;ctx.strokeRect(lx+.25,TITLE_H+7.25,11.5,11.5);txt('Off',lx+16,TITLE_H+LEGEND_H/2,{font:'10px Inter,sans-serif',color:TEXT3});
+  // header
+  const hy=TITLE_H+LEGEND_H;fillRect(0,hy,totalW,HEAD_H,'#f8f9fc');strokeLine(0,hy+HEAD_H-.25,totalW,hy+HEAD_H-.25);
+  txt('User',PAD+4,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2});
+  txt('Info',NAME_W+INFO_W/2,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2,align:'center'});
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(base);d.setDate(base.getDate()+i);const isWe=d.getDay()===0||d.getDay()===6;
+    const cx=NAME_W+INFO_W+i*DAY_W;if(isWe)fillRect(cx,hy,DAY_W,HEAD_H,WE_BG);
+    txt(String(i+1),cx+DAY_W/2,hy+11,{font:'bold 10px Inter,sans-serif',color:isWe?TEXT3:TEXT2,align:'center'});
+    txt(d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),cx+DAY_W/2,hy+27,{font:'9px Inter,sans-serif',color:TEXT3,align:'center'});
+    strokeLine(cx-.25,hy,cx-.25,hy+HEAD_H);
+  }
+  [NAME_W,NAME_W+INFO_W].forEach(x=>strokeLine(x-.25,hy,x-.25,hy+HEAD_H));
+  // rows
+  list.forEach((u,ri)=>{
+    const ry=TITLE_H+LEGEND_H+HEAD_H+ri*ROW_H;const rowBg=ri%2===0?BG2:'#f7f9fc';
+    fillRect(0,ry,totalW,ROW_H,rowBg);
+    txt(u.name,PAD+4,ry+ROW_H/2,{font:'500 11px Inter,sans-serif',color:TEXT,maxW:NAME_W-8});
+    txt([u.sector,u.station,u.unit].filter(Boolean).join(' · '),NAME_W+4,ry+ROW_H/2,{font:'9px Inter,sans-serif',color:TEXT3,maxW:INFO_W-6});
+    const shifts=roster[u.id]||Array(DAYS).fill('OFF');
+    for(let i=0;i<DAYS;i++){
+      const d=new Date(base);d.setDate(base.getDate()+i);const isWe=d.getDay()===0||d.getDay()===6;
+      const s=shifts[i]||'OFF';const cx=NAME_W+INFO_W+i*DAY_W;
+      const def=shiftDefs.find(x=>x.key===s);
+      fillRect(cx,ry,DAY_W,ROW_H,def?(isWe?def.bg+'cc':def.bg):(isWe?WE_BG:rowBg));
+      if(def)txt(def.label,cx+DAY_W/2,ry+ROW_H/2,{font:'bold 10px "DM Mono",monospace',color:def.fg,align:'center'});
+      strokeLine(cx-.25,ry,cx-.25,ry+ROW_H);
+    }
+    strokeLine(0,ry+ROW_H-.25,totalW,ry+ROW_H-.25);
+    [NAME_W,NAME_W+INFO_W].forEach(x=>strokeLine(x-.25,ry,x-.25,ry+ROW_H));
+  });
+  ctx.strokeStyle='#c8d0e0';ctx.lineWidth=1;ctx.strokeRect(.5,TITLE_H+.5,totalW-1,totalH-TITLE_H-1);
+  const fname=['roster_img'];
+  if(secF)fname.push(secF.replace(/\s+/g,'_'));if(natF)fname.push(natF.replace(/\s+/g,'_'));if(shF)fname.push(shF);
+  fname.push(base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/\s/g,''));
+  const link=document.createElement('a');link.download=fname.join('_')+'.png';link.href=canvas.toDataURL('image/png');link.click();
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
