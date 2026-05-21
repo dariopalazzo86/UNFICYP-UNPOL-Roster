@@ -60,7 +60,7 @@ nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);pad
 .tab{font-size:12px;font-weight:600;letter-spacing:.3px;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);white-space:nowrap;transition:color .15s,border-color .15s}
 .tab:hover{color:var(--text2)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 /* MAIN */
-main{flex:1;padding:14px 20px;overflow:hidden}
+main{flex:1;padding:14px 20px;overflow-x:hidden;overflow-y:auto}
 .panel{display:none}.panel.active{display:block}
 /* TOOLBAR */
 .toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:11px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh)}
@@ -131,7 +131,7 @@ td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:cross
 td.sel{outline:2px solid var(--accent)!important;outline-offset:-2px;z-index:3}
 td.paste-target{outline:2px dashed #16a34a!important;outline-offset:-2px;z-index:3}
 /* CORNER FILL HANDLE — Excel-style */
-td[data-uid]{position:relative;overflow:visible}
+td[data-uid]{position:relative}
 .cell-handle{
   position:absolute;bottom:-3px;right:-3px;
   width:7px;height:7px;
