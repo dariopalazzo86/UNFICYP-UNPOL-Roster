@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:41:16.779Z",
+  "savedAt": "2026-05-21T09:41:31.594Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -463,11 +463,11 @@
     {
       "id": "u48",
       "name": "Wihelmina MANAFE",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 4",
+      "station": "Pyla",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Indonesia"
     },
     {
       "id": "u49",
