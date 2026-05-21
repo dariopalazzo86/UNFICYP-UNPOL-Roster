@@ -137,8 +137,8 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 <main>
   <div class="toolbar">
     <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
-    <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
-    <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
+    <select id="fSec" onchange="cascadeFilters();buildBody()"><option value="">All sectors</option></select>
+    <select id="fSta" onchange="cascadeFilters();buildBody()"><option value="">All stations</option></select>
     <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
     <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
     <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
@@ -249,18 +249,49 @@ async function loadAndRender(){
 
 
 function populateSelects(){
-  [['fSec','sector',sectors],['fSta','station',stations],['fUni','unit',units]].forEach(([id,type,list])=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value;
-    el.innerHTML=`<option value="">All ${type}s</option>`
-      +list.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
-  });
+  // sector — always full list
+  const fSec=document.getElementById('fSec');
+  if(fSec){
+    const cur=fSec.value;
+    fSec.innerHTML='<option value="">All sectors</option>'
+      +sectors.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+  }
+  cascadeFilters();
+  // nationality — only used
   const fNat=document.getElementById('fNat');
   if(fNat){
     const cur=fNat.value;
     const usedNats=[...new Set(users.map(u=>u.nationality).filter(Boolean))].sort();
     fNat.innerHTML='<option value="">All nationalities'+(usedNats.length?` (${usedNats.length})`:'')+'</option>'
       +usedNats.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
+  }
+}
+
+function cascadeFilters(){
+  const selSec=document.getElementById('fSec')?.value||'';
+  const selSta=document.getElementById('fSta')?.value||'';
+
+  // stations filtered by sector
+  const availStations=[...new Set(
+    users.filter(u=>!selSec||u.sector===selSec).map(u=>u.station).filter(Boolean)
+  )].sort();
+  const staEl=document.getElementById('fSta');
+  if(staEl){
+    const curSta=availStations.includes(staEl.value)?staEl.value:'';
+    staEl.innerHTML='<option value="">All stations</option>'
+      +availStations.map(v=>`<option value="${esc(v)}"${v===curSta?' selected':''}>${esc(v)}</option>`).join('');
+  }
+
+  // units filtered by sector + station
+  const availUnits=[...new Set(
+    users.filter(u=>(!selSec||u.sector===selSec)&&(!selSta||u.station===selSta))
+         .map(u=>u.unit).filter(Boolean)
+  )].sort();
+  const uniEl=document.getElementById('fUni');
+  if(uniEl){
+    const curUni=availUnits.includes(uniEl.value)?uniEl.value:'';
+    uniEl.innerHTML='<option value="">All units</option>'
+      +availUnits.map(v=>`<option value="${esc(v)}"${v===curUni?' selected':''}>${esc(v)}</option>`).join('');
   }
 }
 
