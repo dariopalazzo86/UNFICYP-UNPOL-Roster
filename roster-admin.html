@@ -1167,7 +1167,7 @@ function saveUser(){
   const nationality=document.getElementById('mNat').value;
   const ds=document.getElementById('mShift').value;
   if(editUID){ Object.assign(users.find(x=>x.id===editUID),{name,sector,station,unit,nationality,defaultShift:ds}); }
-  else { const id='u'+Date.now(); users.push({id,name,sector,station,unit,nationality,defaultShift:ds}); roster[id]=Array(DAYS).fill(ds); }
+  else { const id='u'+Date.now(); users.push({id,name,sector,station,unit,nationality,defaultShift:ds}); roster[id]=makeRoster(ds); }
   closeModal(); populateSelects(); buildUsers(); buildBody(); queueSave();
 }
 function delUser(id){
@@ -1390,6 +1390,21 @@ function exportImage(){
   link.click();
 }
 
+/* ── WEEKEND RD HELPER ─────────────────────────────────────────────
+   Returns a 56-element array pre-filled with RD on Sat/Sun,
+   and the user's defaultShift (or OFF) on all other days.
+   If the shiftDefs don't include RD, falls back to OFF for weekends. */
+function makeRoster(defaultShift){
+  const base = new Date(startDate);
+  const hasRD = shiftDefs.some(s=>s.key==='RD');
+  return Array.from({length:DAYS}, (_,i)=>{
+    const d = new Date(base); d.setDate(base.getDate()+i);
+    const wd = d.getDay();
+    if((wd===0||wd===6) && hasRD) return 'RD';
+    return defaultShift||'OFF';
+  });
+}
+
 function getDefaultUsers(){
   const FN=['Paul','Maja','Heiko','Edoardo','Aoife','Raghu','Dragan','Indri','Anisa','Ala a','Bodha','Surakshya','Ahlam','Nikola','Jack','Davor','Ivana','Stella','Yulia','Andrey','Rami','Li','Benny','Jani Matti','Richard','Susanna Maria','Alexander','Yu','Linda','Nebojsa','Niko','Dragan','Gandhi','Nenad','Libna','Gerhard','Darren','Nicole','Bojan','Dubravka','Graham','Timothy','Gavin','Lenka','Simone','Jozef','Carmen','Wihelmina','Ujjwal','Mary','Vladimir','Lubica','Edin','Brian','Paul','Ala a','Mutya','Yue','Siobhan','Amela','Jonathan'];
   const LN=['SLATTERY','SMAJLOVIC','TROSS','PETRONCINI','REILLY','BISHT','NOVAKOVIC','WIDIASIH','PASIC','KHLEIF','REGMI','K.C.','AL-HABAHBEH','NUNIC','CAGNEY','MLAKIC','MARKOVIC','WASTINI','LOSAPIO','CHERKASHINA','RODIN','ABABNEH','ZHANG','SARAGIH','HYYTIAEINEN','DALY','TUURAS','LYUBCHICH','ZHOU','CRENNAN','GRUJIC','HEIMOLINNA','KULIC','SUGIARTO','DURIC','SHABRINA','VOELKEL','MC CARTHY','BARTH','FILIPOVIC','SIMIC','DESMOND','CASEY','FLEET','REKEMOVA','CALIRI','SLIACKY','CICERELLI','MANAFE','THAPA','DORGAN','KURAMSHIN','HIRKOVA','SABANAGIC','MOORE','KILCOYNE','AL-HANAITY','ZAHARI','ZHOU','MAHER','PITA','PLUNKETT'];
@@ -1405,7 +1420,7 @@ function resetData(){
   sectors=[]; stations=[]; units=[];
   users=getDefaultUsers();
   roster={};
-  users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
+  users.forEach(u=>{roster[u.id]=makeRoster(u.defaultShift);});
   const t=new Date(); startDate=t;
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
   populateSelects(); buildShiftUI(); buildHead(); buildBody(); queueSave();
@@ -1442,7 +1457,7 @@ async function init(){
 
   // pre-populate default users in memory (will be overwritten after login loads data)
   users=getDefaultUsers();
-  users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
+  users.forEach(u=>{roster[u.id]=makeRoster(u.defaultShift);});
   populateSelects(); buildShiftUI(); buildHead(); buildBody();
 
   document.getElementById('loginScreen').style.display='flex';
