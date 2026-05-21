@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:18:17.473Z",
+  "savedAt": "2026-05-21T10:18:29.022Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4198,9 +4198,9 @@
       "key": "A",
       "label": "A",
       "name": "Afternoon",
-      "bg": "#02fce7",
+      "bg": "#dafce7",
       "fg": "#166534",
-      "border": "#02fce7"
+      "border": "#dafce7"
     },
     {
       "key": "RD",
