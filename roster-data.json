@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:25:02.800Z",
+  "savedAt": "2026-05-21T09:25:16.714Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -202,11 +202,11 @@
     {
       "id": "u19",
       "name": "Yulia CHERKASHINA",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 1",
+      "station": "Linou",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Russia"
     },
     {
       "id": "u20",
