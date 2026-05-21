@@ -1,11 +1,12 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:51:31.367Z",
+  "savedAt": "2026-05-21T05:51:32.840Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
     "SECTOR 2",
-    "SECTOR 4"
+    "SECTOR 4",
+    "HQ"
   ],
   "stations": [],
   "units": [],
