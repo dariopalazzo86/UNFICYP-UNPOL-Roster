@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>UNPOL Roster — Viewer</title>
+<title>Roster — Viewer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -114,50 +114,14 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 </head>
 <body>
 
-<!-- SETUP BANNER -->
-<div class="setup-banner" id="setupBanner">
-  <h2>⚙️ One-time Setup — Enter your GitHub repository details</h2>
-  <div class="setup-grid">
-    <div class="setup-field">
-      <label>GitHub Username</label>
-      <input type="text" id="cfgOwner" placeholder="e.g. johndoe">
-      <span class="setup-hint">Your GitHub username</span>
-    </div>
-    <div class="setup-field">
-      <label>Repository Name</label>
-      <input type="text" id="cfgRepo" placeholder="e.g. my-roster">
-      <span class="setup-hint">The repo where the files are hosted</span>
-    </div>
-    <div class="setup-field">
-      <label>Branch (usually main)</label>
-      <input type="text" id="cfgBranch" placeholder="main">
-      <span class="setup-hint">The branch where roster-data.json is saved</span>
-    </div>
-    <div class="setup-field">
-      <label>Data file path</label>
-      <input type="text" id="cfgPath" placeholder="roster-data.json">
-      <span class="setup-hint">Path to the JSON file in the repo</span>
-    </div>
-  </div>
-  <div class="setup-actions">
-    <button class="btn acc" onclick="saveViewerConfig()">💾 Save &amp; Load</button>
-    <button class="btn sm" onclick="toggleSetup()">Hide setup</button>
-    <span class="setup-status" id="setupStatus"></span>
-  </div>
-  <p style="margin-top:10px;font-size:11px;color:var(--text3)">
-    ℹ️ The viewer reads data from the <strong>public</strong> raw GitHub URL — no token needed.<br>
-    Make sure your repository is <strong>public</strong>, or the data file is accessible.
-  </p>
-</div>
 
 <header>
   <div>
-    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
-    <div class="sub" id="repoLabel">Not configured — fill in setup above</div>
+    <div class="logo">ROSTER MANAGER</div>
+    <div class="sub" id="repoLabel">56-day shift planner</div>
   </div>
   <div class="hright">
-    <div class="upd"><span class="udot"></span><span id="updlbl">—</span></div>
-    <button class="btn sm" onclick="toggleSetup()">⚙️ Setup</button>
+    <div class="upd"><span class="udot"></span><span id="updlbl">Loading…</span></div>
     <button class="btn sm acc" onclick="loadAndRender()">↻ Refresh</button>
     <button class="btn sm" onclick="exportCSV()">⬇ CSV</button>
     <span class="rbadge">VIEW ONLY</span>
@@ -166,7 +130,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <main>
   <div class="toolbar">
-    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
+    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
     <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
     <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
     <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
@@ -193,7 +157,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="slbl">IPOs</div><div class="sval" id="su">—</div></div>
+    <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
     <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
     <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
     <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
@@ -217,52 +181,43 @@ const DAYS=56;
 const CLS={D:'sd',A:'sa',RD:'srd',AL:'sal',OFF:'sof'};
 const LBL={D:'D',A:'A',RD:'RD',AL:'AL',OFF:''};
 const NAME={D:'Day',A:'Afternoon',RD:'Rest Day',AL:'Annual Leave',OFF:'Off'};
-const LS_CFG='roster_viewer_config';
 
 let users=[], roster={}, sectors=[], stations=[], units=[];
 let startDate=new Date();
+let appConfig=null;
 
-function loadConfig(){ try{return JSON.parse(localStorage.getItem(LS_CFG))||{};}catch(e){return{};} }
-function saveViewerConfig(){
-  const cfg={
-    owner:document.getElementById('cfgOwner').value.trim(),
-    repo:document.getElementById('cfgRepo').value.trim(),
-    branch:document.getElementById('cfgBranch').value.trim()||'main',
-    path:document.getElementById('cfgPath').value.trim()||'roster-data.json'
-  };
-  if(!cfg.owner||!cfg.repo){
-    document.getElementById('setupStatus').textContent='⚠️ Fill in username and repo.';
-    document.getElementById('setupStatus').style.color='#d97706'; return;
-  }
-  localStorage.setItem(LS_CFG,JSON.stringify(cfg));
-  document.getElementById('repoLabel').textContent=cfg.owner+'/'+cfg.repo+' · '+cfg.path;
-  document.getElementById('setupStatus').textContent='✔ Saved — loading…';
-  document.getElementById('setupStatus').style.color='#16a34a';
-  loadAndRender();
-}
-function toggleSetup(){
-  const b=document.getElementById('setupBanner');
-  b.style.display=b.style.display==='none'?'':'none';
+async function fetchConfig(){
+  try{
+    const r=await fetch('./config.json?t='+Date.now());
+    if(r.ok){ appConfig=await r.json(); return true; }
+  }catch(e){}
+  return false;
 }
 
-/* raw GitHub URL — no token needed for public repos */
-function rawUrl(cfg){
-  return `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch||'main'}/${cfg.path||'roster-data.json'}`;
+function rawUrl(){
+  if(!appConfig) return null;
+  return `https://raw.githubusercontent.com/${appConfig.owner}/${appConfig.repo}/${appConfig.branch||'main'}/${appConfig.dataPath||'roster-data.json'}`;
 }
 
 async function loadAndRender(){
-  const cfg=loadConfig();
-  if(!cfg.owner||!cfg.repo){
-    document.getElementById('nodata').classList.add('show');
-    document.getElementById('twrap').style.display='none';
-    document.getElementById('updlbl').textContent='Not configured';
-    return;
+  if(!appConfig){
+    const ok=await fetchConfig();
+    if(!ok||!appConfig){
+      document.getElementById('nodata').classList.add('show');
+      document.getElementById('twrap').style.display='none';
+      document.getElementById('updlbl').textContent='Error: config.json not found';
+      document.getElementById('nodata').innerHTML=
+        `<div class="ico">⚠️</div><strong>Could not load config.json.</strong><br><br>`+
+        `Make sure config.json is in your repo root and the site is deployed on GitHub Pages.`;
+      return;
+    }
   }
   document.getElementById('updlbl').textContent='Loading…';
+  document.getElementById('repoLabel').textContent=
+    (appConfig.owner||'?')+'/'+(appConfig.repo||'?')+' · '+(appConfig.dataPath||'roster-data.json');
   try{
-    // cache-bust so we always get the latest version
-    const r=await fetch(rawUrl(cfg)+'?t='+Date.now());
-    if(!r.ok) throw new Error('HTTP '+r.status+(r.status===404?' — file not found (has admin saved yet?)':''));
+    const r=await fetch(rawUrl()+'?t='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status+(r.status===404?' — admin has not saved yet':''));
     const p=await r.json();
     sectors=p.sectors||[]; stations=p.stations||[];
     units=p.units||[]; users=p.users||[]; roster=p.roster||{};
@@ -275,20 +230,17 @@ async function loadAndRender(){
     }
     document.getElementById('nodata').classList.remove('show');
     document.getElementById('twrap').style.display='';
-    document.getElementById('repoLabel').textContent=cfg.owner+'/'+cfg.repo+' · '+cfg.path;
-    document.getElementById('setupBanner').style.display='none';
     populateSelects(); buildHead(); buildBody();
   }catch(e){
     document.getElementById('nodata').classList.add('show');
     document.getElementById('twrap').style.display='none';
     document.getElementById('updlbl').textContent='Error: '+e.message;
     document.getElementById('nodata').innerHTML=
-      `<div class="ico">⚠️</div><strong>Could not load data.</strong><br><br>${e.message}<br><br>`+
-      `Make sure:<br>• The repository is <strong>public</strong><br>`+
-      `• The admin has saved at least once<br>`+
-      `• The username, repo and branch are correct`;
+      `<div class="ico">⚠️</div><strong>Could not load roster data.</strong><br><br>${esc(e.message)}<br><br>`+
+      `Make sure the repository is <strong>public</strong> and the admin has saved at least once.`;
   }
 }
+
 
 function populateSelects(){
   [['fSec','sector',sectors],['fSta','station',stations],['fUni','unit',units]].forEach(([id,type,list])=>{
@@ -301,7 +253,7 @@ function populateSelects(){
 
 function buildHead(){
   const base=new Date(startDate);
-  let h='<tr><th class="uc">IPO Name</th>'
+  let h='<tr><th class="uc">User</th>'
     +'<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:78px;text-align:center">Info</th>';
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
@@ -420,18 +372,7 @@ function exportCSV(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // pre-fill form and auto-load on start
-(function init(){
-  const cfg=loadConfig();
-  if(cfg.owner) document.getElementById('cfgOwner').value=cfg.owner;
-  if(cfg.repo)  document.getElementById('cfgRepo').value=cfg.repo;
-  document.getElementById('cfgBranch').value=cfg.branch||'main';
-  document.getElementById('cfgPath').value=cfg.path||'roster-data.json';
-  if(cfg.owner&&cfg.repo){
-    document.getElementById('repoLabel').textContent=cfg.owner+'/'+cfg.repo+' · '+(cfg.path||'roster-data.json');
-    document.getElementById('setupBanner').style.display='none';
-    loadAndRender();
-  }
-})();
+loadAndRender();
 </script>
 </body>
 </html>
