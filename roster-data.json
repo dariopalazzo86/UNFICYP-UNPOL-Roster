@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:18:43.072Z",
+  "savedAt": "2026-05-21T10:18:47.337Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4191,8 +4191,8 @@
       "label": "D",
       "name": "Day",
       "bg": "#dae8fb",
-      "fg": "#1a41c1",
-      "border": "#dae8fb"
+      "fg": "#111212",
+      "border": "#111212"
     },
     {
       "key": "A",
