@@ -96,7 +96,7 @@ thead th.we{background:#f0f4f8!important;color:var(--text3)}
 tbody th.uc{position:sticky;left:0;z-index:6;background:var(--bg2);padding:4px 10px;border-right:1px solid var(--border);font-weight:500;white-space:nowrap;min-width:140px;font-family:var(--ui);font-size:11px;color:var(--text)}
 tbody td.ic{position:sticky;left:140px;z-index:5;background:var(--bg2);border-right:1px solid var(--border);padding:3px 4px;min-width:78px;cursor:default}
 tbody tr:hover th.uc,tbody tr:hover td.ic{background:#eff3ff}
-td{padding:1px 2px;border:1px solid var(--border);text-align:center;cursor:crosshair;min-width:34px}
+td{border:1px solid var(--border);text-align:center;cursor:crosshair;vertical-align:middle}
 td.sd{background:var(--d-bg);color:var(--d-t);font-weight:600}
 td.sa{background:var(--a-bg);color:var(--a-t);font-weight:600}
 td.srd{background:var(--rd-bg);color:var(--rd-t);font-weight:600}
@@ -107,7 +107,13 @@ td.sd.we{background:#bfdbfe!important}
 td.sa.we{background:#bbf7d0!important}
 td.srd.we{background:#fef08a!important}
 td.sal.we{background:#fbcfe8!important}
-.dhdr{font-size:9px;color:var(--text3);display:block;font-family:var(--ui)}
+.dhdr-num{display:block;font-size:11px;font-weight:700;color:var(--text);line-height:1.2}
+.dhdr-date{display:block;font-size:9px;color:var(--text3);font-family:var(--ui);white-space:nowrap;line-height:1.2}
+thead th.we .dhdr-num,thead th.we .dhdr-date{color:var(--text3)}
+/* cell inner layout */
+td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:crosshair;min-width:46px;vertical-align:middle}
+.cell-shift{display:block;font-size:11px;font-weight:700;line-height:1.3}
+.cell-date{display:block;font-size:9px;font-family:var(--ui);opacity:.75;line-height:1.2;white-space:nowrap}
 /* BADGES */
 .badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap}
 .bsec{background:var(--sbg);color:var(--st);border:1px solid var(--sb)}
@@ -532,8 +538,11 @@ function buildHead(){
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
     const we=d.getDay()===0||d.getDay()===6;
-    h+=`<th class="${we?'we':''}" title="${d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}">
-      <span class="dhdr">${d.toLocaleDateString('en-GB',{weekday:'short'})}</span>${i+1}</th>`;
+    const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    h+=`<th class="${we?'we':''}" title="${dateStr}">`
+      +`<span class="dhdr-num">${i+1}</span>`
+      +`<span class="dhdr-date">${dateStr}</span>`
+      +`</th>`;
   }
   document.getElementById('rHead').innerHTML=h+'</tr>';
 }
@@ -574,7 +583,11 @@ function buildBody(){
       const d=new Date(base);d.setDate(base.getDate()+i);
       const we=d.getDay()===0||d.getDay()===6;
       const s=(roster[u.id]||[])[i]||'OFF';
-      h+=`<td class="${CLS[s]}${we?' we':''}" data-uid="${u.id}" data-d="${i}">${LBL[s]}</td>`;
+      const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+      h+=`<td class="${CLS[s]}${we?' we':''}" data-uid="${u.id}" data-d="${i}">`
+        +(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+        +`<span class="cell-date">${dateStr}</span>`
+        +`</td>`;
     }
     h+='</tr>';
   });
@@ -616,8 +629,11 @@ function paint(td,uid,day){
   if(!roster[uid]) roster[uid]=Array(DAYS).fill('OFF');
   roster[uid][day]=dragShift;
   const base=new Date(startDate); base.setDate(base.getDate()+day);
-  td.className=CLS[dragShift]+(base.getDay()===0||base.getDay()===6?' we':'');
-  td.textContent=LBL[dragShift];
+  const we=base.getDay()===0||base.getDay()===6;
+  const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  td.className=CLS[dragShift]+(we?' we':'');
+  td.innerHTML=(LBL[dragShift]?`<span class="cell-shift">${LBL[dragShift]}</span>`:'')
+    +`<span class="cell-date">${dateStr}</span>`;
   dragSet.add(uid+'|'+day);
 }
 
@@ -645,8 +661,11 @@ function applyCtx(s){
   const td=document.querySelector(`td[data-uid="${ctxUID}"][data-d="${ctxDay}"]`);
   if(td){
     const base=new Date(startDate);base.setDate(base.getDate()+ctxDay);
-    td.className=CLS[s]+(base.getDay()===0||base.getDay()===6?' we':'');
-    td.textContent=LBL[s];
+    const we=base.getDay()===0||base.getDay()===6;
+    const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    td.className=CLS[s]+(we?' we':'');
+    td.innerHTML=(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+      +`<span class="cell-date">${dateStr}</span>`;
   }
   updateStats(filtered()); queueSave(); closeCtx();
 }
@@ -804,15 +823,22 @@ function exportCSV(){
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
   a.download='roster_56days.csv'; a.click();
 }
+function getDefaultUsers(){
+  const FN=['Paul','Maja','Heiko','Edoardo','Aoife','Raghu','Dragan','Indri','Anisa','Ala a','Bodha','Surakshya','Ahlam','Nikola','Jack','Davor','Ivana','Stella','Yulia','Andrey','Rami','Li','Benny','Jani Matti','Richard','Susanna Maria','Alexander','Yu','Linda','Nebojsa','Niko','Dragan','Gandhi','Nenad','Libna','Gerhard','Darren','Nicole','Bojan','Dubravka','Graham','Timothy','Gavin','Lenka','Simone','Jozef','Carmen','Wihelmina','Ujjwal','Mary','Vladimir','Lubica','Edin','Brian','Paul','Ala a','Mutya','Yue','Siobhan','Amela','Jonathan'];
+  const LN=['SLATTERY','SMAJLOVIC','TROSS','PETRONCINI','REILLY','BISHT','NOVAKOVIC','WIDIASIH','PASIC','KHLEIF','REGMI','K.C.','AL-HABAHBEH','NUNIC','CAGNEY','MLAKIC','MARKOVIC','WASTINI','LOSAPIO','CHERKASHINA','RODIN','ABABNEH','ZHANG','SARAGIH','HYYTIAEINEN','DALY','TUURAS','LYUBCHICH','ZHOU','CRENNAN','GRUJIC','HEIMOLINNA','KULIC','SUGIARTO','DURIC','SHABRINA','VOELKEL','MC CARTHY','BARTH','FILIPOVIC','SIMIC','DESMOND','CASEY','FLEET','REKEMOVA','CALIRI','SLIACKY','CICERELLI','MANAFE','THAPA','DORGAN','KURAMSHIN','HIRKOVA','SABANAGIC','MOORE','KILCOYNE','AL-HANAITY','ZAHARI','ZHOU','MAHER','PITA','PLUNKETT'];
+  return FN.map((fn,i)=>({
+    id:'u'+i,
+    name:fn+' '+LN[i],
+    sector:'',station:'',unit:'',defaultShift:'OFF'
+  }));
+}
+
 function resetData(){
-  if(!confirm('Reset to 70 sample users? Current data will be overwritten on next save.'))return;
-  sectors=['Alpha','Bravo','Charlie','Delta'];
-  stations=['North','South','East','West','Central'];
-  units=['Unit 1','Unit 2','Unit 3','Unit 4','Unit 5','Unit 6'];
-  const FN=['Alex','Jordan','Morgan','Taylor','Casey','Riley','Quinn','Avery','Blake','Cameron','Dana','Ellis','Finley','Gray','Harper','Indigo','Jesse','Kai','Lane','Loren','Madi','Noel','Oakley','Peyton','Reed','Sage','Shay','Skyler','Tatum','Val','Wren','Zara','Adrian','Brynn','Colin','Drew','Eden','Flynn','Gwen','Hale','Ivy','Jace','Kira','Leo','Mira','Nico','Ora','Piper','Rhys','Sam','Chris','Jamie','Reese','Emery','Rowan','Hayden','Parker','River','Sloane','Kendall'];
-  const LN=['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Martinez','Wilson','Anderson','Taylor','Thomas','Jackson','White','Harris','Clark','Lewis','Lee','Walker'];
-  users=[]; roster={};
-  for(let i=0;i<70;i++){const id='u'+i;users.push({id,name:FN[i%FN.length]+' '+LN[i%LN.length],sector:sectors[i%4],station:stations[i%5],unit:units[i%6],defaultShift:'OFF'});roster[id]=Array(DAYS).fill('OFF');}
+  if(!confirm('Reset to the 61 staff members? Current data will be overwritten on next save.'))return;
+  sectors=[]; stations=[]; units=[];
+  users=getDefaultUsers();
+  roster={};
+  users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
   const t=new Date(); startDate=t;
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
   populateSelects(); buildHead(); buildBody(); queueSave();
@@ -839,7 +865,10 @@ async function init(){
     document.getElementById('setupBanner').style.display='none';
     await loadFromGitHub();
   } else {
-    setStatus('error','Not configured');
+    // not configured yet — pre-load real staff names so the roster is ready to use
+    users=getDefaultUsers();
+    users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
+    setStatus('error','Not configured — fill setup above');
   }
   populateSelects(); buildHead(); buildBody();
 }
