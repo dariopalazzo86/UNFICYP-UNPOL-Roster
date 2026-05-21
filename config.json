@@ -6,9 +6,38 @@
   "dataPath": "roster-data.json",
   "admins": [
     {
-      "name": "Admin",
-      "hash": "627a87a24430701786eb816afead2b8c6de4a7c1833cf105038e51b8bbf39cae",
-      "encryptedToken": "VJiimuiNucAXlPo2LGuFc5S8j2h3pJsNF2KgzTKJFBMvk3IIwnUqSk8ZrB3GVLLYkwWHfR4WwHck7uxVDpySXAGXyCHv4DTyEdJwT/NokYBkqYc9x49n3F8iW0LHzLezQF9sR4l1wvj+wrd3DdbyYtIyz8sNPiyqzA=="
+      "name": "adminhq",
+      "hash": "ea38a743a5ad500aebf7620dbfdacc1a4562a678194e96ff1fe86f0995d19e88",
+      "role": "global",
+      "sectors": [],
+      "encryptedToken": "iTBjTUD3z7YoBjueHKowLAm1cXCjqa17/L1dPsAJf/QN3+avHg7RO6wCAXwylGbCRhKBXm9Z1jwv4InlJs1dgenkEj9V8byVOH+78A710f5lE5f1hZaU10b7+IIxjnyfNLdmMus4MKYFyo1zStjemh446DA/jkpXXg=="
+    },
+    {
+      "name": "admins1",
+      "hash": "d3fde505467804e9980bc700c4cf545d2982e4f5970cebad11a820f6cada4e2f",
+      "role": "sector",
+      "sectors": [
+        "SECTOR 1"
+      ],
+      "encryptedToken": "aVaghDVvII1xZuRNLsfwMs0T1Sjeei9+bVQ2QjjATst2kQjHAN2rPRehU3FZqxRGvvfvzyKJnB+SjqaZlMfgSFo9EDvSl9xnmwj6DY7yVxC+jiilC0zky36xzkTgfQYtvCnIvri0Og75fqCEdBub0I3XoL+/BtMZfQ=="
+    },
+    {
+      "name": "admins2",
+      "hash": "887c5cbfd57a77e24410f3c5f3e403af6fd954c79819291ed6bad2c8ba84d359",
+      "role": "sector",
+      "sectors": [
+        "SECTOR 2"
+      ],
+      "encryptedToken": "24xRjBow4LeS5sYo0dKkHbOniSLzG0ydlXMlRd0yz0q+noPiasVbaLq9ESjnmsibtW0Xs8m1k4fgtJsgaYeA03xMzYSpx9hLxOWbs1BmMB/3CY4i+kpvuMCXeEbu2rPXcPuGD6FaX21VIe6lT7/MOfEfWiRFMXd/BA=="
+    },
+    {
+      "name": "admins4",
+      "hash": "250d18456f97bf4bf7d58171842997edebe3feec279189ef0155068ed0db2440",
+      "role": "sector",
+      "sectors": [
+        "SECTOR 4"
+      ],
+      "encryptedToken": "QXckdPw1MHd2MT+IehBVA24tC1JV4gFsGfG7eoMU2+jFzFQMiKdXtr7aWk7izzWbj9tHEa/QkXRGocPe53hnYEmm1uo3pGoJXq8m8TU5nqj3P1DinDh0O4WC3Yl1pjPGJ/AwE+NpQ+DaCtYu+YCS9o4AKPcY4VR4/w=="
     }
   ]
 }
