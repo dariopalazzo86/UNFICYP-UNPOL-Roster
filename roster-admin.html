@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>UNPOL Roster Manager — Admin</title>
+<title>Roster Manager — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -40,20 +40,21 @@ header{display:flex;align-items:center;gap:12px;padding:11px 20px;background:var
 .sind.saving{color:#d97706}.sind.saving .sdot{background:#d97706}
 .sind.saved{color:var(--green)}.sind.saved .sdot{background:var(--green)}
 .sind.error{color:var(--red)}.sind.error .sdot{background:var(--red)}
-/* SETUP BANNER */
-.setup-banner{background:#eff6ff;border-bottom:2px solid #bfdbfe;padding:14px 20px;font-size:13px;color:var(--text2)}
-.setup-banner h2{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:10px}
-.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-@media(max-width:600px){.setup-grid{grid-template-columns:1fr}}
-.setup-field{display:flex;flex-direction:column;gap:4px}
-.setup-field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
-.setup-field input{font-size:13px;padding:8px 10px;border-radius:var(--r);border:1px solid var(--border2);background:#fff;color:var(--text);outline:none;font-family:var(--mono)}
-.setup-field input:focus{border-color:var(--accent)}
-.setup-field input.valid{border-color:var(--green)}
-.setup-field input.invalid{border-color:var(--red)}
-.setup-hint{font-size:11px;color:var(--text3);margin-top:2px}
-.setup-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.setup-status{font-size:12px;font-family:var(--mono);color:var(--text3)}
+/* LOGIN SCREEN */
+.login-screen{display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:var(--bg);z-index:999}
+.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:32px 28px;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.login-logo{font-size:20px;font-weight:700;color:var(--accent);letter-spacing:-.3px;margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:24px}
+.lfield{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.lfield label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+.lfield input{font-size:14px;padding:9px 11px;border-radius:var(--r);border:1px solid var(--border2);background:#fff;color:var(--text);outline:none;transition:border-color .15s;font-family:var(--ui)}
+.lfield input:focus{border-color:var(--accent)}
+.lerr{font-size:12px;color:var(--red);font-family:var(--mono);min-height:18px;margin-bottom:4px}
+.linfo{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6}
+.loading-screen{display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:var(--bg);z-index:998;flex-direction:column;gap:12px}
+.spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:13px;color:var(--text3);font-family:var(--mono)}
 /* TABS */
 nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto}
 .tab{font-size:12px;font-weight:600;letter-spacing:.3px;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);white-space:nowrap;transition:color .15s,border-color .15s}
@@ -169,49 +170,44 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 </head>
 <body>
 
-<!-- ═══ GITHUB SETUP BANNER ═══ -->
-<div class="setup-banner" id="setupBanner">
-  <h2>⚙️ One-time GitHub Setup</h2>
-  <div class="setup-grid">
-    <div class="setup-field">
-      <label>GitHub Username</label>
-      <input type="text" id="cfgOwner" placeholder="e.g. johndoe" oninput="cfgChanged()">
-      <span class="setup-hint">Your GitHub username</span>
+<!-- ═══ LOADING SCREEN ═══ -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="loading-msg" id="loadingMsg">Loading config…</div>
+</div>
+
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div class="login-screen" id="loginScreen" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">ROSTER MANAGER</div>
+    <div class="login-sub">Admin access · Sign in to continue</div>
+    <div class="lfield">
+      <label>Name</label>
+      <input type="text" id="loginName" placeholder="Your name" autocomplete="username"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     </div>
-    <div class="setup-field">
-      <label>Repository Name</label>
-      <input type="text" id="cfgRepo" placeholder="e.g. my-roster" oninput="cfgChanged()">
-      <span class="setup-hint">The repo where these files are hosted</span>
+    <div class="lfield">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Your password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <div class="setup-field">
-      <label>Personal Access Token</label>
-      <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="cfgChanged()">
-      <span class="setup-hint">GitHub → Settings → Developer settings → Personal access tokens → Fine-grained → Contents: Read &amp; Write</span>
-    </div>
-    <div class="setup-field">
-      <label>Data file path in repo</label>
-      <input type="text" id="cfgPath" placeholder="roster-data.json" oninput="cfgChanged()">
-      <span class="setup-hint">Leave as <code>roster-data.json</code> unless you put it in a subfolder</span>
-    </div>
-  </div>
-  <div class="setup-actions">
-    <button class="btn acc" onclick="saveConfig()">💾 Save &amp; Connect</button>
-    <button class="btn" onclick="testConnection()">🔌 Test connection</button>
-    <button class="btn sm" onclick="toggleSetup()">Hide setup</button>
-    <span class="setup-status" id="setupStatus"></span>
+    <div class="lerr" id="loginErr"></div>
+    <button class="btn acc" style="width:100%;padding:9px" onclick="doLogin()">Sign in →</button>
+    <p class="linfo">Access is restricted to authorised administrators.<br>Contact your roster manager if you need access.</p>
   </div>
 </div>
 
 <header>
   <div>
-    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
-    <div class="sub" id="repoLabel">Not connected — fill in setup above</div>
+    <div class="logo">ROSTER MANAGER</div>
+    <div class="sub" id="repoLabel">56-day shift planner</div>
   </div>
   <div class="hright">
-    <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Not saved</span></div>
-    <button class="btn sm" onclick="toggleSetup()" title="GitHub settings">⚙️ Setup</button>
+    <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Loading…</span></div>
+    <span id="loggedInAs" style="font-size:11px;color:var(--text3);font-family:var(--mono)"></span>
     <button class="btn sm acc" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn sm dan" style="display:none" onclick="resetData()">↺ Reset</button>
+    <button class="btn sm dan" onclick="resetData()">↺ Reset</button>
+    <button class="btn sm" onclick="doLogout()" title="Sign out">⏻ Sign out</button>
     <span class="rbadge">ADMIN</span>
   </div>
 </header>
@@ -219,7 +215,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 <nav>
   <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
   <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
-  <div class="tab" onclick="switchTab('users')">👥 IPOs</div>
+  <div class="tab" onclick="switchTab('users')">👥 Users</div>
 </nav>
 
 <div class="dtip" id="dtip"></div>
@@ -236,7 +232,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <!-- ROSTER -->
   <div id="panel-roster" class="panel active">
     <div class="toolbar">
-      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
+      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
       <label>Start <input type="date" id="startDate" onchange="onDateChange()"></label>
       <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
       <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
@@ -252,7 +248,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <button class="btn sm ba" onclick="bulkFill('A')">A</button>
       <button class="btn sm brd" onclick="bulkFill('RD')">RD</button>
       <button class="btn sm bal" onclick="bulkFill('AL')">AL</button>
-      <button class="btn sm" style="display:none;" onclick="bulkFill('OFF')">Clear</button>
+      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
     </div>
     <div class="legend">
       <span><span class="lsq" style="background:var(--d-bg);border-color:var(--d-b)"></span>D = Day</span>
@@ -263,7 +259,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="slbl">IPOs</div><div class="sval" id="su">—</div></div>
+      <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
       <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
       <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
       <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
@@ -292,7 +288,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
         <div class="arow"><input type="text" id="nUni" placeholder="New unit…" onkeydown="if(event.key==='Enter')addCfg('uni')"><button class="btn sm acc" onclick="addCfg('uni')">+ Add</button></div>
       </div>
     </div>
-    <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>IPOs</strong> tab.</p>
+    <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>Users</strong> tab.</p>
   </div>
 
   <!-- USERS -->
@@ -302,7 +298,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="ufSec" onchange="buildUsers()"><option value="">All sectors</option></select>
       <select id="ufSta" onchange="buildUsers()"><option value="">All stations</option></select>
       <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
-      <button class="btn acc" onclick="openAddUser()">+ Add IPO</button>
+      <button class="btn acc" onclick="openAddUser()">+ Add user</button>
     </div>
     <div class="utwrap">
       <table class="utable">
@@ -315,7 +311,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <div class="mbg" id="modal">
   <div class="modal">
-    <h3 id="mTitle">Add IPO</h3>
+    <h3 id="mTitle">Add user</h3>
     <div class="mfrow"><label>Full name</label><input type="text" id="mName" placeholder="e.g. Jane Smith"></div>
     <div class="mfrow"><label>Sector</label><select id="mSec"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Station</label><select id="mSta"><option value="">— none —</option></select></div>
@@ -348,7 +344,6 @@ const SCOL   = {
   RD:{bg:'#fef9c3',fg:'#854d0e'}, AL:{bg:'#fce7f3',fg:'#9d174d'},
   OFF:{bg:'#f8fafc',fg:'#94a3b8'}
 };
-const LS_CFG = 'roster_gh_config';
 const LS_SHA = 'roster_gh_sha';
 
 /* ══════════════════════════════════════════════════
@@ -360,86 +355,145 @@ let editUID=null, ctxUID=null, ctxDay=null, saveTimer=null;
 let dragging=false, dragShift=null, dragSet=new Set();
 
 /* ══════════════════════════════════════════════════
-   CONFIG  (stored in localStorage — token stays on this browser only)
+   CRYPTO HELPERS
 ══════════════════════════════════════════════════ */
-function loadConfig(){
-  try{ return JSON.parse(localStorage.getItem(LS_CFG))||{}; }
-  catch(e){ return {}; }
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function saveConfig(){
-  const cfg = {
-    owner : document.getElementById('cfgOwner').value.trim(),
-    repo  : document.getElementById('cfgRepo').value.trim(),
-    token : document.getElementById('cfgToken').value.trim(),
-    path  : document.getElementById('cfgPath').value.trim() || 'roster-data.json'
-  };
-  if(!cfg.owner||!cfg.repo||!cfg.token){
-    setSetupStatus('⚠️ Please fill in username, repo and token.','#d97706'); return;
+async function deriveKey(password){
+  const enc=new TextEncoder();
+  const km=await crypto.subtle.importKey('raw',enc.encode(password),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:enc.encode('roster-salt-2024'),iterations:100000,hash:'SHA-256'},
+    km,{name:'AES-GCM',length:256},false,['decrypt']
+  );
+}
+async function aesDecrypt(b64,password){
+  const combined=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  const iv=combined.slice(0,12), data=combined.slice(12);
+  const key=await deriveKey(password);
+  const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
+  return new TextDecoder().decode(dec);
+}
+
+/* ══════════════════════════════════════════════════
+   SESSION  (in-memory only — cleared on tab close)
+══════════════════════════════════════════════════ */
+let session = null; // {name, token, cfg}
+
+/* ══════════════════════════════════════════════════
+   LOAD config.json FROM REPO (public raw URL)
+══════════════════════════════════════════════════ */
+let appConfig = null; // raw config.json contents
+
+async function fetchConfig(){
+  // config.json must be in the repo root on the same origin (GitHub Pages)
+  // Try same-origin first, then raw.githubusercontent as fallback
+  const urls = [
+    './config.json?t='+Date.now(),
+    // fallback populated after config loads — handled below
+  ];
+  for(const url of urls){
+    try{
+      const r=await fetch(url);
+      if(r.ok){ appConfig=await r.json(); return true; }
+    }catch(e){}
   }
-  localStorage.setItem(LS_CFG, JSON.stringify(cfg));
-  document.getElementById('repoLabel').textContent = cfg.owner+'/'+cfg.repo+' · '+cfg.path;
-  setSetupStatus('✔ Config saved — loading data…','#16a34a');
-  loadFromGitHub();
+  return false;
 }
-function cfgChanged(){
-  const cfg=loadConfig();
-  ['cfgOwner','cfgRepo','cfgToken','cfgPath'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.classList.toggle('valid', el.value.trim().length>0);
-  });
+
+/* ══════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════ */
+async function doLogin(){
+  const name=document.getElementById('loginName').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  document.getElementById('loginErr').textContent='';
+  if(!name||!pass){ document.getElementById('loginErr').textContent='Enter your name and password.'; return; }
+  if(!appConfig){ document.getElementById('loginErr').textContent='Config not loaded. Try refreshing.'; return; }
+
+  const admins=appConfig.admins||[];
+  const expected=await sha256(name.toLowerCase()+'::'+pass);
+  const match=admins.find(a=>a.name.toLowerCase()===name.toLowerCase()&&a.hash===expected);
+  if(!match){ document.getElementById('loginErr').textContent='Name or password incorrect.'; return; }
+
+  // decrypt token — master key = all admin passwords combined sorted by name
+  // Since we only know this user's password, we decrypt using their contribution
+  // The master key is all passwords joined — we reconstruct it for single-admin case
+  // For multi-admin: each user's token is encrypted with ALL passwords combined.
+  // On login we try decrypting with just this user's password first (single-admin),
+  // then fall back to prompting — but in practice admins share a setup, so the
+  // master key used during setup.html must be re-derived the same way.
+  // Simplification: we store per-user encrypted tokens (one per admin in setup.html).
+  // Check if match has own encryptedToken, else use global one with this password.
+  let token;
+  try{
+    const encSrc = match.encryptedToken || appConfig.encryptedToken;
+    token = await aesDecrypt(encSrc, pass);
+  }catch(e){
+    document.getElementById('loginErr').textContent='Decryption failed — password may have changed. Re-run setup.html.';
+    return;
+  }
+
+  session = {name: match.name, token, cfg: appConfig};
+  document.getElementById('loggedInAs').textContent = '👤 '+match.name;
+  showApp();
+  await loadFromGitHub();
 }
-function toggleSetup(){
-  const b=document.getElementById('setupBanner');
-  b.style.display = b.style.display==='none' ? '' : 'none';
+
+function doLogout(){
+  session=null;
+  users=[]; roster={}; sectors=[]; stations=[]; units=[];
+  document.getElementById('loginName').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('loggedInAs').textContent='';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loadingScreen').style.display='none';
+  // hide app content
+  document.querySelector('nav').style.display='none';
+  document.querySelector('main').style.display='none';
 }
-function setSetupStatus(msg,color){
-  const el=document.getElementById('setupStatus');
-  el.textContent=msg; el.style.color=color||'var(--text3)';
+
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('loadingScreen').style.display='none';
+  document.querySelector('nav').style.display='flex';
+  document.querySelector('main').style.display='block';
+  if(session&&session.cfg){
+    document.getElementById('repoLabel').textContent=
+      session.cfg.owner+'/'+session.cfg.repo+' · '+(session.cfg.dataPath||'roster-data.json');
+  }
 }
 
 /* ══════════════════════════════════════════════════
    GITHUB API
 ══════════════════════════════════════════════════ */
-function ghHeaders(token){
+function ghHeaders(){
   return {
-    'Authorization':'token '+token,
+    'Authorization':'token '+session.token,
     'Accept':'application/vnd.github.v3+json',
     'Content-Type':'application/json'
   };
 }
-function ghUrl(cfg){
-  return `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
-}
-
-async function testConnection(){
-  const cfg=loadConfig();
-  if(!cfg.token){ setSetupStatus('⚠️ Fill in all fields first.','#d97706'); return; }
-  setSetupStatus('Testing…','#d97706');
-  try{
-    const r=await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}`,
-      {headers:ghHeaders(cfg.token)});
-    if(r.status===200){ setSetupStatus('✔ Connection OK! Repository found.','#16a34a'); }
-    else if(r.status===404){ setSetupStatus('✖ Repository not found. Check username/repo name.','#dc2626'); }
-    else if(r.status===401){ setSetupStatus('✖ Token invalid or expired.','#dc2626'); }
-    else { setSetupStatus('✖ Error: HTTP '+r.status,'#dc2626'); }
-  }catch(e){ setSetupStatus('✖ Network error: '+e.message,'#dc2626'); }
+function ghUrl(){
+  const c=session.cfg;
+  return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.dataPath||'roster-data.json'}`;
 }
 
 async function loadFromGitHub(){
-  const cfg=loadConfig();
-  if(!cfg.token||!cfg.owner||!cfg.repo){ setStatus('error','Not configured'); return false; }
+  if(!session){ return false; }
   setStatus('saving','Loading…');
   try{
-    const r=await fetch(ghUrl(cfg)+'?t='+Date.now(), {headers:ghHeaders(cfg.token)});
+    const r=await fetch(ghUrl()+'?t='+Date.now(), {headers:ghHeaders()});
     if(r.status===404){
-      // file doesn't exist yet — start fresh, will be created on first save
       setStatus('saved','New file — save to create');
       setTimeout(()=>setStatus('idle','Ready'),3000);
       return true;
     }
     if(!r.ok) throw new Error('HTTP '+r.status);
     const j=await r.json();
-    // store sha for future updates
     localStorage.setItem(LS_SHA, j.sha);
     const content=JSON.parse(atob(j.content.replace(/\n/g,'')));
     sectors  = content.sectors  || [];
@@ -453,6 +507,7 @@ async function loadFromGitHub(){
     }
     setStatus('saved','Loaded ✓');
     setTimeout(()=>setStatus('idle','Ready'),2500);
+    populateSelects(); buildHead(); buildBody();
     return true;
   }catch(e){
     setStatus('error','Load failed: '+e.message);
@@ -461,43 +516,29 @@ async function loadFromGitHub(){
 }
 
 async function saveToGitHub(){
-  const cfg=loadConfig();
-  if(!cfg.token||!cfg.owner||!cfg.repo){ setStatus('error','Not configured — fill setup'); return; }
+  if(!session){ setStatus('error','Not logged in'); return; }
   setStatus('saving','Saving to GitHub…');
   try{
-    const payload = {
-      version:3,
-      savedAt:new Date().toISOString(),
+    const payload={version:3,savedAt:new Date().toISOString(),
       startDate:document.getElementById('startDate').value,
-      sectors, stations, units, users, roster
-    };
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
-    const sha = localStorage.getItem(LS_SHA);
-    const body = {
-      message:'roster: update '+new Date().toISOString().slice(0,16),
-      content,
-      ...(sha ? {sha} : {})
-    };
-    const r=await fetch(ghUrl(cfg),{
-      method:'PUT',
-      headers:ghHeaders(cfg.token),
-      body:JSON.stringify(body)
-    });
+      sectors,stations,units,users,roster};
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const sha=localStorage.getItem(LS_SHA);
+    const body={message:'roster: update '+new Date().toISOString().slice(0,16),content,...(sha?{sha}:{})};
+    const r=await fetch(ghUrl(),{method:'PUT',headers:ghHeaders(),body:JSON.stringify(body)});
     if(!r.ok){
       const err=await r.json();
-      // sha conflict — file was updated elsewhere, fetch new sha and retry once
       if(r.status===409||r.status===422){
         setStatus('saving','Conflict — reloading…');
         await loadFromGitHub();
         setTimeout(()=>saveToGitHub(),800);
         return;
       }
-      throw new Error((err.message||'HTTP '+r.status));
+      throw new Error(err.message||'HTTP '+r.status);
     }
     const j=await r.json();
-    localStorage.setItem(LS_SHA, j.content.sha);
-    const t=new Date();
-    setStatus('saved','Saved '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    localStorage.setItem(LS_SHA,j.content.sha);
+    setStatus('saved','Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
     setTimeout(()=>setStatus('idle','Ready'),4000);
   }catch(e){
     setStatus('error','Save failed: '+e.message);
@@ -507,7 +548,7 @@ async function saveToGitHub(){
 function queueSave(){
   clearTimeout(saveTimer);
   setStatus('saving','Saving…');
-  saveTimer=setTimeout(()=>saveToGitHub(), 1200);
+  saveTimer=setTimeout(()=>saveToGitHub(),1200);
 }
 
 function setStatus(state,label){
@@ -515,6 +556,7 @@ function setStatus(state,label){
   el.className='sind'+(state!=='idle'?' '+state:'');
   document.getElementById('slbl').textContent=label;
 }
+
 
 /* ══════════════════════════════════════════════════
    TABS
@@ -533,7 +575,7 @@ function switchTab(t){
 ══════════════════════════════════════════════════ */
 function buildHead(){
   const base=new Date(startDate);
-  let h='<tr><th class="uc">IPO Name</th>'
+  let h='<tr><th class="uc">User</th>'
     +'<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:78px;text-align:center">Info</th>';
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
@@ -850,27 +892,36 @@ function resetData(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 async function init(){
-  // pre-fill config form from localStorage
-  const cfg=loadConfig();
-  if(cfg.owner) document.getElementById('cfgOwner').value=cfg.owner;
-  if(cfg.repo)  document.getElementById('cfgRepo').value=cfg.repo;
-  if(cfg.token) document.getElementById('cfgToken').value=cfg.token;
-  document.getElementById('cfgPath').value=cfg.path||'roster-data.json';
-
   const t=new Date(); startDate=t;
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
 
-  if(cfg.owner&&cfg.repo&&cfg.token){
-    document.getElementById('repoLabel').textContent=cfg.owner+'/'+cfg.repo+' · '+(cfg.path||'roster-data.json');
-    document.getElementById('setupBanner').style.display='none';
-    await loadFromGitHub();
-  } else {
-    // not configured yet — pre-load real staff names so the roster is ready to use
-    users=getDefaultUsers();
-    users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
-    setStatus('error','Not configured — fill setup above');
+  // hide nav+main until logged in
+  document.querySelector('nav').style.display='none';
+  document.querySelector('main').style.display='none';
+
+  // show loading screen while fetching config.json
+  document.getElementById('loadingScreen').style.display='flex';
+  document.getElementById('loadingMsg').textContent='Loading config…';
+
+  const ok=await fetchConfig();
+  document.getElementById('loadingScreen').style.display='none';
+
+  if(!ok || !appConfig || !appConfig.admins || !appConfig.admins.length){
+    // config.json missing or has no admins — show helpful error on login screen
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('loginErr').textContent=
+      ok ? '⚠️ No admins found in config.json. Run setup.html first.'
+         : '⚠️ Could not load config.json. Make sure it is in your repo root.';
+    return;
   }
+
+  // pre-populate default users in memory (will be overwritten after login loads data)
+  users=getDefaultUsers();
+  users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
   populateSelects(); buildHead(); buildBody();
+
+  document.getElementById('loginScreen').style.display='flex';
+  setTimeout(()=>document.getElementById('loginName').focus(), 100);
 }
 
 init();
