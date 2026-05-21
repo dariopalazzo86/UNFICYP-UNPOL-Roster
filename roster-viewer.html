@@ -136,12 +136,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
     <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
     <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
-    <select id="fShift" onchange="buildBody()">
-      <option value="">All shifts</option>
-      <option value="D">D — Day</option><option value="A">A — Afternoon</option>
-      <option value="RD">RD — Rest Day</option><option value="AL">AL — Annual Leave</option>
-      <option value="OFF">Off</option>
-    </select>
+    <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
     <label style="margin-left:auto">My name:
       <input type="text" id="myname" placeholder="Type your name…" style="width:155px" oninput="buildBody()">
     </label>
@@ -149,23 +144,9 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
   <div class="mybanner" id="mybanner"></div>
 
-  <div class="legend">
-    <span><span class="lsq" style="background:var(--d-bg);border-color:var(--d-b)"></span>D = Day</span>
-    <span><span class="lsq" style="background:var(--a-bg);border-color:var(--a-b)"></span>A = Afternoon</span>
-    <span><span class="lsq" style="background:var(--rd-bg);border-color:var(--rd-b)"></span>RD = Rest Day</span>
-    <span><span class="lsq" style="background:var(--al-bg);border-color:var(--al-b)"></span>AL = Annual Leave</span>
-    <span><span class="lsq" style="background:var(--of-bg);border-color:var(--of-b)"></span>Off</span>
-    <span style="margin-left:auto;font-size:10px;color:var(--text3)">Read-only · Admin file to make changes</span>
-  </div>
+  <div class="legend" id="shiftLegend"><!-- populated dynamically --></div>
 
-  <div class="stats">
-    <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
-    <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
-    <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
-    <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
-    <div class="stat"><div class="slbl">Ann. Leave (AL)</div><div class="sval" id="sal" style="color:var(--al-t)">—</div></div>
-    <div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>
-  </div>
+  <div class="stats" id="statsBar"><!-- populated dynamically --></div>
 
   <div class="nodata" id="nodata">
     <div class="ico">📋</div>
@@ -180,10 +161,26 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <script>
 const DAYS=56;
-const CLS={D:'sd',A:'sa',RD:'srd',AL:'sal',OFF:'sof'};
-const LBL={D:'D',A:'A',RD:'RD',AL:'AL',OFF:''};
-const NAME={D:'Day',A:'Afternoon',RD:'Rest Day',AL:'Annual Leave',OFF:'Off'};
-const NATIONALITIES=['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'].sort();
+const OFF_DEF={key:'OFF',label:'',name:'Off / Clear',bg:'#f8fafc',fg:'#94a3b8',border:'#e2e8f0'};
+let shiftDefs=[
+  {key:'D', label:'D', name:'Day',         bg:'#dbeafe',fg:'#1e40af',border:'#93c5fd'},
+  {key:'A', label:'A', name:'Afternoon',   bg:'#dcfce7',fg:'#166534',border:'#86efac'},
+  {key:'RD',label:'RD',name:'Rest Day',    bg:'#fef9c3',fg:'#854d0e',border:'#fde047'},
+  {key:'AL',label:'AL',name:'Annual Leave',bg:'#fce7f3',fg:'#9d174d',border:'#f9a8d4'},
+];
+function rebuildShiftLookups(){
+  window._CLS=Object.fromEntries([...shiftDefs.map(s=>[s.key,'sc_'+s.key]),['OFF','sc_OFF']]);
+  window._LBL=Object.fromEntries([...shiftDefs.map(s=>[s.key,s.label]),['OFF','']]);
+  window._NAME=Object.fromEntries([...shiftDefs.map(s=>[s.key,s.name]),['OFF','Off / Clear']]);
+  let el=document.getElementById('vShiftStyles');
+  if(!el){el=document.createElement('style');el.id='vShiftStyles';document.head.appendChild(el);}
+  el.textContent=[...shiftDefs,OFF_DEF].map(s=>`
+    td.sc_${s.key}{background:${s.bg};color:${s.fg};font-weight:600}
+    td.sc_${s.key}.we{background:${s.bg}cc!important}
+  `).join('')+`td.sc_OFF{background:${OFF_DEF.bg};color:${OFF_DEF.fg};font-weight:400}`;
+}
+rebuildShiftLookups();
+const NATIONALITIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'].sort();
 
 let users=[], roster={}, sectors=[], stations=[], units=[];
 let startDate=new Date();
@@ -224,16 +221,16 @@ async function loadAndRender(){
     const p=await r.json();
     sectors=p.sectors||[]; stations=p.stations||[];
     units=p.units||[]; users=p.users||[]; roster=p.roster||{};
+    if(p.shiftDefs&&p.shiftDefs.length){shiftDefs=p.shiftDefs;rebuildShiftLookups();}
     if(p.startDate) startDate=new Date(p.startDate);
-    if(p.savedAt){
-      const d=new Date(p.savedAt);
+    if(p.savedAt){      const d=new Date(p.savedAt);
       document.getElementById('updlbl').textContent=
         'Updated '+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+
         ' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     }
     document.getElementById('nodata').classList.remove('show');
     document.getElementById('twrap').style.display='';
-    populateSelects(); buildHead(); buildBody();
+    populateSelects(); buildViewerShiftUI(); buildHead(); buildBody();
   }catch(e){
     document.getElementById('nodata').classList.add('show');
     document.getElementById('twrap').style.display='none';
@@ -315,8 +312,8 @@ function buildBody(){
       const we=d.getDay()===0||d.getDay()===6;
       const s=shifts[i]||'OFF';
       const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-      h+=`<td class="${CLS[s]}${we?' we':''}">`
-        +(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+      h+=`<td class="${_CLS[s]}${we?' we':''}">`
+        +(_LBL[s]?`<span class="cell-shift">${_LBL[s]}</span>`:'')
         +`<span class="cell-date">${dateStr}</span>`
         +`</td>`;
     }
@@ -326,21 +323,40 @@ function buildBody(){
   updateStats(list); updateMyBanner(myname);
 }
 
+function buildViewerShiftUI(){
+  // fShift select
+  const fShift=document.getElementById('fShift');
+  if(fShift){
+    const cur=fShift.value;
+    fShift.innerHTML='<option value="">All shifts</option>'
+      +shiftDefs.map(s=>`<option value="${s.key}"${s.key===cur?' selected':''}>${s.label} — ${esc(s.name)}</option>`).join('')
+      +'<option value="OFF">Off / Clear</option>';
+  }
+  // legend
+  const leg=document.getElementById('shiftLegend');
+  if(leg) leg.innerHTML=shiftDefs.map(s=>
+    `<span><span class="lsq" style="background:${s.bg};border-color:${s.border}"></span>${esc(s.label)} = ${esc(s.name)}</span>`
+  ).join('')
+  +`<span><span class="lsq" style="background:#f8fafc;border-color:#e2e8f0"></span>Off</span>`
+  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Read-only · Admin file to make changes</span>`;
+  // stats bar
+  const sb=document.getElementById('statsBar');
+  if(sb) sb.innerHTML=
+    `<div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>`
+    +shiftDefs.map(s=>
+      `<div class="stat"><div class="slbl">${esc(s.label)} — ${esc(s.name)}</div><div class="sval" id="stat_${s.key}" style="color:${s.fg}">—</div></div>`
+    ).join('')
+    +`<div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>`;
+}
+
 function updateStats(list){
-  let d=0,a=0,rd=0,al=0,tot=0;
-  (list||filtered()).forEach(u=>{
-    (roster[u.id]||[]).forEach(s=>{
-      if(s==='D')d++;else if(s==='A')a++;
-      else if(s==='RD')rd++;else if(s==='AL')al++;
-      tot++;
-    });
-  });
-  document.getElementById('su').textContent=(list||filtered()).length;
-  document.getElementById('sd').textContent=d;
-  document.getElementById('sa').textContent=a;
-  document.getElementById('srd').textContent=rd;
-  document.getElementById('sal').textContent=al;
-  document.getElementById('scov').textContent=tot?Math.round((d+a)/tot*100)+'%':'0%';
+  const f=list||filtered();
+  const counts={};shiftDefs.forEach(s=>{counts[s.key]=0;});
+  let tot=0,working=0;
+  f.forEach(u=>{(roster[u.id]||[]).forEach(s=>{if(counts[s]!==undefined){counts[s]++;working++;}tot++;});});
+  const suEl=document.getElementById('su');if(suEl)suEl.textContent=f.length;
+  shiftDefs.forEach(s=>{const el=document.getElementById('stat_'+s.key);if(el)el.textContent=counts[s.key]||0;});
+  const cov=document.getElementById('scov');if(cov)cov.textContent=tot?Math.round(working/tot*100)+'%':'0%';
 }
 
 function updateMyBanner(myname){
@@ -350,21 +366,21 @@ function updateMyBanner(myname){
   if(!me){banner.className='mybanner';return;}
   const today=new Date();today.setHours(0,0,0,0);
   const base=new Date(startDate);
-  let next=null,dc=0,ac=0,rdc=0,alc=0,ofc=0;
+  const counts={};shiftDefs.forEach(s=>{counts[s.key]=0;});
+  let next=null, ofc=0;
   (roster[me.id]||[]).forEach((s,i)=>{
     const d=new Date(base);d.setDate(base.getDate()+i);
     if(d<today)return;
-    if(s==='D'){dc++;if(!next)next={date:d,s:'Day'};}
-    else if(s==='A'){ac++;if(!next)next={date:d,s:'Afternoon'};}
-    else if(s==='RD')rdc++;
-    else if(s==='AL')alc++;
-    else ofc++;
+    if(counts[s]!==undefined){
+      counts[s]++;
+      if(!next){const def=shiftDefs.find(x=>x.key===s);if(def)next={date:d,name:def.name};}
+    } else { ofc++; }
   });
   const nxt=next
-    ?`Next: <strong>${next.s}</strong> on <strong>${next.date.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})}</strong> &nbsp;·&nbsp;`
+    ?`Next: <strong>${esc(next.name)}</strong> on <strong>${next.date.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})}</strong> &nbsp;·&nbsp;`
     :'No upcoming working shifts &nbsp;·&nbsp;';
-  banner.innerHTML=`👤 <strong>${esc(me.name)}</strong> &nbsp;·&nbsp; ${nxt}`
-    +`D:<strong>${dc}</strong> &nbsp;A:<strong>${ac}</strong> &nbsp;RD:<strong>${rdc}</strong> &nbsp;AL:<strong>${alc}</strong> &nbsp;Off:<strong>${ofc}</strong>`;
+  const countsStr=shiftDefs.map(s=>`${esc(s.label)}:<strong>${counts[s.key]}</strong>`).join(' &nbsp;');
+  banner.innerHTML=`👤 <strong>${esc(me.name)}</strong> &nbsp;·&nbsp; ${nxt}${countsStr} &nbsp;Off:<strong>${ofc}</strong>`;
   banner.className='mybanner show';
 }
 
@@ -384,6 +400,7 @@ function exportCSV(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // pre-fill form and auto-load on start
+buildViewerShiftUI();
 loadAndRender();
 </script>
 </body>
