@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Roster Manager — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7fa;--bg2:#fff;--bg3:#eef1f6;--bg4:#e2e7f0;
+  --border:#dde2ec;--border2:#c8d0e0;
+  --text:#1a1f36;--text2:#4a5170;--text3:#8890aa;
+  --accent:#3b5bdb;--accent2:#2f4ac7;
+  --r:7px;--rl:11px;
+  --ui:'Inter',sans-serif;--mono:'DM Mono',monospace;
+  --sh:0 1px 4px rgba(0,0,0,.08);
+  --d-bg:#dbeafe;--d-t:#1e40af;--d-b:#93c5fd;
+  --a-bg:#dcfce7;--a-t:#166534;--a-b:#86efac;
+  --rd-bg:#fef9c3;--rd-t:#854d0e;--rd-b:#fde047;
+  --al-bg:#fce7f3;--al-t:#9d174d;--al-b:#f9a8d4;
+  --of-bg:#f8fafc;--of-t:#94a3b8;--of-b:#e2e8f0;
+  --we:#f1f5f9;
+  --sbg:#ede9fe;--st:#5b21b6;--sb:#c4b5fd;
+  --stbg:#e0f2fe;--stt:#075985;--stb:#7dd3fc;
+  --ubg:#fef3c7;--ut:#92400e;--ub:#fcd34d;
+  --red:#dc2626;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--ui)}
+body{display:flex;flex-direction:column;min-height:100vh;user-select:none}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:12px;padding:11px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:60;box-shadow:var(--sh)}
+.logo{font-size:16px;font-weight:700;color:var(--accent);letter-spacing:-.3px}
+.sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.rbadge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;letter-spacing:.5px;background:var(--accent);color:#fff}
+.sind{font-size:11px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:5px;transition:color .3s}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background .3s;flex-shrink:0}
+.sind.saving{color:#d97706}.sind.saving .sdot{background:#d97706}
+.sind.saved{color:#16a34a}.sind.saved .sdot{background:#16a34a}
+.sind.error{color:var(--red)}.sind.error .sdot{background:var(--red)}
+
+/* ── OFFLINE BANNER ── */
+.offbanner{display:none;background:#fef3c7;border-bottom:1px solid #fde68a;padding:8px 20px;font-size:12px;color:#92400e;gap:8px;align-items:center}
+.offbanner.show{display:flex}
+
+/* ── TABS ── */
+nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto}
+.tab{font-size:12px;font-weight:600;letter-spacing:.3px;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);white-space:nowrap;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text2)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── LAYOUT ── */
+main{flex:1;padding:14px 20px;overflow:hidden}
+.panel{display:none}.panel.active{display:block}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:11px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh)}
+input[type=text],input[type=date],select{font-size:12px;font-family:var(--ui);padding:5px 8px;border-radius:var(--r);border:1px solid var(--border2);background:#fff;color:var(--text);outline:none;transition:border-color .15s}
+input[type=text]:focus,input[type=date]:focus,select:focus{border-color:var(--accent)}
+input::placeholder{color:var(--text3)}
+label{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
+
+/* ── BUTTONS ── */
+.btn{font-size:12px;font-family:var(--ui);font-weight:600;padding:5px 11px;border-radius:var(--r);border:1px solid var(--border2);background:#fff;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .12s}
+.btn:hover{background:var(--bg3);color:var(--text)}
+.btn.acc{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.acc:hover{background:var(--accent2)}
+.btn.sm{font-size:11px;padding:3px 8px}
+.btn.dan{color:var(--red);border-color:var(--red);background:#fff}.btn.dan:hover{background:#fef2f2}
+.btn.bd{background:var(--d-bg);color:var(--d-t);border-color:var(--d-b)}
+.btn.ba{background:var(--a-bg);color:var(--a-t);border-color:var(--a-b)}
+.btn.brd{background:var(--rd-bg);color:var(--rd-t);border-color:var(--rd-b)}
+.btn.bal{background:var(--al-bg);color:var(--al-t);border-color:var(--al-b)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:11px}
+@media(max-width:820px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:8px 12px;box-shadow:var(--sh)}
+.slbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.sval{font-size:20px;font-weight:700;font-family:var(--mono)}
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:10px;font-size:11px;color:var(--text3);margin-bottom:8px;flex-wrap:wrap;align-items:center;font-family:var(--mono)}
+.lsq{width:13px;height:13px;border-radius:3px;display:inline-block;vertical-align:-3px;margin-right:3px;border:1px solid rgba(0,0,0,.1)}
+
+/* ── TABLE WRAPPER ── */
+.twrap{overflow:auto;border:1px solid var(--border);border-radius:var(--rl);max-height:calc(100vh - 320px);background:var(--bg2);box-shadow:var(--sh)}
+table{border-collapse:collapse;width:100%;font-size:11px;font-family:var(--mono)}
+
+/* ── THEAD ── */
+thead th{position:sticky;top:0;background:#f8f9fc;z-index:10;padding:6px 3px;border-bottom:1px solid var(--border2);font-weight:600;text-align:center;white-space:nowrap;color:var(--text2)}
+thead th.uc{left:0;z-index:22;text-align:left;padding-left:10px;min-width:140px;font-family:var(--ui);font-size:11px;background:#f8f9fc}
+thead th.ic{left:140px;z-index:21;min-width:78px;background:#f8f9fc}
+thead th.we{background:#f0f4f8!important;color:var(--text3)}
+
+/* ── TBODY ── */
+tbody th.uc{position:sticky;left:0;z-index:6;background:var(--bg2);padding:4px 10px;border-right:1px solid var(--border);font-weight:500;white-space:nowrap;min-width:140px;font-family:var(--ui);font-size:11px;color:var(--text)}
+tbody td.ic{position:sticky;left:140px;z-index:5;background:var(--bg2);border-right:1px solid var(--border);padding:3px 4px;min-width:78px;cursor:default}
+tbody tr:hover th.uc,tbody tr:hover td.ic{background:#eff3ff}
+td{padding:1px 2px;border:1px solid var(--border);text-align:center;cursor:crosshair;min-width:34px}
+
+/* ── SHIFT COLOURS ── */
+td.sd{background:var(--d-bg);color:var(--d-t);font-weight:600}
+td.sa{background:var(--a-bg);color:var(--a-t);font-weight:600}
+td.srd{background:var(--rd-bg);color:var(--rd-t);font-weight:600}
+td.sal{background:var(--al-bg);color:var(--al-t);font-weight:600}
+td.sof{background:var(--of-bg);color:var(--of-t)}
+td.we{background:var(--we)!important}
+td.sd.we{background:#bfdbfe!important}
+td.sa.we{background:#bbf7d0!important}
+td.srd.we{background:#fef08a!important}
+td.sal.we{background:#fbcfe8!important}
+.dhdr{font-size:9px;color:var(--text3);display:block;font-family:var(--ui)}
+
+/* ── BADGES ── */
+.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:4px;font-weight:500;white-space:nowrap}
+.bsec{background:var(--sbg);color:var(--st);border:1px solid var(--sb)}
+.bsta{background:var(--stbg);color:var(--stt);border:1px solid var(--stb)}
+.buni{background:var(--ubg);color:var(--ut);border:1px solid var(--ub)}
+.mrow{display:flex;gap:2px;flex-wrap:wrap}
+
+/* ── DRAG TIP ── */
+.dtip{position:fixed;z-index:3000;pointer-events:none;padding:4px 10px;border-radius:var(--r);font-size:12px;font-family:var(--mono);font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none;border:1px solid rgba(0,0,0,.08)}
+
+/* ── CONTEXT MENU ── */
+.cmenu{position:fixed;z-index:2000;background:#fff;border:1px solid var(--border2);border-radius:var(--rl);box-shadow:0 8px 28px rgba(0,0,0,.14);padding:5px;min-width:152px;display:none}
+.cmenu.open{display:block}
+.ci{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);cursor:pointer;font-size:12px;font-family:var(--ui);font-weight:500;transition:background .1s}
+.ci:hover{background:var(--bg3)}
+.cdot{width:12px;height:12px;border-radius:3px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+.csep{height:1px;background:var(--border);margin:4px 0}
+
+/* ── CONFIG ── */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+@media(max-width:700px){.cgrid{grid-template-columns:1fr}}
+.ccard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:14px;box-shadow:var(--sh)}
+.ccard h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.clist{list-style:none;margin-bottom:10px;max-height:200px;overflow-y:auto}
+.clist li{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}
+.clist li:last-child{border-bottom:none}
+.delbtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 4px;line-height:1;transition:color .12s}.delbtn:hover{color:var(--red)}
+.arow{display:flex;gap:6px}.arow input{flex:1}
+.ctip{font-size:11px;color:var(--text3);padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)}
+
+/* ── USERS TABLE ── */
+.utwrap{overflow:auto;border:1px solid var(--border);border-radius:var(--rl);max-height:calc(100vh - 250px);box-shadow:var(--sh)}
+.utable{width:100%;border-collapse:collapse;font-size:12px}
+.utable thead th{position:sticky;top:0;z-index:5;background:#f8f9fc;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text3);text-align:left}
+.utable tbody td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.utable tbody tr:hover td{background:#eff3ff}
+.utable tbody tr:last-child td{border-bottom:none}
+
+/* ── MODAL ── */
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);z-index:200;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.modal{background:#fff;border:1px solid var(--border2);border-radius:var(--rl);padding:22px;min-width:280px;max-width:380px;width:92%;box-shadow:0 20px 50px rgba(0,0,0,.15)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:16px}
+.mfrow{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.mfrow label{font-size:11px;color:var(--text3);letter-spacing:.3px;text-transform:uppercase}
+.mfrow input,.mfrow select{width:100%;font-size:13px;padding:7px 9px}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg3)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+.sw{position:relative;display:flex;align-items:center}
+.sw input{padding-left:26px}
+.si{position:absolute;left:8px;color:var(--text3);font-size:12px;pointer-events:none}
+</style>
+</head>
+<body>
+
+<!-- offline warning -->
+<div class="offbanner" id="offbanner">
+  ⚠️ <strong>Cannot reach the local server.</strong> &nbsp;
+  Run <code style="background:#fde68a;padding:1px 5px;border-radius:3px;">node server.js</code> in this folder,
+  then open <strong>http://localhost:3000/roster-admin.html</strong>
+</div>
+
+<header>
+  <div>
+    <div class="logo">ROSTER MANAGER</div>
+    <div class="sub">56-DAY SHIFT PLANNER · roster-data.json</div>
+  </div>
+  <div class="hright">
+    <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Connecting…</span></div>
+    <button class="btn sm acc" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn sm dan" onclick="resetData()">↺ Reset</button>
+    <span class="rbadge">ADMIN</span>
+  </div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
+  <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
+  <div class="tab" onclick="switchTab('users')">👥 Users</div>
+</nav>
+
+<!-- drag tooltip -->
+<div class="dtip" id="dtip"></div>
+
+<!-- right-click menu -->
+<div class="cmenu" id="cmenu">
+  <div class="ci" onclick="applyCtx('D')"><span class="cdot" style="background:var(--d-bg);border-color:var(--d-b)"></span><span style="color:var(--d-t)">D — Day</span></div>
+  <div class="ci" onclick="applyCtx('A')"><span class="cdot" style="background:var(--a-bg);border-color:var(--a-b)"></span><span style="color:var(--a-t)">A — Afternoon</span></div>
+  <div class="ci" onclick="applyCtx('RD')"><span class="cdot" style="background:var(--rd-bg);border-color:var(--rd-b)"></span><span style="color:var(--rd-t)">RD — Rest Day</span></div>
+  <div class="ci" onclick="applyCtx('AL')"><span class="cdot" style="background:var(--al-bg);border-color:var(--al-b)"></span><span style="color:var(--al-t)">AL — Annual Leave</span></div>
+  <div class="csep"></div>
+  <div class="ci" onclick="applyCtx('OFF')"><span class="cdot" style="background:var(--of-bg);border-color:var(--of-b)"></span><span style="color:var(--of-t)">— Clear / Off</span></div>
+</div>
+
+<main>
+
+  <!-- ═══ ROSTER ═══ -->
+  <div id="panel-roster" class="panel active">
+    <div class="toolbar">
+      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
+      <label>Start date <input type="date" id="startDate" onchange="onDateChange()"></label>
+      <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
+      <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
+      <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
+      <select id="fShift" onchange="buildBody()">
+        <option value="">All shifts</option>
+        <option value="D">D — Day</option>
+        <option value="A">A — Afternoon</option>
+        <option value="RD">RD — Rest Day</option>
+        <option value="AL">AL — Annual Leave</option>
+        <option value="OFF">Off</option>
+      </select>
+      <span style="font-size:11px;color:var(--text3)">Bulk fill:</span>
+      <button class="btn sm bd" onclick="bulkFill('D')">D</button>
+      <button class="btn sm ba" onclick="bulkFill('A')">A</button>
+      <button class="btn sm brd" onclick="bulkFill('RD')">RD</button>
+      <button class="btn sm bal" onclick="bulkFill('AL')">AL</button>
+      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
+    </div>
+
+    <div class="legend">
+      <span><span class="lsq" style="background:var(--d-bg);border-color:var(--d-b)"></span>D = Day</span>
+      <span><span class="lsq" style="background:var(--a-bg);border-color:var(--a-b)"></span>A = Afternoon</span>
+      <span><span class="lsq" style="background:var(--rd-bg);border-color:var(--rd-b)"></span>RD = Rest Day</span>
+      <span><span class="lsq" style="background:var(--al-bg);border-color:var(--al-b)"></span>AL = Annual Leave</span>
+      <span><span class="lsq" style="background:var(--of-bg);border-color:var(--of-b)"></span>Off</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click = cycle &nbsp;|&nbsp; Right-click = pick &nbsp;|&nbsp; <b>Click &amp; drag = paint</b></span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
+      <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
+      <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
+      <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
+      <div class="stat"><div class="slbl">Ann. Leave (AL)</div><div class="sval" id="sal" style="color:var(--al-t)">—</div></div>
+      <div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>
+    </div>
+
+    <div class="twrap">
+      <table><thead id="rHead"></thead><tbody id="rBody"></tbody></table>
+    </div>
+  </div>
+
+  <!-- ═══ CONFIG ═══ -->
+  <div id="panel-config" class="panel">
+    <div class="cgrid">
+      <div class="ccard">
+        <h3><span class="badge bsec">S</span> Sectors</h3>
+        <ul class="clist" id="secList"></ul>
+        <div class="arow"><input type="text" id="nSec" placeholder="New sector…" onkeydown="if(event.key==='Enter')addCfg('sec')"><button class="btn sm acc" onclick="addCfg('sec')">+ Add</button></div>
+      </div>
+      <div class="ccard">
+        <h3><span class="badge bsta">ST</span> Stations</h3>
+        <ul class="clist" id="staList"></ul>
+        <div class="arow"><input type="text" id="nSta" placeholder="New station…" onkeydown="if(event.key==='Enter')addCfg('sta')"><button class="btn sm acc" onclick="addCfg('sta')">+ Add</button></div>
+      </div>
+      <div class="ccard">
+        <h3><span class="badge buni">U</span> Units</h3>
+        <ul class="clist" id="uniList"></ul>
+        <div class="arow"><input type="text" id="nUni" placeholder="New unit…" onkeydown="if(event.key==='Enter')addCfg('uni')"><button class="btn sm acc" onclick="addCfg('uni')">+ Add</button></div>
+      </div>
+    </div>
+    <p class="ctip">✦ After adding items here, go to the <strong>Users</strong> tab to assign them to each staff member.</p>
+  </div>
+
+  <!-- ═══ USERS ═══ -->
+  <div id="panel-users" class="panel">
+    <div class="toolbar">
+      <div class="sw"><span class="si">🔍</span><input type="text" id="usrch" placeholder="Search…" style="width:130px" oninput="buildUsers()"></div>
+      <select id="ufSec" onchange="buildUsers()"><option value="">All sectors</option></select>
+      <select id="ufSta" onchange="buildUsers()"><option value="">All stations</option></select>
+      <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
+      <button class="btn acc" onclick="openAddUser()">+ Add user</button>
+    </div>
+    <div class="utwrap">
+      <table class="utable">
+        <thead><tr><th>Name</th><th>Sector</th><th>Station</th><th>Unit</th><th>Default Shift</th><th></th></tr></thead>
+        <tbody id="uBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- modal -->
+<div class="mbg" id="modal">
+  <div class="modal">
+    <h3 id="mTitle">Add user</h3>
+    <div class="mfrow"><label>Full name</label><input type="text" id="mName" placeholder="e.g. Jane Smith"></div>
+    <div class="mfrow"><label>Sector</label><select id="mSec"><option value="">— none —</option></select></div>
+    <div class="mfrow"><label>Station</label><select id="mSta"><option value="">— none —</option></select></div>
+    <div class="mfrow"><label>Unit</label><select id="mUni"><option value="">— none —</option></select></div>
+    <div class="mfrow"><label>Default shift</label>
+      <select id="mShift">
+        <option value="OFF">Off</option>
+        <option value="D">D — Day</option>
+        <option value="A">A — Afternoon</option>
+        <option value="RD">RD — Rest Day</option>
+        <option value="AL">AL — Annual Leave</option>
+      </select>
+    </div>
+    <div class="mbtns">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn acc" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════════════════ */
+const DAYS   = 56;
+const SHIFTS = ['OFF','D','A','RD','AL'];
+const CLS    = {D:'sd',A:'sa',RD:'srd',AL:'sal',OFF:'sof'};
+const LBL    = {D:'D',A:'A',RD:'RD',AL:'AL',OFF:''};
+const NAME   = {D:'Day',A:'Afternoon',RD:'Rest Day',AL:'Annual Leave',OFF:'Off'};
+const SCOL   = {
+  D  :{bg:'#dbeafe',fg:'#1e40af'},
+  A  :{bg:'#dcfce7',fg:'#166534'},
+  RD :{bg:'#fef9c3',fg:'#854d0e'},
+  AL :{bg:'#fce7f3',fg:'#9d174d'},
+  OFF:{bg:'#f8fafc',fg:'#94a3b8'}
+};
+
+/* ════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════ */
+let users=[], roster={}, sectors=[], stations=[], units=[];
+let startDate = new Date();
+let editUID = null, ctxUID = null, ctxDay = null, saveTimer = null;
+let dragging = false, dragShift = null, dragSet = new Set();
+
+/* ════════════════════════════════════════════════════════
+   API
+════════════════════════════════════════════════════════ */
+async function apiLoad(){
+  try {
+    const r = await fetch('/api/data');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const p = await r.json();
+    sectors  = p.sectors  || [];
+    stations = p.stations || [];
+    units    = p.units    || [];
+    users    = p.users    || [];
+    roster   = p.roster   || {};
+    if(p.startDate){
+      startDate = new Date(p.startDate);
+      document.getElementById('startDate').value = p.startDate;
+    }
+    setStatus('saved','Loaded ✓');
+    setTimeout(()=>setStatus('idle','Ready'), 2000);
+    document.getElementById('offbanner').classList.remove('show');
+    return true;
+  } catch(e){
+    document.getElementById('offbanner').classList.add('show');
+    setStatus('error','Server offline');
+    return false;
+  }
+}
+
+function apiSave(){
+  clearTimeout(saveTimer);
+  setStatus('saving','Saving…');
+  saveTimer = setTimeout(async()=>{
+    try {
+      const body = JSON.stringify({
+        version:3,
+        startDate: document.getElementById('startDate').value,
+        sectors, stations, units, users, roster
+      });
+      const r = await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j = await r.json();
+      const t = new Date(j.savedAt);
+      setStatus('saved','Saved '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+      setTimeout(()=>setStatus('idle','Ready'), 3500);
+    } catch(e){
+      setStatus('error','Save failed – '+e.message);
+    }
+  }, 500);
+}
+
+function setStatus(state, label){
+  const el = document.getElementById('sind');
+  el.className = 'sind' + (state!=='idle' ? ' '+state : '');
+  document.getElementById('slbl').textContent = label;
+}
+
+/* ════════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════ */
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>
+    el.classList.toggle('active', ['roster','config','users'][i]===t));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='config') buildCfgLists();
+  if(t==='users')  { populateSelects(); buildUsers(); }
+}
+
+/* ════════════════════════════════════════════════════════
+   ROSTER HEAD
+════════════════════════════════════════════════════════ */
+function buildHead(){
+  const base = new Date(startDate);
+  let h = '<tr>'
+    + '<th class="uc">User</th>'
+    + '<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:78px;text-align:center">Info</th>';
+  for(let i=0;i<DAYS;i++){
+    const d = new Date(base); d.setDate(base.getDate()+i);
+    const we = d.getDay()===0||d.getDay()===6;
+    const lbl = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    const dn  = d.toLocaleDateString('en-GB',{weekday:'short'});
+    h += `<th class="${we?'we':''}" title="${lbl}"><span class="dhdr">${dn}</span>${i+1}</th>`;
+  }
+  document.getElementById('rHead').innerHTML = h + '</tr>';
+}
+
+/* ════════════════════════════════════════════════════════
+   FILTER
+════════════════════════════════════════════════════════ */
+function filtered(){
+  const s   = document.getElementById('srch').value.toLowerCase();
+  const fsc = document.getElementById('fSec').value;
+  const fst = document.getElementById('fSta').value;
+  const fun = document.getElementById('fUni').value;
+  const fsh = document.getElementById('fShift').value;
+  return users.filter(u=>{
+    if(s   && !u.name.toLowerCase().includes(s)) return false;
+    if(fsc && u.sector  !==fsc) return false;
+    if(fst && u.station !==fst) return false;
+    if(fun && u.unit    !==fun) return false;
+    if(fsh && !(roster[u.id]||[]).some(x=>x===fsh)) return false;
+    return true;
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   ROSTER BODY
+════════════════════════════════════════════════════════ */
+function buildBody(){
+  const base = new Date(startDate);
+  const list = filtered();
+  let h = '';
+  list.forEach(u=>{
+    h += `<tr><th class="uc">${esc(u.name)}</th>`
+       + `<td class="ic"><div class="mrow">`
+       + (u.sector  ? `<span class="badge bsec">${esc(u.sector)}</span>`  : '')
+       + (u.station ? `<span class="badge bsta">${esc(u.station)}</span>` : '')
+       + (u.unit    ? `<span class="badge buni">${esc(u.unit)}</span>`    : '')
+       + `</div></td>`;
+    for(let i=0;i<DAYS;i++){
+      const d  = new Date(base); d.setDate(base.getDate()+i);
+      const we = d.getDay()===0||d.getDay()===6;
+      const s  = (roster[u.id]||[])[i]||'OFF';
+      h += `<td class="${CLS[s]}${we?' we':''}" data-uid="${u.id}" data-d="${i}">${LBL[s]}</td>`;
+    }
+    h += '</tr>';
+  });
+  document.getElementById('rBody').innerHTML = h;
+  attachCells();
+  updateStats(list);
+}
+
+/* ════════════════════════════════════════════════════════
+   CELL INTERACTION  (click / drag / right-click)
+════════════════════════════════════════════════════════ */
+function attachCells(){
+  document.querySelectorAll('#rBody td[data-uid]').forEach(td=>{
+
+    // right-click → context menu
+    td.addEventListener('contextmenu', e=>{
+      e.preventDefault();
+      if(dragging) return;
+      ctxUID = td.dataset.uid;
+      ctxDay = +td.dataset.d;
+      const m = document.getElementById('cmenu');
+      m.classList.add('open');
+      m.style.left = Math.min(e.clientX, innerWidth -160)+'px';
+      m.style.top  = Math.min(e.clientY, innerHeight-230)+'px';
+    });
+
+    // mousedown → start drag
+    td.addEventListener('mousedown', e=>{
+      if(e.button!==0) return;
+      e.preventDefault();
+      closeCtx();
+      const uid = td.dataset.uid, day = +td.dataset.d;
+      const cur = (roster[uid]||[])[day]||'OFF';
+      dragShift = SHIFTS[(SHIFTS.indexOf(cur)+1)%SHIFTS.length];
+      dragging  = true;
+      dragSet   = new Set();
+      paint(td, uid, day);
+      showTip(e, dragShift);
+    });
+
+    // mouseenter → paint while dragging
+    td.addEventListener('mouseenter', e=>{
+      if(!dragging) return;
+      const uid = td.dataset.uid, day = +td.dataset.d;
+      const key = uid+'|'+day;
+      if(!dragSet.has(key)) paint(td, uid, day);
+      moveTip(e);
+    });
+  });
+}
+
+function paint(td, uid, day){
+  if(!roster[uid]) roster[uid] = Array(DAYS).fill('OFF');
+  roster[uid][day] = dragShift;
+  const base = new Date(startDate); base.setDate(base.getDate()+day);
+  const we   = base.getDay()===0||base.getDay()===6;
+  td.className = CLS[dragShift] + (we?' we':'');
+  td.textContent = LBL[dragShift];
+  dragSet.add(uid+'|'+day);
+}
+
+document.addEventListener('mouseup', ()=>{
+  if(!dragging) return;
+  dragging = false; hideTip();
+  if(dragSet.size) { updateStats(filtered()); apiSave(); }
+  dragShift = null; dragSet = new Set();
+});
+document.addEventListener('mousemove', e=>{ if(dragging) moveTip(e); });
+
+function showTip(e, s){
+  const t = document.getElementById('dtip');
+  t.style.background = SCOL[s].bg;
+  t.style.color      = SCOL[s].fg;
+  t.textContent = s==='OFF' ? 'Clear' : s+' — '+NAME[s];
+  t.style.display = 'block';
+  moveTip(e);
+}
+function moveTip(e){
+  const t=document.getElementById('dtip');
+  t.style.left=(e.clientX+14)+'px';
+  t.style.top =(e.clientY-10)+'px';
+}
+function hideTip(){ document.getElementById('dtip').style.display='none'; }
+
+/* ── context menu apply ── */
+function applyCtx(s){
+  if(ctxUID===null) return;
+  if(!roster[ctxUID]) roster[ctxUID]=Array(DAYS).fill('OFF');
+  roster[ctxUID][ctxDay]=s;
+  const td=document.querySelector(`td[data-uid="${ctxUID}"][data-d="${ctxDay}"]`);
+  if(td){
+    const base=new Date(startDate);base.setDate(base.getDate()+ctxDay);
+    const we=base.getDay()===0||base.getDay()===6;
+    td.className=CLS[s]+(we?' we':'');
+    td.textContent=LBL[s];
+  }
+  updateStats(filtered()); apiSave(); closeCtx();
+}
+function closeCtx(){
+  document.getElementById('cmenu').classList.remove('open');
+  ctxUID=null; ctxDay=null;
+}
+document.addEventListener('click', e=>{
+  if(!document.getElementById('cmenu').contains(e.target)) closeCtx();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeCtx(); });
+
+/* ════════════════════════════════════════════════════════
+   STATS
+════════════════════════════════════════════════════════ */
+function updateStats(list){
+  let d=0,a=0,rd=0,al=0,tot=0;
+  (list||filtered()).forEach(u=>{
+    (roster[u.id]||[]).forEach(s=>{
+      if(s==='D')d++; else if(s==='A')a++;
+      else if(s==='RD')rd++; else if(s==='AL')al++;
+      tot++;
+    });
+  });
+  document.getElementById('su').textContent  = (list||filtered()).length;
+  document.getElementById('sd').textContent  = d;
+  document.getElementById('sa').textContent  = a;
+  document.getElementById('srd').textContent = rd;
+  document.getElementById('sal').textContent = al;
+  document.getElementById('scov').textContent= tot ? Math.round((d+a)/tot*100)+'%' : '0%';
+}
+
+function bulkFill(s){
+  filtered().forEach(u=>{ roster[u.id]=Array(DAYS).fill(s); });
+  buildBody(); apiSave();
+}
+
+/* ════════════════════════════════════════════════════════
+   FILTER SELECTS
+════════════════════════════════════════════════════════ */
+function populateSelects(){
+  [['fSec','sector',sectors],['fSta','station',stations],['fUni','unit',units],
+   ['ufSec','sector',sectors],['ufSta','station',stations],['ufUni','unit',units]].forEach(([id,type,list])=>{
+    const el=document.getElementById(id); if(!el)return;
+    const cur=el.value;
+    el.innerHTML=`<option value="">All ${type}s</option>`
+      +list.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+  });
+  [['mSec','sector',sectors],['mSta','station',stations],['mUni','unit',units]].forEach(([id,type,list])=>{
+    const el=document.getElementById(id); if(!el)return;
+    el.innerHTML=`<option value="">— none —</option>`
+      +list.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════════════ */
+function buildCfgLists(){
+  [['sec','secList',sectors],['sta','staList',stations],['uni','uniList',units]].forEach(([key,id,list])=>{
+    document.getElementById(id).innerHTML = list.length
+      ? list.map((v,i)=>`<li><span>${esc(v)}</span><button class="delbtn" onclick="delCfg('${key}',${i})">×</button></li>`).join('')
+      : `<li style="color:var(--text3);font-size:11px;font-style:italic">No items yet</li>`;
+  });
+}
+function addCfg(key){
+  const map={sec:['nSec',sectors],sta:['nSta',stations],uni:['nUni',units]};
+  const [inputId,list]=map[key];
+  const v=document.getElementById(inputId).value.trim();
+  if(!v)return;
+  list.push(v);
+  document.getElementById(inputId).value='';
+  buildCfgLists(); populateSelects(); apiSave();
+}
+function delCfg(key,idx){
+  const map={sec:sectors,sta:stations,uni:units};
+  map[key].splice(idx,1);
+  buildCfgLists(); populateSelects(); apiSave();
+}
+
+/* ════════════════════════════════════════════════════════
+   USERS TABLE
+════════════════════════════════════════════════════════ */
+function buildUsers(){
+  const s  =document.getElementById('usrch').value.toLowerCase();
+  const fsc=document.getElementById('ufSec').value;
+  const fst=document.getElementById('ufSta').value;
+  const fun=document.getElementById('ufUni').value;
+  const list=users.filter(u=>{
+    if(s   && !u.name.toLowerCase().includes(s)) return false;
+    if(fsc && u.sector  !==fsc) return false;
+    if(fst && u.station !==fst) return false;
+    if(fun && u.unit    !==fun) return false;
+    return true;
+  });
+  const ss={
+    D  :`background:var(--d-bg);color:var(--d-t);border:1px solid var(--d-b)`,
+    A  :`background:var(--a-bg);color:var(--a-t);border:1px solid var(--a-b)`,
+    RD :`background:var(--rd-bg);color:var(--rd-t);border:1px solid var(--rd-b)`,
+    AL :`background:var(--al-bg);color:var(--al-t);border:1px solid var(--al-b)`,
+    OFF:`background:var(--of-bg);color:var(--of-t);border:1px solid var(--of-b)`
+  };
+  document.getElementById('uBody').innerHTML = list.map(u=>`<tr>
+    <td style="font-weight:500">${esc(u.name)}</td>
+    <td>${u.sector  ? `<span class="badge bsec">${esc(u.sector)}</span>`  : '—'}</td>
+    <td>${u.station ? `<span class="badge bsta">${esc(u.station)}</span>` : '—'}</td>
+    <td>${u.unit    ? `<span class="badge buni">${esc(u.unit)}</span>`    : '—'}</td>
+    <td><span style="display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:5px;font-weight:600;${ss[u.defaultShift||'OFF']}">${NAME[u.defaultShift||'OFF']}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn sm" onclick="openEditUser('${u.id}')">✏ Edit</button>
+      <button class="btn sm dan" onclick="delUser('${u.id}')">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openAddUser(){
+  editUID=null;
+  document.getElementById('mTitle').textContent='Add user';
+  document.getElementById('mName').value='';
+  document.getElementById('mShift').value='OFF';
+  populateSelects();
+  ['mSec','mSta','mUni'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal').classList.add('open');
+}
+function openEditUser(id){
+  editUID=id;
+  const u=users.find(x=>x.id===id);
+  document.getElementById('mTitle').textContent='Edit user';
+  document.getElementById('mName').value=u.name;
+  document.getElementById('mShift').value=u.defaultShift||'OFF';
+  populateSelects();
+  setTimeout(()=>{
+    document.getElementById('mSec').value=u.sector||'';
+    document.getElementById('mSta').value=u.station||'';
+    document.getElementById('mUni').value=u.unit||'';
+  },10);
+  document.getElementById('modal').classList.add('open');
+}
+function saveUser(){
+  const name=document.getElementById('mName').value.trim(); if(!name)return;
+  const sector  =document.getElementById('mSec').value;
+  const station =document.getElementById('mSta').value;
+  const unit    =document.getElementById('mUni').value;
+  const ds      =document.getElementById('mShift').value;
+  if(editUID){
+    Object.assign(users.find(x=>x.id===editUID),{name,sector,station,unit,defaultShift:ds});
+  } else {
+    const id='u'+Date.now();
+    users.push({id,name,sector,station,unit,defaultShift:ds});
+    roster[id]=Array(DAYS).fill(ds);
+  }
+  closeModal(); buildUsers(); buildBody(); apiSave();
+}
+function delUser(id){
+  if(!confirm('Remove this user from the roster?')) return;
+  users=users.filter(u=>u.id!==id);
+  delete roster[id];
+  buildUsers(); buildBody(); apiSave();
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+/* ════════════════════════════════════════════════════════
+   DATE
+════════════════════════════════════════════════════════ */
+function onDateChange(){
+  const v=document.getElementById('startDate').value;
+  startDate=v?new Date(v):new Date();
+  buildHead(); buildBody(); apiSave();
+}
+
+/* ════════════════════════════════════════════════════════
+   EXPORT CSV
+════════════════════════════════════════════════════════ */
+function exportCSV(){
+  const base=new Date(startDate);
+  let csv='Name,Sector,Station,Unit';
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(base);d.setDate(base.getDate()+i);
+    csv+=','+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  }
+  csv+='\n';
+  users.forEach(u=>{
+    csv+=`"${u.name}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
+    (roster[u.id]||[]).forEach(s=>csv+=','+s);
+    csv+='\n';
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='roster_56days.csv'; a.click();
+}
+
+/* ════════════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════════════ */
+function resetData(){
+  if(!confirm('Reset everything and load sample data?')) return;
+  sectors  =['Alpha','Bravo','Charlie','Delta'];
+  stations =['North','South','East','West','Central'];
+  units    =['Unit 1','Unit 2','Unit 3','Unit 4','Unit 5','Unit 6'];
+  const FN =['Alex','Jordan','Morgan','Taylor','Casey','Riley','Quinn','Avery','Blake','Cameron','Dana','Ellis','Finley','Gray','Harper','Indigo','Jesse','Kai','Lane','Loren','Madi','Noel','Oakley','Peyton','Reed','Sage','Shay','Skyler','Tatum','Val','Wren','Zara','Adrian','Brynn','Colin','Drew','Eden','Flynn','Gwen','Hale','Ivy','Jace','Kira','Leo','Mira','Nico','Ora','Piper','Rhys','Sam','Chris','Jamie','Reese','Emery','Rowan','Hayden','Parker','River','Sloane','Kendall'];
+  const LN =['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Martinez','Wilson','Anderson','Taylor','Thomas','Jackson','White','Harris','Clark','Lewis','Lee','Walker','Hall','Allen','Young','King','Wright','Scott','Torres','Green','Adams','Nelson'];
+  users=[]; roster={};
+  for(let i=0;i<70;i++){
+    const id='u'+i;
+    users.push({id,name:FN[i%FN.length]+' '+LN[i%LN.length],sector:sectors[i%4],station:stations[i%5],unit:units[i%6],defaultShift:'OFF'});
+    roster[id]=Array(DAYS).fill('OFF');
+  }
+  const t=new Date(); startDate=t;
+  document.getElementById('startDate').value=t.toISOString().slice(0,10);
+  populateSelects(); buildHead(); buildBody(); apiSave();
+}
+
+/* ════════════════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════════════════ */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════ */
+async function init(){
+  const t=new Date(); startDate=t;
+  document.getElementById('startDate').value=t.toISOString().slice(0,10);
+  const ok = await apiLoad();
+  if(!ok){
+    // server not reachable — start with empty state so UI is usable
+    sectors=['Alpha','Bravo','Charlie','Delta'];
+    stations=['North','South','East','West','Central'];
+    units=['Unit 1','Unit 2','Unit 3','Unit 4','Unit 5','Unit 6'];
+  }
+  populateSelects(); buildHead(); buildBody();
+}
+
+init();
+document.getElementById('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+</script>
+</body>
+</html>
