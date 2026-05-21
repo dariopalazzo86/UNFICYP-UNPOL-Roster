@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:25:16.714Z",
+  "savedAt": "2026-05-21T09:25:36.385Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -211,11 +211,11 @@
     {
       "id": "u20",
       "name": "Andrey RODIN",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 1",
+      "station": "Linou",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Russia"
     },
     {
       "id": "u21",
