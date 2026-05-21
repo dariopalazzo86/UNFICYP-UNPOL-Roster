@@ -88,7 +88,7 @@ label{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
 .legend{display:flex;gap:10px;font-size:11px;color:var(--text3);margin-bottom:8px;flex-wrap:wrap;align-items:center;font-family:var(--mono)}
 .lsq{width:13px;height:13px;border-radius:3px;display:inline-block;vertical-align:-3px;margin-right:3px;border:1px solid rgba(0,0,0,.1)}
 /* TABLE */
-.twrap{overflow:auto;border:1px solid var(--border);border-radius:var(--rl);max-height:calc(100vh - 320px);background:var(--bg2);box-shadow:var(--sh)}
+.twrap{overflow-x:auto;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rl);max-height:calc(100vh - 320px);background:var(--bg2);box-shadow:var(--sh)}
 table{border-collapse:collapse;width:100%;font-size:11px;font-family:var(--mono)}
 thead th{position:sticky;top:0;background:#f8f9fc;z-index:10;padding:6px 3px;border-bottom:1px solid var(--border2);font-weight:600;text-align:center;white-space:nowrap;color:var(--text2)}
 thead th.uc{left:0;z-index:22;text-align:left;padding-left:10px;min-width:140px;font-family:var(--ui);font-size:11px;background:#f8f9fc}
@@ -128,17 +128,16 @@ td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:cross
 .clipbadge{position:fixed;bottom:18px;right:18px;z-index:3000;background:var(--accent);color:#fff;font-size:11px;font-family:var(--mono);font-weight:600;padding:6px 12px;border-radius:var(--r);box-shadow:0 4px 14px rgba(59,91,219,.35);display:none;gap:8px;align-items:center;transition:opacity .3s}
 .clipbadge.show{display:flex}
 /* CELL SELECTION */
-td.sel{outline:2px solid var(--accent)!important;outline-offset:-2px;z-index:3;position:relative}
-td.paste-target{outline:2px dashed #16a34a!important;outline-offset:-2px;z-index:3;position:relative}
+td.sel{outline:2px solid var(--accent)!important;outline-offset:-2px;z-index:3}
+td.paste-target{outline:2px dashed #16a34a!important;outline-offset:-2px;z-index:3}
 /* CORNER FILL HANDLE — Excel-style */
-td{position:relative}
+td[data-uid]{position:relative;overflow:visible}
 .cell-handle{
   position:absolute;bottom:-3px;right:-3px;
   width:7px;height:7px;
   background:var(--accent);border:1px solid #fff;
   border-radius:1px;
   cursor:crosshair;z-index:10;
-  display:block;
 }
 .cell-handle:hover{background:var(--accent2);transform:scale(1.3);}
 td.handle-src{outline:2px solid var(--accent)!important;outline-offset:-2px;}
