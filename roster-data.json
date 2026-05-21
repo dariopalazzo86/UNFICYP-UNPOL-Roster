@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:42:03.159Z",
+  "savedAt": "2026-05-21T09:42:16.139Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -490,11 +490,11 @@
     {
       "id": "u51",
       "name": "Vladimir KURAMSHIN",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 4",
+      "station": "Pyla",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Russia"
     },
     {
       "id": "u52",
