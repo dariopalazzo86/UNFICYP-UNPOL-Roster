@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:52:40.168Z",
+  "savedAt": "2026-05-21T05:53:58.799Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -18,7 +18,9 @@
     "Dherinya",
     "HQ Nicosia"
   ],
-  "units": [],
+  "units": [
+    "S1-LINOU-A"
+  ],
   "users": [
     {
       "id": "u0",
