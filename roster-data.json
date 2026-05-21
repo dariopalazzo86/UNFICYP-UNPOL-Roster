@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:28:46.432Z",
+  "savedAt": "2026-05-21T09:29:05.456Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -229,11 +229,11 @@
     {
       "id": "u22",
       "name": "Li ZHANG",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 1",
+      "station": "Linou",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "China"
     },
     {
       "id": "u23",
