@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:58:26.248Z",
+  "savedAt": "2026-05-21T05:58:30.977Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -520,7 +520,7 @@
   "roster": {
     "u0": [
       "OFF",
-      "D",
+      "OFF",
       "OFF",
       "OFF",
       "D",
