@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:09:41.705Z",
+  "savedAt": "2026-05-21T10:09:43.832Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4189,7 +4189,7 @@
     {
       "key": "D",
       "label": "D",
-      "name": "Day Sh",
+      "name": "Day Shi",
       "bg": "#dbeafe",
       "fg": "#1e40af",
       "border": "#93c5fd"
