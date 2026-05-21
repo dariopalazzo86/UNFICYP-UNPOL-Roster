@@ -39,7 +39,7 @@
     {
       "id": "u1",
       "name": "Maja SMAJLOVIC",
-      "sector": "HQ",
+        "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
       "defaultShift": "OFF"
@@ -47,57 +47,56 @@
     {
       "id": "u2",
       "name": "Heiko TROSS",
-      "sector": "",
-      "station": "",
-      "unit": "",
+       "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u3",
       "name": "Edoardo PETRONCINI",
-      "sector": "",
-      "station": "",
-      "unit": "",
+       "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u4",
       "name": "Aoife REILLY",
-      "sector": "",
-      "station": "",
-      "unit": "",
+       "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u5",
-      "name": "Raghu BISHT",
-      "sector": "",
-      "station": "",
-      "unit": "",
+       "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u6",
       "name": "Dragan NOVAKOVIC",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u7",
       "name": "Indri WIDIASIH",
-      "sector": "",
-      "station": "",
-      "unit": "",
+     "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
       "id": "u8",
       "name": "Anisa PASIC",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
