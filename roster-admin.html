@@ -221,12 +221,9 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <div class="dtip" id="dtip"></div>
 <div class="cmenu" id="cmenu">
-  <div class="ci" onclick="applyCtx('D')"><span class="cdot" style="background:var(--d-bg);border-color:var(--d-b)"></span><span style="color:var(--d-t)">D — Day</span></div>
-  <div class="ci" onclick="applyCtx('A')"><span class="cdot" style="background:var(--a-bg);border-color:var(--a-b)"></span><span style="color:var(--a-t)">A — Afternoon</span></div>
-  <div class="ci" onclick="applyCtx('RD')"><span class="cdot" style="background:var(--rd-bg);border-color:var(--rd-b)"></span><span style="color:var(--rd-t)">RD — Rest Day</span></div>
-  <div class="ci" onclick="applyCtx('AL')"><span class="cdot" style="background:var(--al-bg);border-color:var(--al-b)"></span><span style="color:var(--al-t)">AL — Annual Leave</span></div>
+  <div id="cmenuItems"><!-- populated by buildShiftUI() --></div>
   <div class="csep"></div>
-  <div class="ci" onclick="applyCtx('OFF')"><span class="cdot" style="background:var(--of-bg);border-color:var(--of-b)"></span><span style="color:var(--of-t)">— Clear / Off</span></div>
+  <div class="ci" onclick="applyCtx('OFF')"><span class="cdot" style="background:#f8fafc;border-color:#e2e8f0"></span><span style="color:#94a3b8">— Clear / Off</span></div>
 </div>
 
 <main>
@@ -239,35 +236,13 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
       <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
       <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
-      <select id="fShift" onchange="buildBody()">
-        <option value="">All shifts</option>
-        <option value="D">D — Day</option><option value="A">A — Afternoon</option>
-        <option value="RD">RD — Rest Day</option><option value="AL">AL — Annual Leave</option>
-        <option value="OFF">Off</option>
-      </select>
+      <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
       <span style="font-size:11px;color:var(--text3)">Bulk fill:</span>
-      <button class="btn sm bd" onclick="bulkFill('D')">D</button>
-      <button class="btn sm ba" onclick="bulkFill('A')">A</button>
-      <button class="btn sm brd" onclick="bulkFill('RD')">RD</button>
-      <button class="btn sm bal" onclick="bulkFill('AL')">AL</button>
+      <span id="bulkBtns"><!-- populated by buildShiftUI() --></span>
       <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
     </div>
-    <div class="legend">
-      <span><span class="lsq" style="background:var(--d-bg);border-color:var(--d-b)"></span>D = Day</span>
-      <span><span class="lsq" style="background:var(--a-bg);border-color:var(--a-b)"></span>A = Afternoon</span>
-      <span><span class="lsq" style="background:var(--rd-bg);border-color:var(--rd-b)"></span>RD = Rest Day</span>
-      <span><span class="lsq" style="background:var(--al-bg);border-color:var(--al-b)"></span>AL = Annual Leave</span>
-      <span><span class="lsq" style="background:var(--of-bg);border-color:var(--of-b)"></span>Off</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
-      <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
-      <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
-      <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
-      <div class="stat"><div class="slbl">Ann. Leave (AL)</div><div class="sval" id="sal" style="color:var(--al-t)">—</div></div>
-      <div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>
-    </div>
+    <div class="legend" id="shiftLegend"><!-- populated by buildShiftUI() --></div>
+    <div class="stats" id="statsBar"><!-- populated by buildShiftUI() --></div>
     <div class="twrap"><table><thead id="rHead"></thead><tbody id="rBody"></tbody></table></div>
   </div>
 
@@ -289,6 +264,23 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
         <ul class="clist" id="uniList"></ul>
         <div class="arow"><input type="text" id="nUni" placeholder="New unit…" onkeydown="if(event.key==='Enter')addCfg('uni')"><button class="btn sm acc" onclick="addCfg('uni')">+ Add</button></div>
       </div>
+    </div>
+    <!-- SHIFT TYPES -->
+    <div class="ccard" style="margin-bottom:12px">
+      <h3 style="margin-bottom:14px">🎨 Shift Types</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px" id="shiftTable">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Label</th>
+          <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Full name</th>
+          <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Background</th>
+          <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Text colour</th>
+          <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Preview</th>
+          <th style="padding:5px 8px;border-bottom:1px solid var(--border)"></th>
+        </tr></thead>
+        <tbody id="shiftRows"></tbody>
+      </table>
+      <button class="btn acc btn-sm" onclick="addShiftDef()">+ Add shift type</button>
+      <span style="font-size:11px;color:var(--text3);margin-left:10px">Changes apply immediately to the roster</span>
     </div>
     <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>Users</strong> tab.</p>
   </div>
@@ -338,16 +330,43 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 /* ══════════════════════════════════════════════════
    CONSTANTS
 ══════════════════════════════════════════════════ */
-const DAYS   = 56;
-const SHIFTS = ['OFF','D','A','RD','AL'];
-const CLS    = {D:'sd',A:'sa',RD:'srd',AL:'sal',OFF:'sof'};
-const LBL    = {D:'D',A:'A',RD:'RD',AL:'AL',OFF:''};
-const NAME   = {D:'Day',A:'Afternoon',RD:'Rest Day',AL:'Annual Leave',OFF:'Off'};
-const SCOL   = {
-  D:{bg:'#dbeafe',fg:'#1e40af'}, A:{bg:'#dcfce7',fg:'#166534'},
-  RD:{bg:'#fef9c3',fg:'#854d0e'}, AL:{bg:'#fce7f3',fg:'#9d174d'},
-  OFF:{bg:'#f8fafc',fg:'#94a3b8'}
-};
+const DAYS = 56;
+const LS_SHA = 'roster_gh_sha';
+
+// OFF is always the "clear" sentinel — not user-configurable
+const OFF_DEF = {key:'OFF', label:'', name:'Off / Clear', bg:'#f8fafc', fg:'#94a3b8', border:'#e2e8f0'};
+
+// shiftDefs: array of {key, label, name, bg, fg, border}  — loaded from data, editable in config tab
+let shiftDefs = [
+  {key:'D',  label:'D',  name:'Day',          bg:'#dbeafe', fg:'#1e40af', border:'#93c5fd'},
+  {key:'A',  label:'A',  name:'Afternoon',    bg:'#dcfce7', fg:'#166534', border:'#86efac'},
+  {key:'RD', label:'RD', name:'Rest Day',     bg:'#fef9c3', fg:'#854d0e', border:'#fde047'},
+  {key:'AL', label:'AL', name:'Annual Leave', bg:'#fce7f3', fg:'#9d174d', border:'#f9a8d4'},
+];
+
+// Derived lookups — rebuilt whenever shiftDefs changes
+function rebuildShiftLookups(){
+  window._SHIFTS = ['OFF',...shiftDefs.map(s=>s.key)];
+  window._CLS    = Object.fromEntries([...shiftDefs.map(s=>[s.key,'sc_'+s.key]),['OFF','sc_OFF']]);
+  window._LBL    = Object.fromEntries([...shiftDefs.map(s=>[s.key,s.label]),['OFF','']]);
+  window._NAME   = Object.fromEntries([...shiftDefs.map(s=>[s.key,s.name]),['OFF','Off / Clear']]);
+  window._SCOL   = Object.fromEntries([...shiftDefs.map(s=>[s.key,{bg:s.bg,fg:s.fg}]),['OFF',{bg:OFF_DEF.bg,fg:OFF_DEF.fg}]]);
+  // inject/update CSS classes for each shift
+  injectShiftCSS();
+}
+
+function injectShiftCSS(){
+  let el=document.getElementById('shiftStyles');
+  if(!el){el=document.createElement('style');el.id='shiftStyles';document.head.appendChild(el);}
+  const all=[...shiftDefs, OFF_DEF];
+  el.textContent = all.map(s=>`
+    td.sc_${s.key}{background:${s.bg};color:${s.fg};font-weight:600}
+    td.sc_${s.key}.we{background:${s.bg}cc!important}
+  `).join('') + `td.sc_OFF{background:${OFF_DEF.bg};color:${OFF_DEF.fg};font-weight:400}
+    td.sc_OFF.we{background:#edf1f7!important}`;
+}
+
+rebuildShiftLookups();
 const NATIONALITIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'].sort();
 const LS_SHA = 'roster_gh_sha';
 
@@ -506,13 +525,15 @@ async function loadFromGitHub(){
     units    = content.units    || [];
     users    = content.users    || [];
     roster   = content.roster   || {};
+    if(content.shiftDefs && content.shiftDefs.length) shiftDefs = content.shiftDefs;
+    rebuildShiftLookups();
     if(content.startDate){
       startDate=new Date(content.startDate);
       document.getElementById('startDate').value=content.startDate;
     }
     setStatus('saved','Loaded ✓');
     setTimeout(()=>setStatus('idle','Ready'),2500);
-    populateSelects(); buildHead(); buildBody();
+    populateSelects(); buildShiftUI(); buildHead(); buildBody();
     return true;
   }catch(e){
     setStatus('error','Load failed: '+e.message);
@@ -526,7 +547,7 @@ async function saveToGitHub(){
   try{
     const payload={version:3,savedAt:new Date().toISOString(),
       startDate:document.getElementById('startDate').value,
-      sectors,stations,units,users,roster};
+      sectors,stations,units,users,roster,shiftDefs};
     const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
     const sha=localStorage.getItem(LS_SHA);
     const body={message:'roster: update '+new Date().toISOString().slice(0,16),content,...(sha?{sha}:{})};
@@ -634,8 +655,8 @@ function buildBody(){
       const we=d.getDay()===0||d.getDay()===6;
       const s=(roster[u.id]||[])[i]||'OFF';
       const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-      h+=`<td class="${CLS[s]}${we?' we':''}" data-uid="${u.id}" data-d="${i}">`
-        +(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+      h+=`<td class="${_CLS[s]}${we?' we':''}" data-uid="${u.id}" data-d="${i}">`
+        +(_LBL[s]?`<span class="cell-shift">${_LBL[s]}</span>`:'')
         +`<span class="cell-date">${dateStr}</span>`
         +`</td>`;
     }
@@ -662,7 +683,7 @@ function attachCells(){
       if(e.button!==0)return; e.preventDefault(); closeCtx();
       const uid=td.dataset.uid, day=+td.dataset.d;
       const cur=(roster[uid]||[])[day]||'OFF';
-      dragShift=SHIFTS[(SHIFTS.indexOf(cur)+1)%SHIFTS.length];
+      dragShift=_SHIFTS[(_SHIFTS.indexOf(cur)+1)%_SHIFTS.length];
       dragging=true; dragSet=new Set();
       paint(td,uid,day); showTip(e,dragShift);
     });
@@ -681,8 +702,8 @@ function paint(td,uid,day){
   const base=new Date(startDate); base.setDate(base.getDate()+day);
   const we=base.getDay()===0||base.getDay()===6;
   const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-  td.className=CLS[dragShift]+(we?' we':'');
-  td.innerHTML=(LBL[dragShift]?`<span class="cell-shift">${LBL[dragShift]}</span>`:'')
+  td.className=_CLS[dragShift]+(we?' we':'');
+  td.innerHTML=(_LBL[dragShift]?`<span class="cell-shift">${_LBL[dragShift]}</span>`:'')
     +`<span class="cell-date">${dateStr}</span>`;
   dragSet.add(uid+'|'+day);
 }
@@ -697,8 +718,8 @@ document.addEventListener('mousemove',e=>{if(dragging)moveTip(e);});
 
 function showTip(e,s){
   const t=document.getElementById('dtip');
-  t.style.background=SCOL[s].bg; t.style.color=SCOL[s].fg;
-  t.textContent=s==='OFF'?'Clear':s+' — '+NAME[s];
+  t.style.background=_SCOL[s].bg; t.style.color=_SCOL[s].fg;
+  t.textContent=s==='OFF'?'Clear':s+' — '+_NAME[s];
   t.style.display='block'; moveTip(e);
 }
 function moveTip(e){const t=document.getElementById('dtip');t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY-10)+'px';}
@@ -713,8 +734,8 @@ function applyCtx(s){
     const base=new Date(startDate);base.setDate(base.getDate()+ctxDay);
     const we=base.getDay()===0||base.getDay()===6;
     const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-    td.className=CLS[s]+(we?' we':'');
-    td.innerHTML=(LBL[s]?`<span class="cell-shift">${LBL[s]}</span>`:'')
+    td.className=_CLS[s]+(we?' we':'');
+    td.innerHTML=(_LBL[s]?`<span class="cell-shift">${_LBL[s]}</span>`:'')
       +`<span class="cell-date">${dateStr}</span>`;
   }
   updateStats(filtered()); queueSave(); closeCtx();
@@ -724,23 +745,126 @@ document.addEventListener('click',e=>{if(!document.getElementById('cmenu').conta
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtx();});
 
 /* ══════════════════════════════════════════════════
+   BUILD SHIFT UI  (called after shiftDefs changes)
+══════════════════════════════════════════════════ */
+function buildShiftUI(){
+  // context menu items
+  document.getElementById('cmenuItems').innerHTML = shiftDefs.map(s=>
+    `<div class="ci" onclick="applyCtx('${s.key}')">
+       <span class="cdot" style="background:${s.bg};border-color:${s.border}"></span>
+       <span style="color:${s.fg}">${esc(s.label)} — ${esc(s.name)}</span>
+     </div>`).join('');
+
+  // shift filter select
+  const fShift=document.getElementById('fShift');
+  if(fShift){
+    const cur=fShift.value;
+    fShift.innerHTML='<option value="">All shifts</option>'
+      +shiftDefs.map(s=>`<option value="${s.key}"${s.key===cur?' selected':''}>${s.label} — ${esc(s.name)}</option>`).join('')
+      +'<option value="OFF">Off / Clear</option>';
+  }
+
+  // bulk fill buttons
+  const bb=document.getElementById('bulkBtns');
+  if(bb) bb.innerHTML=shiftDefs.map(s=>
+    `<button class="btn sm" style="background:${s.bg};color:${s.fg};border-color:${s.border}" onclick="bulkFill('${s.key}')">${esc(s.label)}</button>`
+  ).join('');
+
+  // legend
+  const leg=document.getElementById('shiftLegend');
+  if(leg) leg.innerHTML=shiftDefs.map(s=>
+    `<span><span class="lsq" style="background:${s.bg};border-color:${s.border}"></span>${esc(s.label)} = ${esc(s.name)}</span>`
+  ).join('')
+  +`<span><span class="lsq" style="background:#f8fafc;border-color:#e2e8f0"></span>Off</span>`
+  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>`;
+
+  // stats bar
+  const sb=document.getElementById('statsBar');
+  if(sb) sb.innerHTML=
+    `<div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>`
+    +shiftDefs.map(s=>
+      `<div class="stat"><div class="slbl">${esc(s.label)} — ${esc(s.name)}</div><div class="sval" id="stat_${s.key}" style="color:${s.fg}">—</div></div>`
+    ).join('')
+    +`<div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>`;
+
+  // default shift select in modal
+  const mShift=document.getElementById('mShift');
+  if(mShift){
+    const cur=mShift.value;
+    mShift.innerHTML='<option value="OFF">Off / Clear</option>'
+      +shiftDefs.map(s=>`<option value="${s.key}"${s.key===cur?' selected':''}>${s.label} — ${esc(s.name)}</option>`).join('');
+  }
+
+  // shift rows in config tab
+  buildShiftRows();
+}
+
+/* ══════════════════════════════════════════════════
+   SHIFT CONFIG TABLE
+══════════════════════════════════════════════════ */
+function buildShiftRows(){
+  const tbody=document.getElementById('shiftRows');
+  if(!tbody)return;
+  tbody.innerHTML=shiftDefs.map((s,i)=>`<tr>
+    <td style="padding:6px 8px"><input type="text" value="${esc(s.label)}" maxlength="5" style="width:60px;font-weight:700;font-family:var(--mono)" oninput="updateShift(${i},'label',this.value)"></td>
+    <td style="padding:6px 8px"><input type="text" value="${esc(s.name)}" style="width:160px" oninput="updateShift(${i},'name',this.value)"></td>
+    <td style="padding:6px 8px"><input type="color" value="${s.bg}" style="width:44px;height:28px;padding:2px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer" oninput="updateShift(${i},'bg',this.value)"></td>
+    <td style="padding:6px 8px"><input type="color" value="${s.fg}" style="width:44px;height:28px;padding:2px;border-radius:var(--r);border:1px solid var(--border2);cursor:pointer" oninput="updateShift(${i},'fg',this.value)"></td>
+    <td style="padding:6px 8px"><span style="display:inline-block;padding:3px 10px;border-radius:5px;font-size:12px;font-family:var(--mono);font-weight:700;background:${s.bg};color:${s.fg};border:1px solid ${s.border}" id="shiftPreview_${i}">${esc(s.label)}</span></td>
+    <td style="padding:6px 8px;white-space:nowrap">
+      ${i>0?`<button class="btn sm" onclick="moveShift(${i},-1)" title="Move up">↑</button>`:''}
+      ${i<shiftDefs.length-1?`<button class="btn sm" onclick="moveShift(${i},1)" title="Move down">↓</button>`:''}
+      <button class="btn sm dan" onclick="delShift(${i})" title="Delete">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+function updateShift(i, field, val){
+  shiftDefs[i][field]=val;
+  if(field==='bg'||field==='fg'){
+    // auto-derive border as slightly darker bg
+    shiftDefs[i].border=val;
+    const prev=document.getElementById('shiftPreview_'+i);
+    if(prev){prev.style.background=shiftDefs[i].bg;prev.style.color=shiftDefs[i].fg;}
+  }
+  rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
+}
+
+function addShiftDef(){
+  const key='S'+(Date.now()%10000);
+  shiftDefs.push({key,label:key,name:'New Shift',bg:'#e0f2fe',fg:'#075985',border:'#7dd3fc'});
+  rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
+}
+
+function delShift(i){
+  if(shiftDefs.length<=1){alert('You need at least one shift type.');return;}
+  const key=shiftDefs[i].key;
+  if(!confirm(`Delete "${shiftDefs[i].name}"? Cells using this shift will become Off.`))return;
+  // clear cells that use this shift
+  users.forEach(u=>{if(roster[u.id])roster[u.id]=roster[u.id].map(s=>s===key?'OFF':s);});
+  shiftDefs.splice(i,1);
+  rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
+}
+
+function moveShift(i,dir){
+  const j=i+dir;
+  if(j<0||j>=shiftDefs.length)return;
+  [shiftDefs[i],shiftDefs[j]]=[shiftDefs[j],shiftDefs[i]];
+  rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
+}
+
+/* ══════════════════════════════════════════════════
    STATS + BULK
 ══════════════════════════════════════════════════ */
 function updateStats(list){
-  let d=0,a=0,rd=0,al=0,tot=0;
-  (list||filtered()).forEach(u=>{
-    (roster[u.id]||[]).forEach(s=>{
-      if(s==='D')d++;else if(s==='A')a++;
-      else if(s==='RD')rd++;else if(s==='AL')al++;
-      tot++;
-    });
-  });
-  document.getElementById('su').textContent=(list||filtered()).length;
-  document.getElementById('sd').textContent=d;
-  document.getElementById('sa').textContent=a;
-  document.getElementById('srd').textContent=rd;
-  document.getElementById('sal').textContent=al;
-  document.getElementById('scov').textContent=tot?Math.round((d+a)/tot*100)+'%':'0%';
+  const f=list||filtered();
+  const counts={};shiftDefs.forEach(s=>{counts[s.key]=0;});
+  let tot=0;
+  f.forEach(u=>{(roster[u.id]||[]).forEach(s=>{if(counts[s]!==undefined)counts[s]++;tot++;});});
+  const working=shiftDefs.reduce((acc,s)=>acc+(counts[s.key]||0),0);
+  const suEl=document.getElementById('su');if(suEl)suEl.textContent=f.length;
+  shiftDefs.forEach(s=>{const el=document.getElementById('stat_'+s.key);if(el)el.textContent=counts[s.key]||0;});
+  const cov=document.getElementById('scov');if(cov)cov.textContent=tot?Math.round(working/tot*100)+'%':'0%';
 }
 function bulkFill(s){filtered().forEach(u=>{roster[u.id]=Array(DAYS).fill(s);});buildBody();queueSave();}
 
@@ -782,6 +906,7 @@ function buildCfgLists(){
       ?list.map((v,i)=>`<li><span>${esc(v)}</span><button class="delbtn" onclick="delCfg('${k}',${i})">×</button></li>`).join('')
       :`<li style="color:var(--text3);font-size:11px;font-style:italic">No items yet</li>`;
   });
+  buildShiftRows();
 }
 function addCfg(k){
   const map={sec:['nSec',sectors],sta:['nSta',stations],uni:['nUni',units]};
@@ -824,7 +949,7 @@ function buildUsers(){
     <td>${u.sector?`<span class="badge bsec">${esc(u.sector)}</span>`:'—'}</td>
     <td>${u.station?`<span class="badge bsta">${esc(u.station)}</span>`:'—'}</td>
     <td>${u.unit?`<span class="badge buni">${esc(u.unit)}</span>`:'—'}</td>
-    <td><span style="display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:5px;font-weight:600;${ss[u.defaultShift||'OFF']}">${NAME[u.defaultShift||'OFF']}</span></td>
+    <td><span style="display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:5px;font-weight:600;${ss[u.defaultShift||'OFF']}">${_NAME[u.defaultShift||'OFF']}</span></td>
     <td style="white-space:nowrap">
       <button class="btn sm" onclick="openEditUser('${u.id}')">✏ Edit</button>
       <button class="btn sm dan" onclick="delUser('${u.id}')">✕</button>
@@ -908,7 +1033,7 @@ function resetData(){
   users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
   const t=new Date(); startDate=t;
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
-  populateSelects(); buildHead(); buildBody(); queueSave();
+  populateSelects(); buildShiftUI(); buildHead(); buildBody(); queueSave();
 }
 
 /* ══════════════════════════════════════════════════
@@ -943,7 +1068,7 @@ async function init(){
   // pre-populate default users in memory (will be overwritten after login loads data)
   users=getDefaultUsers();
   users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
-  populateSelects(); buildHead(); buildBody();
+  populateSelects(); buildShiftUI(); buildHead(); buildBody();
 
   document.getElementById('loginScreen').style.display='flex';
   setTimeout(()=>document.getElementById('loginName').focus(), 100);
