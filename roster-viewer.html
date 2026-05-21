@@ -264,8 +264,9 @@ function populateSelects(){
   const fNat=document.getElementById('fNat');
   if(fNat){
     const cur=fNat.value;
-    fNat.innerHTML='<option value="">All nationalities</option>'
-      +NATIONALITIES.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
+    const usedNats=[...new Set(users.map(u=>u.nationality).filter(Boolean))].sort();
+    fNat.innerHTML='<option value="">All nationalities'+(usedNats.length?` (${usedNats.length})`:'')+'</option>'
+      +usedNats.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
   }
 }
 
