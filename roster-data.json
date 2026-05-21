@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:32:21.672Z",
+  "savedAt": "2026-05-21T10:32:35.081Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4246,9 +4246,9 @@
       "key": "S7754",
       "label": "EOM",
       "name": "End of Mission",
-      "bg": "#9b36b5",
+      "bg": "#b5364f",
       "fg": "#010e0e",
-      "border": "#010e0e"
+      "border": "#b5364f"
     }
   ]
 }
