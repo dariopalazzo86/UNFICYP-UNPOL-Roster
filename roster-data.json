@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T06:00:03.232Z",
+  "savedAt": "2026-05-21T06:00:26.265Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -106,7 +106,7 @@
       "sector": "SECTOR 1",
       "station": "Linou",
       "unit": "S1-LINOU-A",
-      "defaultShift": "OFF"
+      "defaultShift": "D"
     },
     {
       "id": "u10",
