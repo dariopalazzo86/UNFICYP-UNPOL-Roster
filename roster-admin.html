@@ -120,6 +120,7 @@ td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:cross
 .bsec{background:var(--sbg);color:var(--st);border:1px solid var(--sb)}
 .bsta{background:var(--stbg);color:var(--stt);border:1px solid var(--stb)}
 .buni{background:var(--ubg);color:var(--ut);border:1px solid var(--ub)}
+.bnat{background:#fdf2f8;color:#86198f;border:1px solid #f0abfc}
 .mrow{display:flex;gap:2px;flex-wrap:wrap}
 /* DRAG TIP */
 .dtip{position:fixed;z-index:3000;pointer-events:none;padding:4px 10px;border-radius:var(--r);font-size:12px;font-family:var(--mono);font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none;border:1px solid rgba(0,0,0,.08)}
@@ -237,6 +238,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
       <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
       <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
+      <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
       <select id="fShift" onchange="buildBody()">
         <option value="">All shifts</option>
         <option value="D">D — Day</option><option value="A">A — Afternoon</option>
@@ -298,11 +300,12 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="ufSec" onchange="buildUsers()"><option value="">All sectors</option></select>
       <select id="ufSta" onchange="buildUsers()"><option value="">All stations</option></select>
       <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
+      <select id="ufNat" onchange="buildUsers()"><option value="">All nationalities</option></select>
       <button class="btn acc" onclick="openAddUser()">+ Add user</button>
     </div>
     <div class="utwrap">
       <table class="utable">
-        <thead><tr><th>Name</th><th>Sector</th><th>Station</th><th>Unit</th><th>Default Shift</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Nationality</th><th>Sector</th><th>Station</th><th>Unit</th><th>Default Shift</th><th></th></tr></thead>
         <tbody id="uBody"></tbody>
       </table>
     </div>
@@ -313,6 +316,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <div class="modal">
     <h3 id="mTitle">Add user</h3>
     <div class="mfrow"><label>Full name</label><input type="text" id="mName" placeholder="e.g. Jane Smith"></div>
+    <div class="mfrow"><label>Nationality</label><select id="mNat"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Sector</label><select id="mSec"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Station</label><select id="mSta"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Unit</label><select id="mUni"><option value="">— none —</option></select></div>
@@ -344,6 +348,25 @@ const SCOL   = {
   RD:{bg:'#fef9c3',fg:'#854d0e'}, AL:{bg:'#fce7f3',fg:'#9d174d'},
   OFF:{bg:'#f8fafc',fg:'#94a3b8'}
 };
+const NATIONALITIES = [
+  'Afghan','Albanian','Algerian','American','Andorran','Angolan','Argentine','Armenian',
+  'Australian','Austrian','Azerbaijani','Bahraini','Bangladeshi','Belarusian','Belgian',
+  'Bolivian','Bosnian','Brazilian','British','Bulgarian','Cameroonian','Canadian','Chilean',
+  'Chinese','Colombian','Congolese','Croatian','Cuban','Czech','Danish','Dominican',
+  'Dutch','Ecuadorian','Egyptian','Emirati','Estonian','Ethiopian','Filipino','Finnish',
+  'French','Georgian','German','Ghanaian','Greek','Guatemalan','Honduran','Hungarian',
+  'Indian','Indonesian','Iranian','Iraqi','Irish','Israeli','Italian','Ivorian',
+  'Jamaican','Japanese','Jordanian','Kazakhstani','Kenyan','Korean','Kuwaiti','Kyrgyz',
+  'Latvian','Lebanese','Libyan','Lithuanian','Luxembourgish','Macedonian','Malaysian',
+  'Malian','Maltese','Mexican','Moldovan','Mongolian','Montenegrin','Moroccan','Mozambican',
+  'Namibian','Nepalese','New Zealander','Nicaraguan','Nigerian','Norwegian','Omani',
+  'Pakistani','Palestinian','Panamanian','Paraguayan','Peruvian','Polish','Portuguese',
+  'Qatari','Romanian','Russian','Rwandan','Saudi','Senegalese','Serbian','Singaporean',
+  'Slovak','Slovenian','Somali','South African','Spanish','Sri Lankan','Sudanese',
+  'Swedish','Swiss','Syrian','Taiwanese','Tajik','Tanzanian','Thai','Tunisian','Turkish',
+  'Turkmenistani','Ugandan','Ukrainian','Uruguayan','Uzbekistani','Venezuelan','Vietnamese',
+  'Yemeni','Zambian','Zimbabwean'
+].sort();
 const LS_SHA = 'roster_gh_sha';
 
 /* ══════════════════════════════════════════════════
@@ -597,12 +620,14 @@ function filtered(){
   const fsc=document.getElementById('fSec').value;
   const fst=document.getElementById('fSta').value;
   const fun=document.getElementById('fUni').value;
+  const fnat=document.getElementById('fNat').value;
   const fsh=document.getElementById('fShift').value;
   return users.filter(u=>{
     if(s&&!u.name.toLowerCase().includes(s)) return false;
     if(fsc&&u.sector!==fsc) return false;
     if(fst&&u.station!==fst) return false;
     if(fun&&u.unit!==fun) return false;
+    if(fnat&&u.nationality!==fnat) return false;
     if(fsh&&!(roster[u.id]||[]).some(x=>x===fsh)) return false;
     return true;
   });
@@ -617,6 +642,7 @@ function buildBody(){
   list.forEach(u=>{
     h+=`<tr><th class="uc">${esc(u.name)}</th>`
       +`<td class="ic"><div class="mrow">`
+      +(u.nationality?`<span class="badge bnat">🌐 ${esc(u.nationality)}</span>`:'')
       +(u.sector?`<span class="badge bsec">${esc(u.sector)}</span>`:'')
       +(u.station?`<span class="badge bsta">${esc(u.station)}</span>`:'')
       +(u.unit?`<span class="badge buni">${esc(u.unit)}</span>`:'')
@@ -740,6 +766,7 @@ function bulkFill(s){filtered().forEach(u=>{roster[u.id]=Array(DAYS).fill(s);});
    SELECTS
 ══════════════════════════════════════════════════ */
 function populateSelects(){
+  // dynamic lists (sectors, stations, units)
   [['fSec','sector',sectors],['fSta','station',stations],['fUni','unit',units],
    ['ufSec','sector',sectors],['ufSta','station',stations],['ufUni','unit',units]].forEach(([id,type,list])=>{
     const el=document.getElementById(id);if(!el)return;
@@ -752,6 +779,16 @@ function populateSelects(){
     el.innerHTML=`<option value="">— none —</option>`
       +list.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
   });
+  // nationality dropdowns — static list
+  ['fNat','ufNat'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML='<option value="">All nationalities</option>'
+      +NATIONALITIES.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
+  });
+  const mNat=document.getElementById('mNat');
+  if(mNat) mNat.innerHTML='<option value="">— none —</option>'
+    +NATIONALITIES.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
 }
 
 /* ══════════════════════════════════════════════════
@@ -783,11 +820,13 @@ function buildUsers(){
   const fsc=document.getElementById('ufSec').value;
   const fst=document.getElementById('ufSta').value;
   const fun=document.getElementById('ufUni').value;
+  const fnat=document.getElementById('ufNat').value;
   const list=users.filter(u=>{
     if(s&&!u.name.toLowerCase().includes(s))return false;
     if(fsc&&u.sector!==fsc)return false;
     if(fst&&u.station!==fst)return false;
     if(fun&&u.unit!==fun)return false;
+    if(fnat&&u.nationality!==fnat)return false;
     return true;
   });
   const ss={
@@ -799,6 +838,7 @@ function buildUsers(){
   };
   document.getElementById('uBody').innerHTML=list.map(u=>`<tr>
     <td style="font-weight:500">${esc(u.name)}</td>
+    <td>${u.nationality?`<span class="badge bnat">🌐 ${esc(u.nationality)}</span>`:'—'}</td>
     <td>${u.sector?`<span class="badge bsec">${esc(u.sector)}</span>`:'—'}</td>
     <td>${u.station?`<span class="badge bsta">${esc(u.station)}</span>`:'—'}</td>
     <td>${u.unit?`<span class="badge buni">${esc(u.unit)}</span>`:'—'}</td>
@@ -812,7 +852,8 @@ function buildUsers(){
 function openAddUser(){
   editUID=null; document.getElementById('mTitle').textContent='Add user';
   document.getElementById('mName').value=''; document.getElementById('mShift').value='OFF';
-  populateSelects(); ['mSec','mSta','mUni'].forEach(id=>document.getElementById(id).value='');
+  populateSelects();
+  ['mSec','mSta','mUni','mNat'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('modal').classList.add('open');
 }
 function openEditUser(id){
@@ -825,6 +866,7 @@ function openEditUser(id){
     document.getElementById('mSec').value=u.sector||'';
     document.getElementById('mSta').value=u.station||'';
     document.getElementById('mUni').value=u.unit||'';
+    document.getElementById('mNat').value=u.nationality||'';
   },10);
   document.getElementById('modal').classList.add('open');
 }
@@ -833,9 +875,10 @@ function saveUser(){
   const sector=document.getElementById('mSec').value;
   const station=document.getElementById('mSta').value;
   const unit=document.getElementById('mUni').value;
+  const nationality=document.getElementById('mNat').value;
   const ds=document.getElementById('mShift').value;
-  if(editUID){ Object.assign(users.find(x=>x.id===editUID),{name,sector,station,unit,defaultShift:ds}); }
-  else { const id='u'+Date.now(); users.push({id,name,sector,station,unit,defaultShift:ds}); roster[id]=Array(DAYS).fill(ds); }
+  if(editUID){ Object.assign(users.find(x=>x.id===editUID),{name,sector,station,unit,nationality,defaultShift:ds}); }
+  else { const id='u'+Date.now(); users.push({id,name,sector,station,unit,nationality,defaultShift:ds}); roster[id]=Array(DAYS).fill(ds); }
   closeModal(); buildUsers(); buildBody(); queueSave();
 }
 function delUser(id){
@@ -854,11 +897,11 @@ function onDateChange(){
   buildHead(); buildBody(); queueSave();
 }
 function exportCSV(){
-  const base=new Date(startDate); let csv='Name,Sector,Station,Unit';
+  const base=new Date(startDate); let csv='Name,Nationality,Sector,Station,Unit';
   for(let i=0;i<DAYS;i++){const d=new Date(base);d.setDate(base.getDate()+i);csv+=','+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
   csv+='\n';
   users.forEach(u=>{
-    csv+=`"${u.name}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
+    csv+=`"${u.name}","${u.nationality||''}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
     (roster[u.id]||[]).forEach(s=>csv+=','+s); csv+='\n';
   });
   const a=document.createElement('a');
@@ -871,7 +914,7 @@ function getDefaultUsers(){
   return FN.map((fn,i)=>({
     id:'u'+i,
     name:fn+' '+LN[i],
-    sector:'',station:'',unit:'',defaultShift:'OFF'
+    sector:'',station:'',unit:'',nationality:'',defaultShift:'OFF'
   }));
 }
 
