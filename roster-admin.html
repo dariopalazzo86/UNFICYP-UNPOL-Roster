@@ -260,8 +260,8 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     <div class="toolbar">
       <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
       <label>Start <input type="date" id="startDate" onchange="onDateChange()"></label>
-      <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
-      <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
+      <select id="fSec" onchange="cascadeFilters('roster');buildBody()"><option value="">All sectors</option></select>
+      <select id="fSta" onchange="cascadeFilters('roster');buildBody()"><option value="">All stations</option></select>
       <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
       <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
       <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
@@ -317,8 +317,8 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <div id="panel-users" class="panel">
     <div class="toolbar">
       <div class="sw"><span class="si">🔍</span><input type="text" id="usrch" placeholder="Search…" style="width:130px" oninput="buildUsers()"></div>
-      <select id="ufSec" onchange="buildUsers()"><option value="">All sectors</option></select>
-      <select id="ufSta" onchange="buildUsers()"><option value="">All stations</option></select>
+      <select id="ufSec" onchange="cascadeFilters('users');buildUsers()"><option value="">All sectors</option></select>
+      <select id="ufSta" onchange="cascadeFilters('users');buildUsers()"><option value="">All stations</option></select>
       <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
       <select id="ufNat" onchange="buildUsers()"><option value="">All nationalities</option></select>
       <button class="btn acc" onclick="openAddUser()">+ Add user</button>
@@ -1105,20 +1105,23 @@ function bulkFill(s){filtered().forEach(u=>{roster[u.id]=Array(DAYS).fill(s);});
    SELECTS
 ══════════════════════════════════════════════════ */
 function populateSelects(){
-  // dynamic lists (sectors, stations, units)
-  [['fSec','sector',sectors],['fSta','station',stations],['fUni','unit',units],
-   ['ufSec','sector',sectors],['ufSta','station',stations],['ufUni','unit',units]].forEach(([id,type,list])=>{
+  // sector dropdowns — always full list
+  [['fSec','sectors'],['ufSec','sectors']].forEach(([id])=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
-    el.innerHTML=`<option value="">All ${type}s</option>`
-      +list.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+    el.innerHTML='<option value="">All sectors</option>'
+      +sectors.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
   });
+  // cascade station/unit based on current sector selection
+  cascadeFilters('roster');
+  cascadeFilters('users');
+  // modal selects — always full lists
   [['mSec','sector',sectors],['mSta','station',stations],['mUni','unit',units]].forEach(([id,type,list])=>{
     const el=document.getElementById(id);if(!el)return;
     el.innerHTML=`<option value="">— none —</option>`
       +list.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
   });
-  // nationality filter dropdowns — show only nationalities assigned to at least one user
+  // nationality filter dropdowns — only used nationalities
   const usedNats=[...new Set(users.map(u=>u.nationality).filter(Boolean))].sort();
   ['fNat','ufNat'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
@@ -1126,10 +1129,51 @@ function populateSelects(){
     el.innerHTML='<option value="">All nationalities'+(usedNats.length?` (${usedNats.length})`:'')+'</option>'
       +usedNats.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
   });
-  // modal nationality selector — full list so admin can assign any country
+  // modal nationality — full list
   const mNat=document.getElementById('mNat');
   if(mNat) mNat.innerHTML='<option value="">— none —</option>'
     +NATIONALITIES.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+}
+
+/* cascadeFilters(ctx) — updates station and unit dropdowns based on
+   current sector (and station) selection, showing only options that
+   exist for at least one user matching the upstream filters.
+   ctx = 'roster' (fSec/fSta/fUni) or 'users' (ufSec/ufSta/ufUni)  */
+function cascadeFilters(ctx){
+  const secId = ctx==='roster' ? 'fSec' : 'ufSec';
+  const staId = ctx==='roster' ? 'fSta' : 'ufSta';
+  const uniId = ctx==='roster' ? 'fUni' : 'ufUni';
+
+  const selSec = document.getElementById(secId)?.value || '';
+  const selSta = document.getElementById(staId)?.value || '';
+
+  // stations: filtered by selected sector
+  const availStations = [...new Set(
+    users.filter(u=> !selSec || u.sector===selSec)
+         .map(u=>u.station).filter(Boolean)
+  )].sort();
+
+  const staEl = document.getElementById(staId);
+  if(staEl){
+    const curSta = availStations.includes(staEl.value) ? staEl.value : '';
+    staEl.innerHTML = '<option value="">All stations</option>'
+      + availStations.map(v=>`<option value="${esc(v)}"${v===curSta?' selected':''}>${esc(v)}</option>`).join('');
+  }
+
+  // units: filtered by selected sector + station
+  const availUnits = [...new Set(
+    users.filter(u=>
+      (!selSec || u.sector===selSec) &&
+      (!selSta || u.station===selSta)
+    ).map(u=>u.unit).filter(Boolean)
+  )].sort();
+
+  const uniEl = document.getElementById(uniId);
+  if(uniEl){
+    const curUni = availUnits.includes(uniEl.value) ? uniEl.value : '';
+    uniEl.innerHTML = '<option value="">All units</option>'
+      + availUnits.map(v=>`<option value="${esc(v)}"${v===curUni?' selected':''}>${esc(v)}</option>`).join('');
+  }
 }
 
 /* ══════════════════════════════════════════════════
