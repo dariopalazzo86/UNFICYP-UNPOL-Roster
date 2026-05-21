@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:20:59.442Z",
+  "savedAt": "2026-05-21T10:21:02.280Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4228,7 +4228,7 @@
     },
     {
       "key": "S3802",
-      "label": "CC",
+      "label": "CCBD",
       "name": "New Shift",
       "bg": "#e0f2fe",
       "fg": "#075985",
