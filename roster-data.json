@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:19:36.823Z",
+  "savedAt": "2026-05-21T10:19:39.822Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4214,9 +4214,9 @@
       "key": "AL",
       "label": "AL",
       "name": "Annual Leave",
-      "bg": "#20a729",
+      "bg": "#25cb30",
       "fg": "#9d174d",
-      "border": "#20a729"
+      "border": "#25cb30"
     }
   ]
 }
