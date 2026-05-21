@@ -211,7 +211,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Not saved</span></div>
     <button class="btn sm" onclick="toggleSetup()" title="GitHub settings">⚙️ Setup</button>
     <button class="btn sm acc" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn sm dan" onclick="resetData()">↺ Reset</button>
+    <button class="btn sm dan" style="display:none" onclick="resetData()">↺ Reset</button>
     <span class="rbadge">ADMIN</span>
   </div>
 </header>
@@ -252,7 +252,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <button class="btn sm ba" onclick="bulkFill('A')">A</button>
       <button class="btn sm brd" onclick="bulkFill('RD')">RD</button>
       <button class="btn sm bal" onclick="bulkFill('AL')">AL</button>
-      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
+      <button class="btn sm" style="display:none;" onclick="bulkFill('OFF')">Clear</button>
     </div>
     <div class="legend">
       <span><span class="lsq" style="background:var(--d-bg);border-color:var(--d-b)"></span>D = Day</span>
