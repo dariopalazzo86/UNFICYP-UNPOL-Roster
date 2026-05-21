@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Roster Manager — Admin</title>
+<title>UNPOL Roster Manager — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -204,7 +204,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <header>
   <div>
-    <div class="logo">ROSTER MANAGER</div>
+    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
     <div class="sub" id="repoLabel">Not connected — fill in setup above</div>
   </div>
   <div class="hright">
@@ -219,7 +219,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 <nav>
   <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
   <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
-  <div class="tab" onclick="switchTab('users')">👥 Users</div>
+  <div class="tab" onclick="switchTab('users')">👥 IPOs</div>
 </nav>
 
 <div class="dtip" id="dtip"></div>
@@ -236,7 +236,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <!-- ROSTER -->
   <div id="panel-roster" class="panel active">
     <div class="toolbar">
-      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
+      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
       <label>Start <input type="date" id="startDate" onchange="onDateChange()"></label>
       <select id="fSec" onchange="buildBody()"><option value="">All sectors</option></select>
       <select id="fSta" onchange="buildBody()"><option value="">All stations</option></select>
@@ -263,7 +263,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="slbl">Users</div><div class="sval" id="su">—</div></div>
+      <div class="stat"><div class="slbl">IPOs</div><div class="sval" id="su">—</div></div>
       <div class="stat"><div class="slbl">Day (D)</div><div class="sval" id="sd" style="color:var(--d-t)">—</div></div>
       <div class="stat"><div class="slbl">Afternoon (A)</div><div class="sval" id="sa" style="color:var(--a-t)">—</div></div>
       <div class="stat"><div class="slbl">Rest Day (RD)</div><div class="sval" id="srd" style="color:var(--rd-t)">—</div></div>
@@ -292,7 +292,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
         <div class="arow"><input type="text" id="nUni" placeholder="New unit…" onkeydown="if(event.key==='Enter')addCfg('uni')"><button class="btn sm acc" onclick="addCfg('uni')">+ Add</button></div>
       </div>
     </div>
-    <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>Users</strong> tab.</p>
+    <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>IPOs</strong> tab.</p>
   </div>
 
   <!-- USERS -->
@@ -302,7 +302,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="ufSec" onchange="buildUsers()"><option value="">All sectors</option></select>
       <select id="ufSta" onchange="buildUsers()"><option value="">All stations</option></select>
       <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
-      <button class="btn acc" onclick="openAddUser()">+ Add user</button>
+      <button class="btn acc" onclick="openAddUser()">+ Add IPO</button>
     </div>
     <div class="utwrap">
       <table class="utable">
@@ -315,7 +315,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <div class="mbg" id="modal">
   <div class="modal">
-    <h3 id="mTitle">Add user</h3>
+    <h3 id="mTitle">Add IPO</h3>
     <div class="mfrow"><label>Full name</label><input type="text" id="mName" placeholder="e.g. Jane Smith"></div>
     <div class="mfrow"><label>Sector</label><select id="mSec"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Station</label><select id="mSta"><option value="">— none —</option></select></div>
