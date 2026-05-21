@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:55:18.340Z",
+  "savedAt": "2026-05-21T05:55:31.248Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -31,9 +31,9 @@
     {
       "id": "u0",
       "name": "Paul SLATTERY",
-      "sector": "",
-      "station": "",
-      "unit": "",
+      "sector": "HQ",
+      "station": "HQ Nicosia",
+      "unit": "HQ",
       "defaultShift": "OFF"
     },
     {
