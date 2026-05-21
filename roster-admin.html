@@ -1,3 +1,1164 @@
+
+Claude finished the response
+i would like to have a solution useful to manage a 56 days roster management for daili and afternoon shift for 70 users
+
+May 20
+Here's a full-featured 56-day roster manager for daily and afternoon shifts across 70 users, built right into the chat:
+
+V
+
+Connecting to visualize...
+Here's what the roster manager can do:
+
+Core features:
+
+70 pre-populated users across a 56-day grid (8 weeks)
+Click any cell to cycle through: Day off → Day (D) → Afternoon (A) → back to off
+Set the start date to anchor the roster to any period
+Weekends are visually shaded to stand out
+Toolbar tools:
+
+Search by user name to focus on one person
+Filter by shift type to see who's on Day, Afternoon, or off
+"Fill all Day / Afternoon / Clear all" for bulk assignment (respects the active search filter)
+Export to CSV for use in Excel or Google Sheets
+Add new users at any time with a default shift preset
+Stats bar at the top keeps a live count of Day shifts, Afternoon shifts, and days off as you edit.
+
+A few things I could add if useful — let me know:
+
+Color-coded conflict detection (e.g. same user on both shifts, or understaffed days)
+Per-day minimum staffing rules
+Copy one user's pattern to others
+Weekly summary view per user
+is there way to have it online? or as a mobile app?
+
+May 20
+Great question! There are a few practical options depending on how technical you want to get:
+
+Easiest — save it as a web app (no coding)
+
+You can save the artifact as an HTML file and host it for free on services like:
+
+Netlify Drop (netlify.com/drop) — drag and drop an HTML file, get a live URL in seconds
+GitHub Pages — free hosting if you have a GitHub account
+Vercel — similar to Netlify, very easy
+To get the HTML file, I can generate a standalone .html file version of the roster that you can host anywhere.
+
+Mobile app — Progressive Web App (PWA)
+
+I can upgrade the roster into a PWA, which means:
+
+It works in the browser on any phone
+Users can tap "Add to Home Screen" and it behaves like a native app (full screen, offline, app icon)
+No App Store needed
+Works on both iOS and Android
+Cloud-synced version (for team use)
+
+If you need all 70 users to access and edit the same roster in real time, you'd want a backend. Options:
+
+Google Sheets — I can build a version that reads/writes to a shared sheet via Apps Script
+Airtable — similar, with a nicer UI
+Supabase + hosted HTML — free tier, real-time sync, a bit more technical
+What fits your situation best?
+
+could you also add to the roster management possibility to specify sectors, stations and units
+
+May 20
+Let me know your answers when you can — and in the meantime I'll go ahead and build the upgraded version with sectors, stations, and units added!
+
+V
+
+Connecting to visualize...
+Here's what's new in this version:
+
+Sectors / Stations / Units tab — fully configurable. Add or remove sectors, stations, and units freely. Pre-loaded with sample data (Alpha/Bravo/Charlie/Delta sectors, North/South/East/West/Central stations, Unit 1–6) that you can replace with your real ones.
+
+Users tab — manage all 70 users in a table. Edit any user to assign their sector, station, unit, and default shift. Add or delete users at any time.
+
+Roster tab — now has filter dropdowns for sector, station, and unit, so you can view and bulk-assign shifts to just one group (e.g. "show all Bravo sector, North station users and set them all to Day shift"). Each row shows colour-coded badges for sector, station, and unit inline.
+
+CSV export now includes the sector, station, and unit columns alongside the 56-day schedule.
+
+Would you like me to generate this as a standalone .html file you can host or install as a PWA on your phone?
+
+yes please give me a HTML file
+
+May 20
+
+Viewed a file, created a file, read a file
+Viewed a file, created a file, read a file
+Here's your standalone HTML file! Everything is self-contained — no internet connection required to run it after the first load.
+
+How to use it:
+
+On desktop: just double-click the file to open it in any browser. Bookmark it for quick access.
+
+On iPhone / iPad:
+
+Upload the file to iCloud Drive (or AirDrop it to yourself)
+Open it in Safari
+Tap the Share button → "Add to Home Screen"
+It will appear as an app icon on your home screen
+On Android:
+
+Open the file in Chrome
+Tap the three-dot menu → "Add to Home screen"
+Done — works like an app
+To host it online for free (so the whole team can access it):
+
+Go to netlify.com/drop
+Drag and drop the HTML file onto the page
+You'll get a live URL in about 10 seconds — share it with anyone
+Note: Data lives in memory only — changes reset on page refresh. If you'd like me to add local storage so the roster auto-saves in the browser (no server needed), just say the word.
+
+
+Roster manager
+Code · HTML 
+i would like to somehow save the changes i do within the html
+
+May 20
+
+Edited 3 files, viewed 2 files, read a file
+Edited 3 files, viewed 2 files, read a file
+Done! The file now auto-saves everything to your browser's local storage — no server needed.
+
+Here's how it works:
+
+Auto-save — every time you click a shift cell, edit a user, add/remove a sector/station/unit, or change the start date, it saves automatically after a short delay. You'll see a green "Saved HH:MM" indicator in the top-right corner flash to confirm.
+
+Auto-load — when you reopen the file in the same browser, it instantly restores everything exactly as you left it — all 70 users, all shift assignments, all your sectors/stations/units.
+
+Reset button — the ↺ Reset button in the header lets you wipe all saved data and start fresh if needed (it asks for confirmation first).
+
+One important note: localStorage is tied to the browser + file location. If you open the file from a different folder, or in a different browser, it will start fresh. For the most reliable experience, keep the file in the same location and always open it in the same browser. If you ever want to move it, export a CSV first as a backup.
+
+
+Roster manager
+Code · HTML 
+is it possible to have to versions of the same file one for administrator for doing changes and one for normal users just to see
+
+May 20
+Great idea! I'll create two files — an Admin version (full edit access) and a Viewer version (read-only, clean display). Both share the same localStorage data, so whatever the admin saves, the viewer sees instantly on refresh.
+
+
+Read full HTML file to base both versions on it
+Read full HTML file to base both versions on it
+Good, I have the full file. Now I'll build both versions — the admin file stays as-is (with saves), and I'll generate a clean viewer file that reads the same localStorage key but has all editing stripped out.
+
+
+Edited 2 files, ran a command
+Edited 2 files, ran a command
+Now create the viewer file:
+
+
+Created a file, read a file
+Created a file, read a file
+Here are your two files:
+
+roster-admin.html — full edit access, marked with a blue ADMIN badge. All existing features: click to assign shifts, manage users, sectors/stations/units, auto-save.
+
+roster-viewer.html — read-only, marked with a green VIEW ONLY badge. Features include:
+
+All filters (sector, station, unit, shift type, search)
+"My name" field — type your own name and your row gets highlighted in blue, plus a personal banner appears at the top showing your next upcoming shift and your Day/Afternoon/Off counts for the period
+↻ Refresh button to reload the latest data saved by the admin
+Export to CSV
+No editing — cells are not clickable
+How the sharing works: both files read from the exact same browser localStorage key (roster_manager_v1). So the admin saves changes on their device, and anyone on the same device and browser sees them in the viewer instantly on refresh.
+
+Important: localStorage is per-device. If your team is on different devices, the viewer won't automatically see the admin's changes. For true multi-device sharing, the next step would be hosting on Netlify and adding a small cloud sync — let me know if you'd like that!
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+could you please give me a version without using dark background and for each day i can have D,A, RD,AL
+
+May 20
+
+Read the admin HTML file fully to rebuild it with light theme and new shift types
+Read the admin HTML file fully to rebuild it with light theme and new shift types
+Now I'll rebuild both files cleanly — light theme, 4 shift types (D, A, RD, AL), right-click context menu for shift selection instead of cycling.
+
+
+Write the light-theme admin HTML file with 4 shift types
+Write the light-theme admin HTML file with 4 shift types
+could you please give me both html files with also the ooportunity to drag the same value in teh cell across multiples cells?
+
+6:38 AM
+
+Read the current admin file to add drag functionality
+Read the current admin file to add drag functionality
+Good — I have the full file. Now I'll write both files from scratch with drag-to-fill built in.
+
+
+Ran 2 commands, read a file
+Ran 2 commands, read a file
+Both files are ready — fully rebuilt with light theme, 4 shift types, and drag-to-paint. Here's a summary of what's new:
+
+Drag-to-fill (Admin only)
+
+Click and hold any cell, then drag across multiple cells — they all get painted with the next shift in the cycle from where you started
+A floating tooltip follows your cursor showing which shift you're painting
+Release the mouse to confirm — all changes auto-save automatically
+Works horizontally across days and vertically across users in one stroke
+How the three interaction modes work (Admin):
+
+Left-click a single cell → cycles through OFF → D → A → RD → AL → OFF
+Left-click + drag → paints all cells you hover over with the same shift
+Right-click → opens a precise pick menu to set any shift directly
+Viewer stays fully read-only — no drag, no click editing — with the "My name" personal highlight and next-shift banner as before.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+there is a huge limitation by using the browser local stroage. could you give me a solution whihc use a simple db like a json or whatever which I can put within the same folder of the two html files
+
+6:46 AM
+Great idea — instead of localStorage we'll use a tiny local server that reads/writes a roster-data.json file sitting in the same folder. You run it once, then both HTML files talk to it.
+
+Here's the plan: 3 files in one folder:
+
+📁 roster/
+  ├── server.js          ← tiny Node.js server (run once)
+  ├── roster-data.json   ← your database (auto-created)
+  ├── roster-admin.html
+  └── roster-viewer.html
+
+Write the Node.js local server
+Write the Node.js local server
+Now rewrite both HTML files to use the API instead of localStorage:
+
+
+Write admin HTML with API-based persistence
+Write admin HTML with API-based persistence
+could you please give me now the full solution?
+
+6:57 AM
+Let me build all 4 files cleanly in one go.
+
+
+Ran 3 commands
+Ran 3 commands
+Now write the README:
+
+
+Ran 2 commands
+Ran 2 commands
+All 4 files are ready. ✅
+
+
+Presented 4 files
+Presented 4 files
+Here's your complete 4-file solution. Put them all in the same folder and you're done.
+
+Quick start (3 steps):
+
+Install Node.js from nodejs.org if you don't have it
+Open a terminal in that folder and run: node server.js
+Open http://localhost:3000/roster-admin.html in your browser
+What's in each file:
+
+File	Purpose
+server.js	Tiny local web server — run once, keeps running in background
+roster-admin.html	Full editor with drag-paint, right-click menu, bulk fill, user/sector/station/unit management
+roster-viewer.html	Read-only view for staff — filters, "My name" highlight, personal shift banner
+README.txt	Full setup guide including network sharing tips
+Data flow: every change in the admin auto-saves to roster-data.json within half a second. The viewer reads from the same file on every refresh. The JSON file is human-readable and easy to back up — just copy it.
+
+Sharing on your office network: find your computer's local IP (e.g. 192.168.1.45) and give staff the URL http://192.168.1.45:3000/roster-viewer.html — they can access it from any device on the same Wi-Fi without installing anything.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+
+Server
+JS 
+
+Readme
+TXT 
+i do not have any serve...I want to use github pages
+
+7:14 AM
+Good choice — GitHub Pages is free, always-on, and accessible from any device. The challenge is that GitHub Pages is static (no server-side code), so we need a different approach for data storage.
+
+The best solution for your case is to use Google Sheets as a database via its free API — no server needed, data lives in a spreadsheet you control, and both HTML files read/write to it from anywhere.
+
+While you answer — here's a quick overview of the options depending on your answer:
+
+Option A — Google Sheets backend (recommended)
+
+Data lives in a Google Sheet you own
+Admin writes to it via Google Apps Script (free, no server)
+Viewer reads from it
+Works perfectly on GitHub Pages
+One-time 10-min setup
+Option B — JSONBin.io (simplest possible)
+
+Free online JSON storage (like a tiny cloud database)
+No Google account needed
+Just get a free API key, paste it in the files
+Zero setup beyond that
+Option C — GitHub itself as the database
+
+Data saved as a JSON file committed directly to your repo via GitHub API
+100% free, no third-party service
+Slightly slower saves (~2–3 sec) but very robust
+Which direction would you like to go?
+
+option c
+
+7:15 AM
+Perfect choice — everything stays in GitHub, no third-party services needed. Here's how it works:
+
+roster-data.json lives in your GitHub repo
+The Admin file writes to it via the GitHub API (commits the file directly)
+The Viewer file reads it as a raw file from GitHub
+GitHub Pages hosts both HTML files for free
+Let me build the complete solution.
+
+
+Ran 4 commands, read a file
+Ran 4 commands, read a file
+All 4 files are ready. Here's exactly what to do:
+
+Setup in 6 steps
+1. Create a public GitHub repo at github.com → New repository → set to Public
+
+2. Upload all 4 files into it (roster-admin.html, roster-viewer.html, roster-data.json, README.md)
+
+3. Enable GitHub Pages → repo Settings → Pages → Deploy from branch main → Save. Your site goes live at https://YOUR-USERNAME.github.io/YOUR-REPO/
+
+4. Create a Personal Access Token (admin only):
+
+GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token
+Give it Contents: Read & Write permission on your repo only
+Copy it immediately
+5. Configure the Admin file — open the admin URL, fill the setup banner with your username, repo name, and token → Save & Connect
+
+6. Configure the Viewer — open the viewer URL, fill in username, repo, branch (main) → Save & Load — no token needed
+
+How it works
+Every change the admin makes → auto-commits roster-data.json to the repo via GitHub API (~1–2 sec)
+The viewer reads directly from raw.githubusercontent.com — no token, no server, works on any device
+Every save is a Git commit → you get full version history of all roster changes for free
+The token is stored only in the admin's browser, never in the repo
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+
+Roster data
+Code · JSON 
+
+Readme
+Document · MD 
+i do not see Developer settings within github settings
+
+7:28 AM
+GitHub moved it! Here's exactly where it is now:
+
+The fast way: Go directly to this URL (replace YOUR-USERNAME):
+
+https://github.com/settings/personal-access-tokens/new
+Or navigate there manually:
+
+Click your profile picture (top-right corner of GitHub)
+Click Settings (near the bottom of the dropdown)
+Scroll all the way down the left sidebar
+Click Developer settings — it's the very last item at the bottom of the sidebar
+Then → Personal access tokens → Fine-grained tokens → Generate new token
+When creating the token, the key settings are:
+
+Setting	Value
+Token name	Roster Manager
+Expiration	1 year (or No expiration)
+Resource owner	your username
+Repository access	Only select repositories → pick your roster repo
+Permissions → Contents	Read and Write
+Everything else can stay at default. Click Generate token, then copy it immediately — GitHub only shows it once.
+
+Once you have it, paste it into the setup banner in roster-admin.html and click Save & Connect.
+
+could you please pre populate the users with the following data const FIRST=[
+  'Paul',
+  'Maja',
+  'Heiko',
+  'Edoardo',
+  'Aoife',
+  'Raghu',
+  'Dragan',
+  'Indri',
+  'Anisa',
+  'Ala a',
+  'Bodha',
+  'Surakshya',
+  'Ahlam',
+  'Nikola',
+  'Jack',
+  'Davor',
+  'Ivana',
+  'Stella',
+  'Yulia',
+  'Andrey',
+  'Rami',
+  'Li',
+  'Benny',
+  'Jani Matti',
+  'Richard',
+  'Susanna Maria',
+  'Alexander',
+  'Yu',
+  'Linda',
+  'Nebojsa',
+  'Niko',
+  'Dragan',
+  'Gandhi',
+  'Nenad',
+  'Libna',
+  'Gerhard',
+  'Darren',
+  'Nicole',
+  'Bojan',
+  'Dubravka',
+  'Graham',
+  'Timothy',
+  'Gavin',
+  'Lenka',
+  'Simone',
+  'Jozef',
+  'Carmen',
+  'Wihelmina',
+  'Ujjwal',
+  'Mary',
+  'Vladimir',
+  'Lubica',
+  'Edin',
+  'Brian',
+  'Paul',
+  'Ala a',
+  'Mutya',
+  'Yue',
+  'Siobhan',
+  'Amela',
+  'Jonathan'
+];
+const LAST=[
+  'SLATTERY',
+  'SMAJLOVIC',
+  'TROSS',
+  'PETRONCINI',
+  'REILLY',
+  'BISHT',
+  'NOVAKOVIC',
+  'WIDIASIH',
+  'PASIC',
+  'KHLEIF',
+  'REGMI',
+  'K.C.',
+  'AL-HABAHBEH',
+  'NUNIC',
+  'CAGNEY',
+  'MLAKIC',
+  'MARKOVIC',
+  'WASTINI',
+  'LOSAPIO',
+  'CHERKASHINA',
+  'RODIN',
+  'ABABNEH',
+  'ZHANG',
+  'SARAGIH',
+  'HYYTIAEINEN',
+  'DALY',
+  'TUURAS',
+  'LYUBCHICH',
+  'ZHOU',
+  'CRENNAN',
+  'GRUJIC',
+  'HEIMOLINNA',
+  'KULIC',
+  'SUGIARTO',
+  'DURIC',
+  'SHABRINA',
+  'VOELKEL',
+  'MC CARTHY',
+  'BARTH',
+  'FILIPOVIC',
+  'SIMIC',
+  'DESMOND',
+  'CASEY',
+  'FLEET',
+  'REKEMOVA',
+  'CALIRI',
+  'SLIACKY',
+  'CICERELLI',
+  'MANAFE',
+  'THAPA',
+  'DORGAN',
+  'KURAMSHIN',
+  'HIRKOVA',
+  'SABANAGIC',
+  'MOORE',
+  'KILCOYNE',
+  'AL-HANAITY',
+  'ZAHARI',
+  'ZHOU',
+  'MAHER',
+  'PITA',
+  'PLUNKETT'
+];
+
+Show more
+7:40 AM
+
+Viewed 2 files, ran a command, edited a file
+Viewed 2 files, ran a command, edited a file
+Now update the init fallback (when GitHub isn't configured yet) to also use the real names:
+
+
+Ran 2 commands, viewed a file, edited a file
+Ran 2 commands, viewed a file, edited a file
+Also update the roster-data.json to be pre-populated with the real users:
+
+
+Ran a command, read a file
+Ran a command, read a file
+Done! Two files updated:
+
+roster-admin.html — the resetData() function (↺ Reset button) now loads all 61 real staff members. The app also pre-populates them immediately when you first open the file before GitHub is configured, so the roster is ready to see right away.
+
+roster-data.json — pre-populated with all 61 users (Paul SLATTERY through Jonathan PLUNKETT), all set to Off with no sector/station/unit yet assigned. Upload this to your GitHub repo to replace the empty version — the viewer will show the full staff list immediately.
+
+Just upload both files to your GitHub repo to replace the previous versions.
+
+
+Roster admin
+Code · HTML 
+
+Roster data
+Code · JSON 
+also, for the visualization of both HTML files, I would like to see the data for each day in the grid
+
+7:42 AM
+What exactly would you like to see in each day cell? Right now cells just show the shift code (D, A, RD, AL).
+
+Q: What additional data do you want visible in each day cell?
+A: Day number + date
+
+7:43 AM
+Got it. I'll update both files so each day column header shows the day number and date (e.g. 1 / 21 May), and each shift cell shows the shift code plus the date in small text below it.
+
+
+Viewed 2 files
+Viewed 2 files
+Now I have a clear picture. I'll update both files — wider cells, the header shows day number + date, and each shift cell shows the code + date below it.
+
+
+Edited 2 files
+Edited 2 files
+Now update the paint function to also render the date inside dragged cells:
+
+
+Edited 2 files, ran a command, viewed a file
+Edited 2 files, ran a command, viewed a file
+Now update the applyCtx function similarly:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now add the new CSS for the header and cell layout:
+
+
+Replace old dhdr CSS and add new cell styles in admin
+Replace old dhdr CSS and add new cell styles in admin
+Also remove the old td rule that conflicts:
+
+
+Ran a command, edited a file
+Ran a command, edited a file
+Now do the same for the viewer file:
+
+
+Edited 2 files, ran a command, viewed a file
+Edited 2 files, ran a command, viewed a file
+Now update the viewer's buildHead and buildBody functions:
+
+
+Edited 2 files, viewed a file, read a file
+Edited 2 files, viewed a file, read a file
+Both files updated. Here's what changed in the grid:
+
+Column headers now show two lines:
+
+Bold day number (1, 2, 3…)
+Date below it (21 May, 22 May…)
+Each shift cell now shows two lines:
+
+The shift code in bold (D, A, RD, AL) — or blank for Off
+The date below in small text (21 May)
+Cells are also slightly wider (46px minimum) to fit the date comfortably. Upload both files to your GitHub repo to replace the previous versions.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+is it possible to avoid to put the parameter for the setup for both html files? and also is it somehow possible to think about a kind of login for the admin one?
+
+10:37 AM
+Great questions. Both are very doable:
+
+For removing the setup parameters — since both files live in the same GitHub repo, they can read the owner/repo/branch from a single config.json file in the repo. You edit it once, upload it, and both HTML files pick it up automatically. No setup banner needed.
+
+For the admin login — since there's no real server, we can't do server-side auth, but a solid approach is a password stored as a SHA-256 hash in config.json. The admin enters a password, it gets hashed in the browser and compared — the real password is never stored anywhere. The GitHub token stays in config.json encrypted with that password using AES.
+
+Q: For the admin login, what kind of access control do you need?
+A: I'd prefer per-user logins (name + password)
+
+Q: How should the GitHub token be handled?
+A: Store token encrypted in config.json (recommended)
+
+10:39 AM
+Perfect. Here's the full architecture before I build it:
+
+config.json — one file in the repo containing:
+
+GitHub owner/repo/branch/path (read by both files)
+GitHub token encrypted with AES-256
+List of admin users with hashed passwords (SHA-256)
+How login works:
+
+Admin enters name + password
+Password is SHA-256 hashed in browser → compared against stored hash
+If match → token is AES-decrypted using the password → used for GitHub API calls
+Session lives in memory only — closing the tab logs you out
+A small one-time setup.html tool helps you generate the config.json without typing JSON manually.
+
+
+Ran 2 commands
+Ran 2 commands
+Now rewrite the admin HTML with auto-config loading and per-user login:
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Good — I have the full picture of the existing styles. Now I'll inject the login screen CSS and HTML, replace the setup banner, and add the crypto+auth JS:
+
+
+Replace setup banner CSS with login screen CSS
+Replace setup banner CSS with login screen CSS
+Now replace the setup banner HTML with the login + loading screens:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now replace the entire JS section with the new auth+config version:
+
+
+Viewed 4 files
+Viewed 4 files
+Now I'll replace the old config+API block with the new crypto+login+config-from-repo version:
+
+
+Replace old config/auth/API JS with new crypto+login+config-from-repo version
+Replace old config/auth/API JS with new crypto+login+config-from-repo version
+Now fix the STATE block (it got removed with the old code) and update the boot function:
+
+
+Add STATE block after LS_SHA declaration
+Add STATE block after LS_SHA declaration
+Now replace the old init function with the new one:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update the viewer to also auto-load config.json instead of requiring manual setup:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now replace the viewer JS config/init section:
+
+
+Viewed 2 files, edited a file
+Viewed 2 files, edited a file
+Now fix the viewer's init function at the bottom:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Also update the setup.html to generate per-admin encrypted tokens:
+
+
+Edited a file, ran a command
+Edited a file, ran a command
+All checks pass. Now update the README:
+
+
+Ran a command, read a file
+Ran a command, read a file
+Here's your complete updated solution — 5 files. Here's what changed and how everything works now:
+
+No more manual setup in the browser. Both HTML files automatically load config.json from the repo root when they open — zero configuration needed by end users.
+
+Per-user login on the admin file. When you open roster-admin.html, it shows a clean login screen asking for name and password. Under the hood: the password is SHA-256 hashed and compared against the stored hash, then used to AES-256 decrypt that user's personal copy of the GitHub token. The token is never stored in plaintext anywhere — closing the tab wipes it from memory completely.
+
+The setup flow is now:
+
+Run setup.html locally (double-click it — never upload it to GitHub)
+Fill in your repo details, token, and add each admin with their password
+Click Generate config.json → copy the output → save as config.json
+Upload all 5 files to GitHub (setup.html stays on your computer only)
+Enable GitHub Pages → done
+The viewer needs no login and no configuration — it just opens and loads the roster automatically from config.json.
+
+
+Setup
+Code · HTML 
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+
+Config
+Code · JSON 
+
+Readme
+Document · MD 
+what about the roster-data.json to save the data?
+
+10:47 AM
+Good catch. The roster-data.json also needs to be uploaded to your repo — it's the file where all roster data gets saved. You already have it from earlier (pre-populated with your 61 staff members).
+
+
+Presented file
+Presented file
+Upload this to your GitHub repo alongside the other files. Your full repo should contain exactly these 6 files:
+
+File	Upload to GitHub?
+config.json	✅ Yes (generated by setup.html)
+roster-admin.html	✅ Yes
+roster-viewer.html	✅ Yes
+roster-data.json	✅ Yes — this one
+README.md	✅ Yes
+setup.html	❌ No — keep locally only
+The roster-data.json serves as the starting point — all 61 staff members are already in it with no shifts assigned. Every time the admin makes a change and it auto-saves, GitHub replaces this file with the updated version. The full history of every save is kept as Git commits, so you can always roll back if needed.
+
+
+Roster data
+Code · JSON 
+coudl you please also generate and index.html file with two buttons where usder can select to open the admin or the viewver?
+
+10:57 AM
+
+Created a file, read a file
+Created a file, read a file
+Done! Upload this to your repo and it becomes the homepage of your GitHub Pages site. Since it's named index.html, it loads automatically when anyone visits https://YOUR-USERNAME.github.io/YOUR-REPO/ — no need to type the full filename.
+
+Your complete file list is now:
+
+File	Purpose
+index.html	Landing page — links to Admin and Viewer
+roster-admin.html	Admin editor with login
+roster-viewer.html	Read-only roster view
+config.json	Generated by setup.html
+roster-data.json	Roster database
+README.md	Documentation
+setup.html	❌ Keep locally, don't upload
+
+Index
+Code · HTML 
+for each user, I need to add nationality and I need also a combobox to select the nationality in both html files
+
+11:05 AM
+
+Ran 2 commands, viewed a file
+Ran 2 commands, viewed a file
+Good — I have a full picture. Now I'll make all the changes across both files: add the nationality badge CSS, add nationality filter dropdowns to both toolbars, add nationality field to the admin modal, wire it into populateSelects, filtered, buildBody, buildUsers, saveUser, openEditUser, openAddUser, and update getDefaultUsers. Then mirror everything in the viewer.
+
+
+Edited 4 files
+Edited 4 files
+Now add the NATIONALITIES constant and update all JS functions:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update populateSelects to include nationality:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update the filtered() function in admin to include nationality:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update buildBody to show nationality badge in the info cell:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update buildUsers, openAddUser, openEditUser, saveUser, and getDefaultUsers in admin:
+
+
+Viewed 2 files, ran a command
+Viewed 2 files, ran a command
+Now I'll do all the user-management function updates in one block:
+
+
+Update buildUsers, openAddUser, openEditUser, saveUser, exportCSV and getDefaultUsers to include nationality
+Update buildUsers, openAddUser, openEditUser, saveUser, exportCSV and getDefaultUsers to include nationality
+Also add Nationality column header to the Users table:
+
+
+Add Nationality column to users table header in admin
+Add Nationality column to users table header in admin
+Now do all the same changes in the viewer file:
+
+
+Edited 2 files, ran a command
+Edited 2 files, ran a command
+Now add NATIONALITIES constant and update populateSelects, filtered, buildBody in viewer:
+
+
+Edited 3 files, ran 2 commands, viewed 2 files
+Edited 3 files, ran 2 commands, viewed 2 files
+Finally update roster-data.json to add nationality field to all 61 users:
+
+
+Ran a command, read a file
+Ran a command, read a file
+All three files updated. Here's what changed:
+
+Both files now have a Nationality filter dropdown in the toolbar (alongside Sector, Station, Unit) with a full sorted list of 120+ nationalities. The nationality shows as a purple 🌐 badge in the info column next to each user's sector/station/unit badges.
+
+Admin file additionally:
+
+New Nationality field in the Add/Edit User modal (searchable combobox)
+Nationality column added to the Users table
+Nationality filter in the Users tab too
+CSV export now includes a Nationality column
+roster-data.json — all 61 existing users have the nationality field added (empty by default, ready to be filled in via the admin).
+
+Upload all three files to your GitHub repo to replace the previous versions.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+
+Roster data
+Code · JSON 
+instead of this const NATIONALITIES = [
+  'Afghan','Albanian','Algerian','American','Andorran','Angolan','Argentine','Armenian',
+  'Australian','Austrian','Azerbaijani','Bahraini','Bangladeshi','Belarusian','Belgian',
+  'Bolivian','Bosnian','Brazilian','British','Bulgarian','Cameroonian','Canadian','Chilean',
+  'Chinese','Colombian','Congolese','Croatian','Cuban','Czech','Danish','Dominican',
+  'Dutch','Ecuadorian','Egyptian','Emirati','Estonian','Ethiopian','Filipino','Finnish',
+  'French','Georgian','German','Ghanaian','Greek','Guatemalan','Honduran','Hungarian',
+  'Indian','Indonesian','Iranian','Iraqi','Irish','Israeli','Italian','Ivorian',
+  'Jamaican','Japanese','Jordanian','Kazakhstani','Kenyan','Korean','Kuwaiti','Kyrgyz',
+  'Latvian','Lebanese','Libyan','Lithuanian','Luxembourgish','Macedonian','Malaysian',
+  'Malian','Maltese','Mexican','Moldovan','Mongolian','Montenegrin','Moroccan','Mozambican',
+  'Namibian','Nepalese','New Zealander','Nicaraguan','Nigerian','Norwegian','Omani',
+  'Pakistani','Palestinian','Panamanian','Paraguayan','Peruvian','Polish','Portuguese',
+  'Qatari','Romanian','Russian','Rwandan','Saudi','Senegalese','Serbian','Singaporean',
+  'Slovak','Slovenian','Somali','South African','Spanish','Sri Lankan','Sudanese',
+  'Swedish','Swiss','Syrian','Taiwanese','Tajik','Tanzanian','Thai','Tunisian','Turkish',
+  'Turkmenistani','Ugandan','Ukrainian','Uruguayan','Uzbekistani','Venezuelan','Vietnamese',
+  'Yemeni','Zambian','Zimbabwean'
+].sort(); please give me the name of the countries
+
+Show more
+11:16 AM
+Got it — instead of adjectives like "French", you want country names like "France". Let me update both files.
+
+
+Prepare the countries list and count entries
+Prepare the countries list and count entries
+194 countries (388 quotes / 2). Now replace in both files:
+
+
+Ran 2 commands, read a file
+Ran 2 commands, read a file
+Done — both files now have 194 country names (Afghanistan → Zimbabwe, sorted alphabetically) in the nationality dropdown instead of adjectives. Upload both to your GitHub repo to replace the previous versions.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+coudl you please give me also the oppotunity to configure the values for the shift
+
+11:47 AM
+Great idea — instead of hardcoded D, A, RD, AL you'll be able to define your own shift types (name, label, colour) from within the admin. Let me build this properly.
+
+
+Viewed 3 files
+Viewed 3 files
+Good — I now have the full picture. The approach: shift types become dynamic data (stored in roster-data.json like sectors/stations/units), with OFF always reserved as the "clear" value. Everything that touches shifts — constants, context menu, toolbar, legend, stats, bulk fill, filters, modal default shift, viewer — gets rebuilt dynamically from shiftDefs.
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Now I have everything I need. I'll do this as a series of targeted replacements — making shifts fully dynamic throughout the admin, then mirror to the viewer.
+
+
+Replace hardcoded shift constants with dynamic helpers driven by shiftDefs
+Replace hardcoded shift constants with dynamic helpers driven by shiftDefs
+Now update loadFromGitHub and saveToGitHub to persist shiftDefs:
+
+
+Edited 2 files
+Edited 2 files
+Now replace all references to SHIFTS, CLS, LBL, NAME, SCOL with the dynamic _SHIFTS, _CLS etc. throughout the JS:
+
+
+Ran 3 commands
+Ran 3 commands
+Good. Now replace the hardcoded context menu, toolbar shift filter, bulk fill buttons, legend, and stats with dynamically generated ones:
+
+
+Edited 3 files
+Edited 3 files
+Now add the Shift Types card to the config tab and the buildShiftUI / shift config functions:
+
+
+Add Shifts card to config tab
+Add Shifts card to config tab
+Now replace updateStats and buildCfgLists functions, and add the new shift management functions:
+
+
+Viewed a file, edited a file
+Viewed a file, edited a file
+Now update the boot init to call buildShiftUI, and update loadFromGitHub to also call it:
+
+
+Edited 2 files, ran 2 commands
+Edited 2 files, ran 2 commands
+Fix the remaining two call sites (reset and init) to also call buildShiftUI:
+
+
+Edited 2 files, viewed a file
+Edited 2 files, viewed a file
+Now update the viewer to also use dynamic shiftDefs from the loaded data:
+
+
+Ran a command, edited a file
+Ran a command, edited a file
+Now update loadAndRender in viewer to load shiftDefs, and replace CLS/LBL/NAME usages with _CLS/_LBL/_NAME:
+
+
+Ran a command, edited a file
+Ran a command, edited a file
+Now replace CLS/LBL/NAME usages in viewer with _CLS/_LBL/_NAME:
+
+
+Ran 2 commands
+Ran 2 commands
+Good — those already have the _ prefix. The "Still" warnings were false positives from the regex matching inside the already-replaced strings. Now update updateStats and fShift select, and add the shift legend in the viewer:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now replace updateStats in the viewer and add buildViewerShiftUI:
+
+
+Viewed 3 files, edited a file
+Viewed 3 files, edited a file
+Now call buildViewerShiftUI after data loads in the viewer:
+
+
+Edited 2 files, ran a command
+Edited 2 files, ran a command
+Also call buildViewerShiftUI on initial page load so the default shift types show before data arrives:
+
+
+Call buildViewerShiftUI on initial page load in viewer
+Call buildViewerShiftUI on initial page load in viewer
+Also update roster-data.json to include shiftDefs:
+
+
+Ran 2 commands, read a file
+Ran 2 commands, read a file
+All three files updated. Here's what you can now do in the Sectors / Stations / Units config tab:
+
+Shift Types editor — a new table at the bottom of the config tab lets you:
+
+Action	How
+Rename the label (e.g. D → M)	Edit the short label field
+Rename the full name (e.g. Day → Morning Shift)	Edit the name field
+Change background colour	Click the colour picker
+Change text colour	Click the second colour picker
+See a live preview	Updates instantly in the row
+Reorder shifts	↑ ↓ buttons
+Add a new shift type	"+ Add shift type" button
+Delete a shift type	✕ button (cells using it become Off)
+Every change saves automatically to GitHub and updates the roster grid, legend, stats bar, filter dropdown, bulk-fill buttons, context menu, and the viewer — all in real time. Upload all three files to your repo.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+
+Roster data
+Code · JSON 
+I have this issue Identifier 'LS_SHA' has already been declared
+
+12:01 PM
+The LS_SHA constant got declared twice during our edits. Quick fix:
+
+
+Find all LS_SHA declarations
+Find all LS_SHA declarations
+Two declarations at lines 334 and 371. Remove the duplicate at line 371:
+
+
+Viewed a file, edited a file, ran a command
+Viewed a file, edited a file, ran a command
+Fixed — LS_SHA is now declared exactly once (line 334). Upload this file to your GitHub repo to replace the previous version.
+
+
+Roster admin
+Code · HTML 
+is it possible that the I have a button to export the grid with the applied filter ?
+
+12:45 PM
+The export already uses filtered() so it only exports visible users — but the shift columns are always all 56 days regardless of the shift filter. Let me check the current export and make it fully respect all active filters including which days show.
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Good — currently it exports users (all users) ignoring filters. I'll update both files so the export button respects all active filters (users, sector, station, unit, nationality, shift), includes the shift label name instead of the key, and generates a meaningful filename with the active filters noted. I'll also add the export button to the viewer.
+
+
+Replace exportCSV in admin with filter-aware version
+Replace exportCSV in admin with filter-aware version
+Now do the same for the viewer:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update the export button in both toolbars to show the active filter count as a hint:
+
+
+Edited 3 files, ran 2 commands, read a file
+Edited 3 files, ran 2 commands, read a file
+Both files updated. Here's what the export now does:
+
+Respects all active filters — only the users currently visible in the grid are exported. If you filter by Sector = "Alpha", Nationality = "Italian", or Shift = "D", only those rows appear in the CSV.
+
+Readable shift names — instead of raw keys like D, RD, AL, the CSV shows the full names like Day, Rest Day, Annual Leave (using whatever names you've configured in the Shift Types editor).
+
+Smart filename — the downloaded file is automatically named to reflect the active filters, for example:
+
+roster_Alpha_North_21Dec2025.csv (filtered by sector + station)
+roster_Italian_D_12users_21Dec2025.csv (filtered by nationality + shift type)
+roster_21Dec2025.csv (no filters — full roster)
+Upload both files to your GitHub repo.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+could be possible also to export as a picture?
+
+12:47 PM
+Yes! I'll add an Export as Image button that captures the current filtered grid and downloads it as a PNG — using the browser's built-in Canvas API, no external libraries needed.
+
+
+Viewed a file, edited a file
+Viewed a file, edited a file
+Now add the exportImage function to the admin. I'll place it right after exportCSV:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now do the same for the viewer — add the button and the function:
+
+
+Edited 2 files, ran 2 commands, read a file
+Edited 2 files, ran 2 commands, read a file
+Both files updated. The 🖼 PNG button is now in the header of both files next to the CSV button. Here's what the exported image includes:
+
+Blue title bar — "ROSTER · Alpha · North · 21 Dec 2025 (12 users)" built from active filters
+Legend row — colour swatches for each shift type (using your custom colours if you've changed them)
+Day headers — two lines: day number + actual date (e.g. "1 / 21 Dec")
+Rows — alternating row colours, name, sector/station/unit info, coloured shift cells with the shift label
+Weekends — slightly muted to match the grid
+@2x resolution — crisp on retina / high-DPI screens
+Smart filename — same filter-aware naming as the CSV (e.g. roster_img_Alpha_D_21Dec2025.png)
+No external libraries needed — it renders entirely using the browser's built-in Canvas API.
+
+
+Roster admin
+Code · HTML 
+
+Roster viewer
+Code · HTML 
+there is this error for the admin Uncaught Error: Uncaught SyntaxError: Illegal return statement
+
+12:49 PM
+Let me find the stray return statement outside a function:
+
+
+Ran 6 commands
+Ran 6 commands
+Found it — exportImage closes at line 876 (}), but then getDefaultUsers body (lines 877–884) is orphaned outside any function — its opening function getDefaultUsers(){ is missing. The str_replace that inserted exportImage accidentally consumed the function getDefaultUsers(){ line. Let me fix it:
+
+
+Confirm getDefaultUsers declaration is missing
+Confirm getDefaultUsers declaration is missing
+Confirmed — the declaration was swallowed. Fix it:
+
+
+Edited a file, ran a command
+Edited a file, ran a command
+Clean. Let's also verify the viewer while we're at it:
+
+
+Syntax check viewer JS too
+Syntax check viewer JS too
+Both files are clean. Download the fixed admin file:
+
+
+Presented file
+Presented file
+The root cause was a bad str_replace that matched function getDefaultUsers(){ as part of the insertion anchor and swallowed the function declaration, leaving the body floating at the top level — which is what caused Illegal return statement. It's now restored and syntax-verified. Upload this file to your repo.
+
+
+Roster admin
+Code · HTML 
+
+
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+Roster admin · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -170,13 +1331,13 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 </style>
 </head>
 <body>
-
+ 
 <!-- ═══ LOADING SCREEN ═══ -->
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
   <div class="loading-msg" id="loadingMsg">Loading config…</div>
 </div>
-
+ 
 <!-- ═══ LOGIN SCREEN ═══ -->
 <div class="login-screen" id="loginScreen" style="display:none">
   <div class="login-card">
@@ -197,7 +1358,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     <p class="linfo">Access is restricted to authorised administrators.<br>Contact your roster manager if you need access.</p>
   </div>
 </div>
-
+ 
 <header>
   <div>
     <div class="logo">ROSTER MANAGER</div>
@@ -206,26 +1367,27 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <div class="hright">
     <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Loading…</span></div>
     <span id="loggedInAs" style="font-size:11px;color:var(--text3);font-family:var(--mono)"></span>
-    <button class="btn sm acc" onclick="exportCSV()">⬇ CSV</button>
-    <!--<button class="btn sm dan" onclick="resetData()">↺ Reset</button>-->
+    <button class="btn sm acc" onclick="exportCSV()" title="Exports only the users and shifts visible with current filters">⬇ CSV</button>
+    <button class="btn sm acc" onclick="exportImage()" title="Export current filtered grid as PNG image">🖼 PNG</button>
+    <button class="btn sm dan" onclick="resetData()">↺ Reset</button>
     <button class="btn sm" onclick="doLogout()" title="Sign out">⏻ Sign out</button>
     <span class="rbadge">ADMIN</span>
   </div>
 </header>
-
+ 
 <nav>
   <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
   <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
   <div class="tab" onclick="switchTab('users')">👥 Users</div>
 </nav>
-
+ 
 <div class="dtip" id="dtip"></div>
 <div class="cmenu" id="cmenu">
   <div id="cmenuItems"><!-- populated by buildShiftUI() --></div>
   <div class="csep"></div>
   <div class="ci" onclick="applyCtx('OFF')"><span class="cdot" style="background:#f8fafc;border-color:#e2e8f0"></span><span style="color:#94a3b8">— Clear / Off</span></div>
 </div>
-
+ 
 <main>
   <!-- ROSTER -->
   <div id="panel-roster" class="panel active">
@@ -237,17 +1399,15 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
       <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
       <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
-      <!-- This PIECE HAS BEEN COMMENTED -->
-      <!-- <span style="font-size:11px;color:var(--text3)">Bulk fill:</span>
-      <span id="bulkBtns"><!-- populated by buildShiftUI() --> <!--</span>
-      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button> -->
-       <!-- This PIECE HAS BEEN COMMENTED -->
+      <span style="font-size:11px;color:var(--text3)">Bulk fill:</span>
+      <span id="bulkBtns"><!-- populated by buildShiftUI() --></span>
+      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
     </div>
     <div class="legend" id="shiftLegend"><!-- populated by buildShiftUI() --></div>
     <div class="stats" id="statsBar"><!-- populated by buildShiftUI() --></div>
     <div class="twrap"><table><thead id="rHead"></thead><tbody id="rBody"></tbody></table></div>
   </div>
-
+ 
   <!-- CONFIG -->
   <div id="panel-config" class="panel">
     <div class="cgrid">
@@ -286,7 +1446,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     </div>
     <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>Users</strong> tab.</p>
   </div>
-
+ 
   <!-- USERS -->
   <div id="panel-users" class="panel">
     <div class="toolbar">
@@ -305,7 +1465,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     </div>
   </div>
 </main>
-
+ 
 <div class="mbg" id="modal">
   <div class="modal">
     <h3 id="mTitle">Add user</h3>
@@ -327,17 +1487,17 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
     </div>
   </div>
 </div>
-
+ 
 <script>
 /* ══════════════════════════════════════════════════
    CONSTANTS
 ══════════════════════════════════════════════════ */
 const DAYS = 56;
 const LS_SHA = 'roster_gh_sha';
-
+ 
 // OFF is always the "clear" sentinel — not user-configurable
 const OFF_DEF = {key:'OFF', label:'', name:'Off / Clear', bg:'#f8fafc', fg:'#94a3b8', border:'#e2e8f0'};
-
+ 
 // shiftDefs: array of {key, label, name, bg, fg, border}  — loaded from data, editable in config tab
 let shiftDefs = [
   {key:'D',  label:'D',  name:'Day',          bg:'#dbeafe', fg:'#1e40af', border:'#93c5fd'},
@@ -345,7 +1505,7 @@ let shiftDefs = [
   {key:'RD', label:'RD', name:'Rest Day',     bg:'#fef9c3', fg:'#854d0e', border:'#fde047'},
   {key:'AL', label:'AL', name:'Annual Leave', bg:'#fce7f3', fg:'#9d174d', border:'#f9a8d4'},
 ];
-
+ 
 // Derived lookups — rebuilt whenever shiftDefs changes
 function rebuildShiftLookups(){
   window._SHIFTS = ['OFF',...shiftDefs.map(s=>s.key)];
@@ -356,7 +1516,7 @@ function rebuildShiftLookups(){
   // inject/update CSS classes for each shift
   injectShiftCSS();
 }
-
+ 
 function injectShiftCSS(){
   let el=document.getElementById('shiftStyles');
   if(!el){el=document.createElement('style');el.id='shiftStyles';document.head.appendChild(el);}
@@ -367,10 +1527,10 @@ function injectShiftCSS(){
   `).join('') + `td.sc_OFF{background:${OFF_DEF.bg};color:${OFF_DEF.fg};font-weight:400}
     td.sc_OFF.we{background:#edf1f7!important}`;
 }
-
+ 
 rebuildShiftLookups();
 const NATIONALITIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'].sort();
-
+ 
 /* ══════════════════════════════════════════════════
    STATE
 ══════════════════════════════════════════════════ */
@@ -378,7 +1538,7 @@ let users=[], roster={}, sectors=[], stations=[], units=[];
 let startDate = new Date();
 let editUID=null, ctxUID=null, ctxDay=null, saveTimer=null;
 let dragging=false, dragShift=null, dragSet=new Set();
-
+ 
 /* ══════════════════════════════════════════════════
    CRYPTO HELPERS
 ══════════════════════════════════════════════════ */
@@ -401,17 +1561,17 @@ async function aesDecrypt(b64,password){
   const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
   return new TextDecoder().decode(dec);
 }
-
+ 
 /* ══════════════════════════════════════════════════
    SESSION  (in-memory only — cleared on tab close)
 ══════════════════════════════════════════════════ */
 let session = null; // {name, token, cfg}
-
+ 
 /* ══════════════════════════════════════════════════
    LOAD config.json FROM REPO (public raw URL)
 ══════════════════════════════════════════════════ */
 let appConfig = null; // raw config.json contents
-
+ 
 async function fetchConfig(){
   // config.json must be in the repo root on the same origin (GitHub Pages)
   // Try same-origin first, then raw.githubusercontent as fallback
@@ -427,7 +1587,7 @@ async function fetchConfig(){
   }
   return false;
 }
-
+ 
 /* ══════════════════════════════════════════════════
    LOGIN
 ══════════════════════════════════════════════════ */
@@ -437,12 +1597,12 @@ async function doLogin(){
   document.getElementById('loginErr').textContent='';
   if(!name||!pass){ document.getElementById('loginErr').textContent='Enter your name and password.'; return; }
   if(!appConfig){ document.getElementById('loginErr').textContent='Config not loaded. Try refreshing.'; return; }
-
+ 
   const admins=appConfig.admins||[];
   const expected=await sha256(name.toLowerCase()+'::'+pass);
   const match=admins.find(a=>a.name.toLowerCase()===name.toLowerCase()&&a.hash===expected);
   if(!match){ document.getElementById('loginErr').textContent='Name or password incorrect.'; return; }
-
+ 
   // decrypt token — master key = all admin passwords combined sorted by name
   // Since we only know this user's password, we decrypt using their contribution
   // The master key is all passwords joined — we reconstruct it for single-admin case
@@ -460,13 +1620,13 @@ async function doLogin(){
     document.getElementById('loginErr').textContent='Decryption failed — password may have changed. Re-run setup.html.';
     return;
   }
-
+ 
   session = {name: match.name, token, cfg: appConfig};
   document.getElementById('loggedInAs').textContent = '👤 '+match.name;
   showApp();
   await loadFromGitHub();
 }
-
+ 
 function doLogout(){
   session=null;
   users=[]; roster={}; sectors=[]; stations=[]; units=[];
@@ -480,7 +1640,7 @@ function doLogout(){
   document.querySelector('nav').style.display='none';
   document.querySelector('main').style.display='none';
 }
-
+ 
 function showApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('loadingScreen').style.display='none';
@@ -491,7 +1651,7 @@ function showApp(){
       session.cfg.owner+'/'+session.cfg.repo+' · '+(session.cfg.dataPath||'roster-data.json');
   }
 }
-
+ 
 /* ══════════════════════════════════════════════════
    GITHUB API
 ══════════════════════════════════════════════════ */
@@ -506,7 +1666,7 @@ function ghUrl(){
   const c=session.cfg;
   return `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.dataPath||'roster-data.json'}`;
 }
-
+ 
 async function loadFromGitHub(){
   if(!session){ return false; }
   setStatus('saving','Loading…');
@@ -541,7 +1701,7 @@ async function loadFromGitHub(){
     return false;
   }
 }
-
+ 
 async function saveToGitHub(){
   if(!session){ setStatus('error','Not logged in'); return; }
   setStatus('saving','Saving to GitHub…');
@@ -571,20 +1731,20 @@ async function saveToGitHub(){
     setStatus('error','Save failed: '+e.message);
   }
 }
-
+ 
 function queueSave(){
   clearTimeout(saveTimer);
   setStatus('saving','Saving…');
   saveTimer=setTimeout(()=>saveToGitHub(),1200);
 }
-
+ 
 function setStatus(state,label){
   const el=document.getElementById('sind');
   el.className='sind'+(state!=='idle'?' '+state:'');
   document.getElementById('slbl').textContent=label;
 }
-
-
+ 
+ 
 /* ══════════════════════════════════════════════════
    TABS
 ══════════════════════════════════════════════════ */
@@ -596,7 +1756,7 @@ function switchTab(t){
   if(t==='config') buildCfgLists();
   if(t==='users'){populateSelects();buildUsers();}
 }
-
+ 
 /* ══════════════════════════════════════════════════
    HEAD
 ══════════════════════════════════════════════════ */
@@ -615,7 +1775,7 @@ function buildHead(){
   }
   document.getElementById('rHead').innerHTML=h+'</tr>';
 }
-
+ 
 /* ══════════════════════════════════════════════════
    FILTER
 ══════════════════════════════════════════════════ */
@@ -636,7 +1796,7 @@ function filtered(){
     return true;
   });
 }
-
+ 
 /* ══════════════════════════════════════════════════
    BODY
 ══════════════════════════════════════════════════ */
@@ -666,7 +1826,7 @@ function buildBody(){
   document.getElementById('rBody').innerHTML=h;
   attachCells(); updateStats(list);
 }
-
+ 
 /* ══════════════════════════════════════════════════
    CELL EVENTS
 ══════════════════════════════════════════════════ */
@@ -696,7 +1856,7 @@ function attachCells(){
     });
   });
 }
-
+ 
 function paint(td,uid,day){
   if(!roster[uid]) roster[uid]=Array(DAYS).fill('OFF');
   roster[uid][day]=dragShift;
@@ -708,7 +1868,7 @@ function paint(td,uid,day){
     +`<span class="cell-date">${dateStr}</span>`;
   dragSet.add(uid+'|'+day);
 }
-
+ 
 document.addEventListener('mouseup',()=>{
   if(!dragging)return;
   dragging=false; hideTip();
@@ -716,7 +1876,7 @@ document.addEventListener('mouseup',()=>{
   dragShift=null; dragSet=new Set();
 });
 document.addEventListener('mousemove',e=>{if(dragging)moveTip(e);});
-
+ 
 function showTip(e,s){
   const t=document.getElementById('dtip');
   t.style.background=_SCOL[s].bg; t.style.color=_SCOL[s].fg;
@@ -725,7 +1885,7 @@ function showTip(e,s){
 }
 function moveTip(e){const t=document.getElementById('dtip');t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY-10)+'px';}
 function hideTip(){document.getElementById('dtip').style.display='none';}
-
+ 
 function applyCtx(s){
   if(ctxUID===null)return;
   if(!roster[ctxUID]) roster[ctxUID]=Array(DAYS).fill('OFF');
@@ -744,7 +1904,7 @@ function applyCtx(s){
 function closeCtx(){document.getElementById('cmenu').classList.remove('open');ctxUID=null;ctxDay=null;}
 document.addEventListener('click',e=>{if(!document.getElementById('cmenu').contains(e.target))closeCtx();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtx();});
-
+ 
 /* ══════════════════════════════════════════════════
    BUILD SHIFT UI  (called after shiftDefs changes)
 ══════════════════════════════════════════════════ */
@@ -755,7 +1915,7 @@ function buildShiftUI(){
        <span class="cdot" style="background:${s.bg};border-color:${s.border}"></span>
        <span style="color:${s.fg}">${esc(s.label)} — ${esc(s.name)}</span>
      </div>`).join('');
-
+ 
   // shift filter select
   const fShift=document.getElementById('fShift');
   if(fShift){
@@ -764,13 +1924,13 @@ function buildShiftUI(){
       +shiftDefs.map(s=>`<option value="${s.key}"${s.key===cur?' selected':''}>${s.label} — ${esc(s.name)}</option>`).join('')
       +'<option value="OFF">Off / Clear</option>';
   }
-
+ 
   // bulk fill buttons
   const bb=document.getElementById('bulkBtns');
   if(bb) bb.innerHTML=shiftDefs.map(s=>
     `<button class="btn sm" style="background:${s.bg};color:${s.fg};border-color:${s.border}" onclick="bulkFill('${s.key}')">${esc(s.label)}</button>`
   ).join('');
-
+ 
   // legend
   const leg=document.getElementById('shiftLegend');
   if(leg) leg.innerHTML=shiftDefs.map(s=>
@@ -778,7 +1938,7 @@ function buildShiftUI(){
   ).join('')
   +`<span><span class="lsq" style="background:#f8fafc;border-color:#e2e8f0"></span>Off</span>`
   +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>`;
-
+ 
   // stats bar
   const sb=document.getElementById('statsBar');
   if(sb) sb.innerHTML=
@@ -787,7 +1947,7 @@ function buildShiftUI(){
       `<div class="stat"><div class="slbl">${esc(s.label)} — ${esc(s.name)}</div><div class="sval" id="stat_${s.key}" style="color:${s.fg}">—</div></div>`
     ).join('')
     +`<div class="stat"><div class="slbl">Coverage</div><div class="sval" id="scov" style="color:var(--accent)">—</div></div>`;
-
+ 
   // default shift select in modal
   const mShift=document.getElementById('mShift');
   if(mShift){
@@ -795,11 +1955,11 @@ function buildShiftUI(){
     mShift.innerHTML='<option value="OFF">Off / Clear</option>'
       +shiftDefs.map(s=>`<option value="${s.key}"${s.key===cur?' selected':''}>${s.label} — ${esc(s.name)}</option>`).join('');
   }
-
+ 
   // shift rows in config tab
   buildShiftRows();
 }
-
+ 
 /* ══════════════════════════════════════════════════
    SHIFT CONFIG TABLE
 ══════════════════════════════════════════════════ */
@@ -819,7 +1979,7 @@ function buildShiftRows(){
     </td>
   </tr>`).join('');
 }
-
+ 
 function updateShift(i, field, val){
   shiftDefs[i][field]=val;
   if(field==='bg'||field==='fg'){
@@ -830,13 +1990,13 @@ function updateShift(i, field, val){
   }
   rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
 }
-
+ 
 function addShiftDef(){
   const key='S'+(Date.now()%10000);
   shiftDefs.push({key,label:key,name:'New Shift',bg:'#e0f2fe',fg:'#075985',border:'#7dd3fc'});
   rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
 }
-
+ 
 function delShift(i){
   if(shiftDefs.length<=1){alert('You need at least one shift type.');return;}
   const key=shiftDefs[i].key;
@@ -846,14 +2006,14 @@ function delShift(i){
   shiftDefs.splice(i,1);
   rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
 }
-
+ 
 function moveShift(i,dir){
   const j=i+dir;
   if(j<0||j>=shiftDefs.length)return;
   [shiftDefs[i],shiftDefs[j]]=[shiftDefs[j],shiftDefs[i]];
   rebuildShiftLookups(); buildShiftUI(); buildBody(); queueSave();
 }
-
+ 
 /* ══════════════════════════════════════════════════
    STATS + BULK
 ══════════════════════════════════════════════════ */
@@ -868,7 +2028,7 @@ function updateStats(list){
   const cov=document.getElementById('scov');if(cov)cov.textContent=tot?Math.round(working/tot*100)+'%':'0%';
 }
 function bulkFill(s){filtered().forEach(u=>{roster[u.id]=Array(DAYS).fill(s);});buildBody();queueSave();}
-
+ 
 /* ══════════════════════════════════════════════════
    SELECTS
 ══════════════════════════════════════════════════ */
@@ -897,7 +2057,7 @@ function populateSelects(){
   if(mNat) mNat.innerHTML='<option value="">— none —</option>'
     +NATIONALITIES.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
 }
-
+ 
 /* ══════════════════════════════════════════════════
    CONFIG LISTS
 ══════════════════════════════════════════════════ */
@@ -919,7 +2079,7 @@ function delCfg(k,i){
   ({sec:sectors,sta:stations,uni:units})[k].splice(i,1);
   buildCfgLists(); populateSelects(); queueSave();
 }
-
+ 
 /* ══════════════════════════════════════════════════
    USERS
 ══════════════════════════════════════════════════ */
@@ -995,7 +2155,7 @@ function delUser(id){
   buildUsers(); buildBody(); queueSave();
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');}
-
+ 
 /* ══════════════════════════════════════════════════
    DATE / EXPORT / RESET
 ══════════════════════════════════════════════════ */
@@ -1005,17 +2165,206 @@ function onDateChange(){
   buildHead(); buildBody(); queueSave();
 }
 function exportCSV(){
-  const base=new Date(startDate); let csv='Name,Nationality,Sector,Station,Unit';
-  for(let i=0;i<DAYS;i++){const d=new Date(base);d.setDate(base.getDate()+i);csv+=','+d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});}
+  const base=new Date(startDate);
+  const list=filtered(); // respects all active filters
+  const fShift=document.getElementById('fShift').value;
+ 
+  // build header: meta cols + one col per day (using actual date)
+  let csv='Name,Nationality,Sector,Station,Unit';
+  const dates=[];
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(base);d.setDate(base.getDate()+i);
+    const lbl=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    csv+=',Day '+(i+1)+' ('+lbl+')';
+    dates.push(d);
+  }
   csv+='\n';
-  users.forEach(u=>{
+ 
+  list.forEach(u=>{
+    const shifts=roster[u.id]||Array(DAYS).fill('OFF');
     csv+=`"${u.name}","${u.nationality||''}","${u.sector||''}","${u.station||''}","${u.unit||''}"`;
-    (roster[u.id]||[]).forEach(s=>csv+=','+s); csv+='\n';
+    shifts.forEach(s=>{
+      // use full shift name instead of raw key for readability
+      csv+=','+(s==='OFF'?'Off':(_NAME[s]||s));
+    });
+    csv+='\n';
   });
+ 
+  // build a descriptive filename from active filters
+  const parts=['roster'];
+  const secF=document.getElementById('fSec').value;
+  const staF=document.getElementById('fSta').value;
+  const uniF=document.getElementById('fUni').value;
+  const natF=document.getElementById('fNat').value;
+  if(secF)parts.push(secF.replace(/\s+/g,'_'));
+  if(staF)parts.push(staF.replace(/\s+/g,'_'));
+  if(uniF)parts.push(uniF.replace(/\s+/g,'_'));
+  if(natF)parts.push(natF.replace(/\s+/g,'_'));
+  if(fShift)parts.push(fShift);
+  if(list.length!==users.length)parts.push(list.length+'users');
+  parts.push(base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/\s/g,''));
+  const filename=parts.join('_')+'.csv';
+ 
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='roster_56days.csv'; a.click();
+  a.download=filename; a.click();
 }
+ 
+function exportImage(){
+  const list=filtered();
+  if(!list.length){alert('No users to export with current filters.');return;}
+  const base=new Date(startDate);
+ 
+  // ── layout constants ──────────────────────────────────────────────
+  const SCALE    = 2;          // retina sharpness
+  const ROW_H    = 28;
+  const HEAD_H   = 44;         // two-line header
+  const NAME_W   = 160;
+  const INFO_W   = 80;
+  const DAY_W    = 46;
+  const PAD      = 4;
+  const TITLE_H  = 36;
+  const LEGEND_H = 26;
+ 
+  const totalW   = NAME_W + INFO_W + DAY_W * DAYS;
+  const totalH   = TITLE_H + LEGEND_H + HEAD_H + ROW_H * list.length + 2;
+ 
+  const canvas   = document.createElement('canvas');
+  canvas.width   = totalW  * SCALE;
+  canvas.height  = totalH  * SCALE;
+  const ctx      = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+ 
+  // ── helpers ───────────────────────────────────────────────────────
+  const BG     = '#f5f7fa';
+  const BG2    = '#ffffff';
+  const BORDER = '#dde2ec';
+  const TEXT   = '#1a1f36';
+  const TEXT2  = '#4a5170';
+  const TEXT3  = '#8890aa';
+  const WE_BG  = '#f1f5f9';
+  const ACCENT = '#3b5bdb';
+ 
+  function fillRect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
+  function strokeRect(x,y,w,h,color='#dde2ec'){ctx.strokeStyle=color;ctx.lineWidth=.5;ctx.strokeRect(x+.25,y+.25,w-.5,h-.5);}
+  function text(str,x,y,{font='12px Inter,sans-serif',color=TEXT,align='left',baseline='middle',maxW}={}){
+    ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline=baseline;
+    if(maxW)ctx.fillText(str,x,y,maxW);else ctx.fillText(str,x,y);
+  }
+ 
+  // ── title bar ────────────────────────────────────────────────────
+  fillRect(0,0,totalW,TITLE_H,ACCENT);
+  // build title from active filters
+  const parts=['ROSTER'];
+  const secF=document.getElementById('fSec').value;
+  const staF=document.getElementById('fSta').value;
+  const uniF=document.getElementById('fUni').value;
+  const natF=document.getElementById('fNat').value;
+  const shF=document.getElementById('fShift').value;
+  if(secF)parts.push(secF);if(staF)parts.push(staF);
+  if(uniF)parts.push(uniF);if(natF)parts.push(natF);
+  if(shF)parts.push(_NAME[shF]||shF);
+  const titleStr=parts.join(' · ')+' — '+base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' ('+list.length+' users)';
+  text(titleStr,12,TITLE_H/2,{font:'bold 13px Inter,sans-serif',color:'#fff',baseline:'middle'});
+ 
+  // ── legend bar ───────────────────────────────────────────────────
+  let ly=TITLE_H;
+  fillRect(0,ly,totalW,LEGEND_H,'#eef1f6');
+  ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+  ctx.beginPath();ctx.moveTo(0,ly+LEGEND_H-.25);ctx.lineTo(totalW,ly+LEGEND_H-.25);ctx.stroke();
+  let lx=10;
+  shiftDefs.forEach(s=>{
+    fillRect(lx,ly+7,12,12,s.bg);strokeRect(lx,ly+7,12,12,s.border);
+    text(s.label+' = '+s.name,lx+16,ly+LEGEND_H/2,{font:'10px Inter,sans-serif',color:TEXT2});
+    lx+=ctx.measureText(s.label+' = '+s.name).width+30;
+  });
+  // Off
+  fillRect(lx,ly+7,12,12,'#f8fafc');strokeRect(lx,ly+7,12,12,'#e2e8f0');
+  text('Off',lx+16,ly+LEGEND_H/2,{font:'10px Inter,sans-serif',color:TEXT3});
+ 
+  // ── column headers ───────────────────────────────────────────────
+  let hy=TITLE_H+LEGEND_H;
+  fillRect(0,hy,totalW,HEAD_H,'#f8f9fc');
+  ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+  ctx.beginPath();ctx.moveTo(0,hy+HEAD_H-.25);ctx.lineTo(totalW,hy+HEAD_H-.25);ctx.stroke();
+  text('User',PAD+4,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2});
+  text('Info',NAME_W+INFO_W/2,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2,align:'center'});
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(base);d.setDate(base.getDate()+i);
+    const isWe=d.getDay()===0||d.getDay()===6;
+    const cx=NAME_W+INFO_W+i*DAY_W;
+    if(isWe)fillRect(cx,hy,DAY_W,HEAD_H,WE_BG);
+    // day number
+    text(String(i+1),cx+DAY_W/2,hy+10,{font:'bold 10px Inter,sans-serif',color:isWe?TEXT3:TEXT2,align:'center',baseline:'top'});
+    // date
+    const dl=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+    text(dl,cx+DAY_W/2,hy+24,{font:'9px Inter,sans-serif',color:TEXT3,align:'center',baseline:'top'});
+    // vertical divider
+    ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(cx-.25,hy);ctx.lineTo(cx-.25,hy+HEAD_H);ctx.stroke();
+  }
+  // header dividers
+  [NAME_W,NAME_W+INFO_W].forEach(x=>{
+    ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(x-.25,hy);ctx.lineTo(x-.25,hy+HEAD_H);ctx.stroke();
+  });
+ 
+  // ── rows ─────────────────────────────────────────────────────────
+  list.forEach((u,ri)=>{
+    const ry=TITLE_H+LEGEND_H+HEAD_H+ri*ROW_H;
+    const rowBg=ri%2===0?BG2:'#f7f9fc';
+    fillRect(0,ry,totalW,ROW_H,rowBg);
+ 
+    // name
+    text(u.name,PAD+4,ry+ROW_H/2,{font:'500 11px Inter,sans-serif',color:TEXT,maxW:NAME_W-8});
+ 
+    // info badges (sector first, abbreviated)
+    const infoParts=[u.sector,u.station,u.unit].filter(Boolean);
+    const infoStr=infoParts.join(' · ');
+    text(infoStr,NAME_W+4,ry+ROW_H/2,{font:'9px Inter,sans-serif',color:TEXT3,maxW:INFO_W-6});
+ 
+    // shift cells
+    const shifts=roster[u.id]||Array(DAYS).fill('OFF');
+    for(let i=0;i<DAYS;i++){
+      const d=new Date(base);d.setDate(base.getDate()+i);
+      const isWe=d.getDay()===0||d.getDay()===6;
+      const s=shifts[i]||'OFF';
+      const cx=NAME_W+INFO_W+i*DAY_W;
+      const def=shiftDefs.find(x=>x.key===s);
+      const bg=def?(isWe?def.bg+'cc':def.bg):(isWe?WE_BG:rowBg);
+      const fg=def?def.fg:'#94a3b8';
+      fillRect(cx,ry,DAY_W,ROW_H,bg);
+      if(def) text(def.label,cx+DAY_W/2,ry+ROW_H/2,{font:'bold 10px "DM Mono",monospace',color:fg,align:'center'});
+      // cell border
+      ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(cx-.25,ry);ctx.lineTo(cx-.25,ry+ROW_H);ctx.stroke();
+    }
+ 
+    // row dividers
+    ctx.strokeStyle=BORDER;ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(0,ry+ROW_H-.25);ctx.lineTo(totalW,ry+ROW_H-.25);ctx.stroke();
+    [NAME_W,NAME_W+INFO_W].forEach(x=>{
+      ctx.beginPath();ctx.moveTo(x-.25,ry);ctx.lineTo(x-.25,ry+ROW_H);ctx.stroke();
+    });
+  });
+ 
+  // ── outer border ─────────────────────────────────────────────────
+  ctx.strokeStyle='#c8d0e0';ctx.lineWidth=1;
+  ctx.strokeRect(.5,TITLE_H+.5,totalW-1,totalH-TITLE_H-1);
+ 
+  // ── download ─────────────────────────────────────────────────────
+  const fname=['roster_img'];
+  if(secF)fname.push(secF.replace(/\s+/g,'_'));
+  if(staF)fname.push(staF.replace(/\s+/g,'_'));
+  if(natF)fname.push(natF.replace(/\s+/g,'_'));
+  if(shF)fname.push(shF);
+  fname.push(base.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/\s/g,''));
+  const link=document.createElement('a');
+  link.download=fname.join('_')+'.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+ 
 function getDefaultUsers(){
   const FN=['Paul','Maja','Heiko','Edoardo','Aoife','Raghu','Dragan','Indri','Anisa','Ala a','Bodha','Surakshya','Ahlam','Nikola','Jack','Davor','Ivana','Stella','Yulia','Andrey','Rami','Li','Benny','Jani Matti','Richard','Susanna Maria','Alexander','Yu','Linda','Nebojsa','Niko','Dragan','Gandhi','Nenad','Libna','Gerhard','Darren','Nicole','Bojan','Dubravka','Graham','Timothy','Gavin','Lenka','Simone','Jozef','Carmen','Wihelmina','Ujjwal','Mary','Vladimir','Lubica','Edin','Brian','Paul','Ala a','Mutya','Yue','Siobhan','Amela','Jonathan'];
   const LN=['SLATTERY','SMAJLOVIC','TROSS','PETRONCINI','REILLY','BISHT','NOVAKOVIC','WIDIASIH','PASIC','KHLEIF','REGMI','K.C.','AL-HABAHBEH','NUNIC','CAGNEY','MLAKIC','MARKOVIC','WASTINI','LOSAPIO','CHERKASHINA','RODIN','ABABNEH','ZHANG','SARAGIH','HYYTIAEINEN','DALY','TUURAS','LYUBCHICH','ZHOU','CRENNAN','GRUJIC','HEIMOLINNA','KULIC','SUGIARTO','DURIC','SHABRINA','VOELKEL','MC CARTHY','BARTH','FILIPOVIC','SIMIC','DESMOND','CASEY','FLEET','REKEMOVA','CALIRI','SLIACKY','CICERELLI','MANAFE','THAPA','DORGAN','KURAMSHIN','HIRKOVA','SABANAGIC','MOORE','KILCOYNE','AL-HANAITY','ZAHARI','ZHOU','MAHER','PITA','PLUNKETT'];
@@ -1025,7 +2374,7 @@ function getDefaultUsers(){
     sector:'',station:'',unit:'',nationality:'',defaultShift:'OFF'
   }));
 }
-
+ 
 function resetData(){
   if(!confirm('Reset to the 61 staff members? Current data will be overwritten on next save.'))return;
   sectors=[]; stations=[]; units=[];
@@ -1036,27 +2385,27 @@ function resetData(){
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
   populateSelects(); buildShiftUI(); buildHead(); buildBody(); queueSave();
 }
-
+ 
 /* ══════════════════════════════════════════════════
    UTILS + BOOT
 ══════════════════════════════════════════════════ */
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
+ 
 async function init(){
   const t=new Date(); startDate=t;
   document.getElementById('startDate').value=t.toISOString().slice(0,10);
-
+ 
   // hide nav+main until logged in
   document.querySelector('nav').style.display='none';
   document.querySelector('main').style.display='none';
-
+ 
   // show loading screen while fetching config.json
   document.getElementById('loadingScreen').style.display='flex';
   document.getElementById('loadingMsg').textContent='Loading config…';
-
+ 
   const ok=await fetchConfig();
   document.getElementById('loadingScreen').style.display='none';
-
+ 
   if(!ok || !appConfig || !appConfig.admins || !appConfig.admins.length){
     // config.json missing or has no admins — show helpful error on login screen
     document.getElementById('loginScreen').style.display='flex';
@@ -1065,18 +2414,20 @@ async function init(){
          : '⚠️ Could not load config.json. Make sure it is in your repo root.';
     return;
   }
-
+ 
   // pre-populate default users in memory (will be overwritten after login loads data)
   users=getDefaultUsers();
   users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
   populateSelects(); buildShiftUI(); buildHead(); buildBody();
-
+ 
   document.getElementById('loginScreen').style.display='flex';
   setTimeout(()=>document.getElementById('loginName').focus(), 100);
 }
-
+ 
 init();
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 </script>
 </body>
 </html>
+ 
+
