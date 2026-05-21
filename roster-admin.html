@@ -130,6 +130,19 @@ td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:cross
 /* CELL SELECTION */
 td.sel{outline:2px solid var(--accent)!important;outline-offset:-2px;z-index:3;position:relative}
 td.paste-target{outline:2px dashed #16a34a!important;outline-offset:-2px;z-index:3;position:relative}
+/* CORNER FILL HANDLE — Excel-style */
+td{position:relative}
+.cell-handle{
+  position:absolute;bottom:-3px;right:-3px;
+  width:7px;height:7px;
+  background:var(--accent);border:1px solid #fff;
+  border-radius:1px;
+  cursor:crosshair;z-index:10;
+  display:block;
+}
+.cell-handle:hover{background:var(--accent2);transform:scale(1.3);}
+td.handle-src{outline:2px solid var(--accent)!important;outline-offset:-2px;}
+td.handle-fill{outline:1px dashed var(--accent)!important;outline-offset:-1px;}
 /* CONTEXT MENU */
 .cmenu{position:fixed;z-index:2000;background:#fff;border:1px solid var(--border2);border-radius:var(--rl);box-shadow:0 8px 28px rgba(0,0,0,.14);padding:5px;min-width:152px;display:none}
 .cmenu.open{display:block}
@@ -694,14 +707,23 @@ function buildBody(){
 }
 
 /* ══════════════════════════════════════════════════
-   CELL EVENTS  (drag-paint · shift+drag-select · Ctrl+C/V)
+   CELL EVENTS  (drag-paint · corner-handle fill · shift+drag-select · Ctrl+C/V)
 ══════════════════════════════════════════════════ */
+
+/* ── HANDLE DRAG STATE ─────────────────────────────────────────
+   handleDragging: true when dragging from the corner handle
+   handleShift:    the shift value being filled
+   handleSrcUID/Day: the source cell
+   handleSet:      cells already filled in this drag             */
+let handleDragging=false, handleShift=null;
+let handleSrcUID=null, handleSrcDay=null, handleSet=new Set();
+
 function attachCells(){
   document.querySelectorAll('#rBody td[data-uid]').forEach(td=>{
 
     // ── right-click → context menu ──────────────────────────────
     td.addEventListener('contextmenu',e=>{
-      e.preventDefault(); if(dragging||selecting)return;
+      e.preventDefault(); if(dragging||selecting||handleDragging)return;
       ctxUID=td.dataset.uid; ctxDay=+td.dataset.d;
       const m=document.getElementById('cmenu');
       m.classList.add('open');
@@ -709,21 +731,45 @@ function attachCells(){
       m.style.top=Math.min(e.clientY,innerHeight-230)+'px';
     });
 
-    // ── mousedown ───────────────────────────────────────────────
+    // ── mouseenter → show/hide corner handle ────────────────────
+    td.addEventListener('mouseenter',e=>{
+      const uid=td.dataset.uid, day=+td.dataset.d;
+
+      if(dragging){
+        if(!dragSet.has(uid+'|'+day)) paint(td,uid,day);
+        moveTip(e); return;
+      }
+      if(selecting){
+        addToSelection(td,uid,day); return;
+      }
+      if(handleDragging){
+        fillHandle(td,uid,day); return;
+      }
+
+      // show corner handle on hover (only when idle)
+      showHandle(td);
+    });
+
+    td.addEventListener('mouseleave',()=>{
+      if(!handleDragging && !dragging && !selecting){
+        removeHandle(td);
+      }
+    });
+
+    // ── mousedown on cell body → cycle/paint or select ──────────
     td.addEventListener('mousedown',e=>{
       if(e.button!==0)return;
+      // ignore if clicking on the handle itself
+      if(e.target.classList.contains('cell-handle'))return;
       e.preventDefault(); closeCtx();
       const uid=td.dataset.uid, day=+td.dataset.d;
 
       if(e.shiftKey){
-        // Shift+click/drag → selection mode
         selecting=true; selMode='select';
-        clearSelectionUI();
-        selection=new Set();
+        clearSelectionUI(); selection=new Set();
         selAnchorUID=uid; selAnchorDay=day;
         addToSelection(td,uid,day);
       } else {
-        // normal drag → paint mode
         const cur=(roster[uid]||[])[day]||'OFF';
         dragShift=_SHIFTS[(_SHIFTS.indexOf(cur)+1)%_SHIFTS.length];
         dragging=true; dragSet=new Set();
@@ -731,19 +777,79 @@ function attachCells(){
         paint(td,uid,day); showTip(e,dragShift);
       }
     });
-
-    // ── mouseenter ──────────────────────────────────────────────
-    td.addEventListener('mouseenter',e=>{
-      const uid=td.dataset.uid, day=+td.dataset.d;
-      if(dragging){
-        if(!dragSet.has(uid+'|'+day)) paint(td,uid,day);
-        moveTip(e);
-      } else if(selecting){
-        addToSelection(td,uid,day);
-      }
-    });
   });
 }
+
+/* ── CORNER HANDLE ─────────────────────────────────────────────
+   A small square injected into the cell on hover.
+   Dragging it copies the cell's CURRENT shift value.            */
+function showHandle(td){
+  if(td.querySelector('.cell-handle'))return;
+  const h=document.createElement('span');
+  h.className='cell-handle';
+  h.title='Drag to fill';
+  h.addEventListener('mousedown',e=>{
+    e.preventDefault(); e.stopPropagation();
+    const uid=td.dataset.uid, day=+td.dataset.d;
+    handleShift=(roster[uid]||[])[day]||'OFF';
+    handleSrcUID=uid; handleSrcDay=day;
+    handleDragging=true; handleSet=new Set();
+    handleSet.add(uid+'|'+day);
+    showHandleTip(e, handleShift);
+    // highlight the source cell
+    td.classList.add('handle-src');
+  });
+  td.appendChild(h);
+}
+
+function removeHandle(td){
+  const h=td.querySelector('.cell-handle');
+  if(h)h.remove();
+}
+
+function fillHandle(td,uid,day){
+  const key=uid+'|'+day;
+  if(handleSet.has(key))return;
+  handleSet.add(key);
+  // paint the cell with the handle shift (no cycle — exact copy)
+  if(!roster[uid])roster[uid]=Array(DAYS).fill('OFF');
+  roster[uid][day]=handleShift;
+  const base=new Date(startDate); base.setDate(base.getDate()+day);
+  const we=base.getDay()===0||base.getDay()===6;
+  const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+  td.className=_CLS[handleShift]+(we?' we':'')+' handle-fill';
+  td.innerHTML=(_LBL[handleShift]?`<span class="cell-shift">${_LBL[handleShift]}</span>`:'')+`<span class="cell-date">${dateStr}</span>`;
+}
+
+function showHandleTip(e,s){
+  const t=document.getElementById('dtip');
+  t.style.background=_SCOL[s].bg; t.style.color=_SCOL[s].fg;
+  t.textContent='Fill: '+(s==='OFF'?'Off / Clear':(_LBL[s]+' — '+_NAME[s]));
+  t.style.display='block'; moveTip(e);
+}
+
+// ── global mouseup — end all drag modes ─────────────────────────
+document.addEventListener('mouseup',()=>{
+  if(dragging){
+    dragging=false; hideTip();
+    if(dragSet.size){updateStats(filtered());queueSave();}
+    dragShift=null; dragSet=new Set();
+  }
+  if(selecting){
+    selecting=false;
+  }
+  if(handleDragging){
+    handleDragging=false; hideTip();
+    // remove handle-src/fill classes
+    document.querySelectorAll('#rBody td.handle-src').forEach(t=>t.classList.remove('handle-src'));
+    document.querySelectorAll('#rBody td.handle-fill').forEach(t=>t.classList.remove('handle-fill'));
+    if(handleSet.size>1){updateStats(filtered());queueSave();}
+    handleShift=null; handleSrcUID=null; handleSrcDay=null; handleSet=new Set();
+  }
+});
+document.addEventListener('mousemove',e=>{
+  if(dragging||handleDragging) moveTip(e);
+});
 
 // ── selection helpers ──────────────────────────────────────────
 function addToSelection(td,uid,day){
@@ -759,24 +865,6 @@ function clearSelectionUI(){
   document.querySelectorAll('#rBody td.paste-target').forEach(t=>t.classList.remove('paste-target'));
 }
 
-// ── mouseup ────────────────────────────────────────────────────
-document.addEventListener('mouseup',()=>{
-  if(dragging){
-    dragging=false; hideTip();
-    if(dragSet.size){updateStats(filtered());queueSave();}
-    dragShift=null; dragSet=new Set();
-  }
-  if(selecting){
-    selecting=false;
-    // record anchor as top-left of selection
-    if(selection.size){
-      // find the cell that was clicked first as paste anchor
-      selAnchorUID=selAnchorUID; // already set on mousedown
-    }
-  }
-});
-document.addEventListener('mousemove',e=>{if(dragging)moveTip(e);});
-
 // ── Ctrl+C / Ctrl+V / Escape ───────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ closeCtx(); clearSelectionUI(); selection=new Set(); hideCBBadge(); return; }
@@ -785,67 +873,46 @@ document.addEventListener('keydown',e=>{
   const inInput=active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.tagName==='SELECT');
 
   if((e.ctrlKey||e.metaKey) && e.key==='c' && !inInput && selection.size){
-    e.preventDefault();
-    copySelection();
-    return;
+    e.preventDefault(); copySelection(); return;
   }
   if((e.ctrlKey||e.metaKey) && e.key==='v' && !inInput && clipboard){
-    e.preventDefault();
-    pasteClipboard();
-    return;
+    e.preventDefault(); pasteClipboard(); return;
   }
 });
 
 function copySelection(){
   if(!selection.size)return;
-
-  // convert selection keys to {uid, day} and sort
   const cells=[...selection].map(k=>{const[uid,day]=k.split('|');return{uid,day:+day};});
-
-  // find bounding box
   const userOrder=filtered().map(u=>u.id);
   const rows=[...new Set(cells.map(c=>c.uid))].sort((a,b)=>userOrder.indexOf(a)-userOrder.indexOf(b));
   const days=[...new Set(cells.map(c=>c.day))].sort((a,b)=>a-b);
-  const minRow=rows[0], minDay=days[0];
-
-  // store as 2D grid of shifts (null = not in selection)
   const grid=rows.map(uid=>
-    days.map(day=>
-      selection.has(uid+'|'+day) ? ((roster[uid]||[])[day]||'OFF') : null
-    )
+    days.map(day=> selection.has(uid+'|'+day) ? ((roster[uid]||[])[day]||'OFF') : null)
   );
-
-  clipboard={grid, rows:rows.length, cols:days.length, anchorUID:minRow, anchorDay:minDay};
-
+  clipboard={grid, rows:rows.length, cols:days.length, anchorUID:rows[0], anchorDay:days[0]};
   const total=cells.length;
   showCBBadge(`📋 Copied ${total} cell${total!==1?'s':''} (${rows.length}×${days.length}) — Ctrl+V to paste`);
 }
 
 function pasteClipboard(){
-  if(!clipboard||!selAnchorUID) return;
-
+  if(!clipboard||!selAnchorUID)return;
   const userOrder=filtered().map(u=>u.id);
   const anchorRowIdx=userOrder.indexOf(selAnchorUID);
   const anchorDay=selAnchorDay;
-
   if(anchorRowIdx===-1)return;
-
   const changed=[];
-
   clipboard.grid.forEach((rowData,ri)=>{
     const targetUID=userOrder[anchorRowIdx+ri];
     if(!targetUID)return;
     if(!roster[targetUID])roster[targetUID]=Array(DAYS).fill('OFF');
     rowData.forEach((shift,ci)=>{
-      if(shift===null)return; // gap — skip
+      if(shift===null)return;
       const targetDay=anchorDay+ci;
       if(targetDay<0||targetDay>=DAYS)return;
       roster[targetUID][targetDay]=shift;
       changed.push({uid:targetUID,day:targetDay,shift});
     });
   });
-
-  // re-render affected cells
   changed.forEach(({uid,day,shift})=>{
     const td=document.querySelector(`td[data-uid="${uid}"][data-d="${day}"]`);
     if(td){
@@ -856,34 +923,25 @@ function pasteClipboard(){
       td.innerHTML=(_LBL[shift]?`<span class="cell-shift">${_LBL[shift]}</span>`:'')+`<span class="cell-date">${dateStr}</span>`;
     }
   });
-
-  // show paste-target highlight briefly
   clearSelectionUI();
   changed.forEach(({uid,day})=>{
     const td=document.querySelector(`td[data-uid="${uid}"][data-d="${day}"]`);
     if(td)td.classList.add('paste-target');
   });
   setTimeout(()=>{document.querySelectorAll('#rBody td.paste-target').forEach(t=>t.classList.remove('paste-target'));},800);
-
   if(changed.length){updateStats(filtered());queueSave();}
   showCBBadge(`✅ Pasted ${changed.length} cell${changed.length!==1?'s':''} — Ctrl+V again to repeat`);
 }
 
 function clearClipboard(){
-  clipboard=null;
-  clearSelectionUI();
-  selection=new Set();
-  hideCBBadge();
+  clipboard=null; clearSelectionUI(); selection=new Set(); hideCBBadge();
 }
-
 function showCBBadge(msg){
   const b=document.getElementById('clipbadge');
   document.getElementById('clipbadgeText').textContent=msg;
   b.classList.add('show');
 }
-function hideCBBadge(){
-  document.getElementById('clipbadge').classList.remove('show');
-}
+function hideCBBadge(){ document.getElementById('clipbadge').classList.remove('show'); }
 
 function paint(td,uid,day){
   if(!roster[uid]) roster[uid]=Array(DAYS).fill('OFF');
@@ -956,7 +1014,7 @@ function buildShiftUI(){
     `<span><span class="lsq" style="background:${s.bg};border-color:${s.border}"></span>${esc(s.label)} = ${esc(s.name)}</span>`
   ).join('')
   +`<span><span class="lsq" style="background:#f8fafc;border-color:#e2e8f0"></span>Off</span>`
-  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b> · <b>Shift+drag=select → Ctrl+C / Ctrl+V</b></span>`;
+  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · Drag=paint · <b>Corner handle=fill copy</b> · Shift+drag=select → Ctrl+C/V</span>`;
 
   // stats bar
   const sb=document.getElementById('statsBar');
@@ -1391,18 +1449,144 @@ function exportImage(){
 }
 
 function getDefaultUsers(){
-  const FN=['Paul','Maja','Heiko','Edoardo','Aoife','Raghu','Dragan','Indri','Anisa','Ala a','Bodha','Surakshya','Ahlam','Nikola','Jack','Davor','Ivana','Stella','Yulia','Andrey','Rami','Li','Benny','Jani Matti','Richard','Susanna Maria','Alexander','Yu','Linda','Nebojsa','Niko','Dragan','Gandhi','Nenad','Libna','Gerhard','Darren','Nicole','Bojan','Dubravka','Graham','Timothy','Gavin','Lenka','Simone','Jozef','Carmen','Wihelmina','Ujjwal','Mary','Vladimir','Lubica','Edin','Brian','Paul','Ala a','Mutya','Yue','Siobhan','Amela','Jonathan'];
-  const LN=['SLATTERY','SMAJLOVIC','TROSS','PETRONCINI','REILLY','BISHT','NOVAKOVIC','WIDIASIH','PASIC','KHLEIF','REGMI','K.C.','AL-HABAHBEH','NUNIC','CAGNEY','MLAKIC','MARKOVIC','WASTINI','LOSAPIO','CHERKASHINA','RODIN','ABABNEH','ZHANG','SARAGIH','HYYTIAEINEN','DALY','TUURAS','LYUBCHICH','ZHOU','CRENNAN','GRUJIC','HEIMOLINNA','KULIC','SUGIARTO','DURIC','SHABRINA','VOELKEL','MC CARTHY','BARTH','FILIPOVIC','SIMIC','DESMOND','CASEY','FLEET','REKEMOVA','CALIRI','SLIACKY','CICERELLI','MANAFE','THAPA','DORGAN','KURAMSHIN','HIRKOVA','SABANAGIC','MOORE','KILCOYNE','AL-HANAITY','ZAHARI','ZHOU','MAHER','PITA','PLUNKETT'];
-  return FN.map((fn,i)=>({
-    id:'u'+i,
-    name:fn+' '+LN[i],
-    sector:'',station:'',unit:'',nationality:'',defaultShift:'OFF'
-  }));
+  return [
+    {id:'u0',name:'Paul SLATTERY',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u1',name:'Maja SMAJLOVIC',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u2',name:'Heiko TROSS',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Germany',defaultShift:'OFF'},
+    {id:'u3',name:'Edoardo PETRONCINI',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Italy',defaultShift:'OFF'},
+    {id:'u4',name:'Aoife REILLY',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u5',name:'Raghu BISHT',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Nepal',defaultShift:'OFF'},
+    {id:'u6',name:'Dragan NOVAKOVIC',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Serbia',defaultShift:'OFF'},
+    {id:'u7',name:'Indri WIDIASIH',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u8',name:'Anisa PASIC',sector:'HQ',station:'HQ Nicosia',unit:'HQ',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u9',name:'Ala\'a KHLEIF',sector:'SECTOR 1',station:'Linou',unit:'S1-LINOU-A',nationality:'Jordan',defaultShift:'D'},
+    {id:'u10',name:'Bodha REGMI',sector:'SECTOR 1',station:'Dhenia',unit:'S1-DHENIA-A',nationality:'Nepal',defaultShift:'OFF'},
+    {id:'u11',name:'Surakshya K.C.',sector:'SECTOR 1',station:'Dhenia',unit:'S1-DHENIA-A',nationality:'Nepal',defaultShift:'OFF'},
+    {id:'u12',name:'Ahlam AL-HABAHBEH',sector:'SECTOR 1',station:'Dhenia',unit:'',nationality:'Jordan',defaultShift:'OFF'},
+    {id:'u13',name:'Nikola NUNIC',sector:'SECTOR 1',station:'Dhenia',unit:'',nationality:'Montenegro',defaultShift:'OFF'},
+    {id:'u14',name:'Jack CAGNEY',sector:'SECTOR 1',station:'Dhenia',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u15',name:'Davor MLAKIC',sector:'SECTOR 1',station:'Dhenia',unit:'',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u16',name:'Ivana MARKOVIC',sector:'SECTOR 1',station:'Dhenia',unit:'',nationality:'Serbia',defaultShift:'OFF'},
+    {id:'u17',name:'WASTINI',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u18',name:'Stella LOSAPIO',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'Italy',defaultShift:'OFF'},
+    {id:'u19',name:'Yulia CHERKASHINA',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'Russia',defaultShift:'OFF'},
+    {id:'u20',name:'Andrey RODIN',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'Russia',defaultShift:'OFF'},
+    {id:'u21',name:'Rami ABABNEH',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'Jordan',defaultShift:'OFF'},
+    {id:'u22',name:'Li ZHANG',sector:'SECTOR 1',station:'Linou',unit:'',nationality:'China',defaultShift:'OFF'},
+    {id:'u23',name:'Benny SARAGIH',sector:'SECTOR 1',station:'Kato Pyrgos',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u24',name:'Jani Matti HYYTIAEINEN',sector:'SECTOR 1',station:'Kato Pyrgos',unit:'',nationality:'Finland',defaultShift:'OFF'},
+    {id:'u25',name:'Richard DALY',sector:'SECTOR 1',station:'Kato Pyrgos',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u26',name:'Susanna Maria  TUURAS',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Finland',defaultShift:'OFF'},
+    {id:'u27',name:'Alexander LYUBCHICH',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Russia',defaultShift:'OFF'},
+    {id:'u28',name:'Yu ZHOU',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'China',defaultShift:'OFF'},
+    {id:'u29',name:'Linda CRENNAN',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u30',name:'Nebojsa GRUJIC',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Serbia',defaultShift:'OFF'},
+    {id:'u31',name:'Niko HEIMOLINNA',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Finland',defaultShift:'OFF'},
+    {id:'u32',name:'Dragan KULIC',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Montenegro',defaultShift:'OFF'},
+    {id:'u33',name:'Gandhi SUGIARTO',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u34',name:'Nenad DURIC',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u35',name:'Libna SHABRINA',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u36',name:'Gerhard VOELKEL',sector:'SECTOR 2',station:'Ledra',unit:'',nationality:'Germany',defaultShift:'OFF'},
+    {id:'u37',name:'Darren MC CARTHY',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u38',name:'Nicole BARTH',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Germany',defaultShift:'OFF'},
+    {id:'u39',name:'Bojan FILIPOVIC',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Serbia',defaultShift:'OFF'},
+    {id:'u40',name:'Dubravka SIMIC',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u41',name:'Graham DESMOND',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u42',name:'Timothy CASEY',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u43',name:'Gavin FLEET',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u44',name:'Lenka REKEMOVA',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Slovakia',defaultShift:'OFF'},
+    {id:'u45',name:'Simone CALIRI',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Italy',defaultShift:'OFF'},
+    {id:'u46',name:'Jozef SLIACKY',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Slovakia',defaultShift:'OFF'},
+    {id:'u47',name:'Carmen CICERELLI',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Italy',defaultShift:'OFF'},
+    {id:'u48',name:'Wihelmina MANAFE',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u49',name:'Ujjwal THAPA',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Nepal',defaultShift:'OFF'},
+    {id:'u50',name:'Mary DORGAN',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u51',name:'Vladimir KURAMSHIN',sector:'SECTOR 4',station:'Pyla',unit:'',nationality:'Russia',defaultShift:'OFF'},
+    {id:'u52',name:'Lubica HIRKOVA',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Slovakia',defaultShift:'OFF'},
+    {id:'u53',name:'Edin SABANAGIC',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u54',name:'Brian MOORE',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u55',name:'Paul KILCOYNE',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u56',name:'Ala\'a AL-HANAITY',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Jordan',defaultShift:'OFF'},
+    {id:'u57',name:'Mutya ZAHARI',sector:'SECTOR 4',station:'Athienou',unit:'',nationality:'Indonesia',defaultShift:'OFF'},
+    {id:'u58',name:'Yue ZHOU',sector:'SECTOR 4',station:'Dherinya',unit:'',nationality:'China',defaultShift:'OFF'},
+    {id:'u59',name:'Siobhan MAHER',sector:'SECTOR 4',station:'Dherinya',unit:'',nationality:'Ireland',defaultShift:'OFF'},
+    {id:'u60',name:'Amela PITA',sector:'SECTOR 4',station:'Dherinya',unit:'',nationality:'Bosnia and Herzegovina',defaultShift:'OFF'},
+    {id:'u61',name:'Jonathan PLUNKETT',sector:'SECTOR 4',station:'Dherinya',unit:'',nationality:'Ireland',defaultShift:'OFF'}
+  ];
 }
 
 function resetData(){
-  if(!confirm('Reset to the 61 staff members? Current data will be overwritten on next save.'))return;
-  sectors=[]; stations=[]; units=[];
+  if(!confirm('Reset to the 62 staff members? Current data will be overwritten on next save.'))return;
+  sectors=["SECTOR 1", "SECTOR 2", "SECTOR 4", "HQ"];
+  stations=["Kato Pyrgos", "Linou", "Dhenia", "Ledra", "Athienou", "Pyla", "Dherinya", "HQ Nicosia"];
+  units=["S1-LINOU-A", "S1-LINOU-B", "S1-DHENIA-A", "S1-DHENIA-B", "S1-KATO-A", "S1-KATO-B", "HQ"];
+  shiftDefs=[
+    {
+        "key": "D",
+        "label": "D",
+        "name": "Day",
+        "bg": "#dae8fb",
+        "fg": "#111212",
+        "border": "#111212"
+    },
+    {
+        "key": "A",
+        "label": "A",
+        "name": "Afternoon",
+        "bg": "#dae8fb",
+        "fg": "#111212",
+        "border": "#111212"
+    },
+    {
+        "key": "RD",
+        "label": "RD",
+        "name": "Rest Day",
+        "bg": "#fef9c3",
+        "fg": "#854d0e",
+        "border": "#fde047"
+    },
+    {
+        "key": "AL",
+        "label": "AL",
+        "name": "Annual Leave",
+        "bg": "#25cb30",
+        "fg": "#222021",
+        "border": "#222021"
+    },
+    {
+        "key": "S2619",
+        "label": "CD",
+        "name": "Contingent Day",
+        "bg": "#2a9dea",
+        "fg": "#02080d",
+        "border": "#02080d"
+    },
+    {
+        "key": "S3802",
+        "label": "CCBD",
+        "name": "Contingent Comm Day",
+        "bg": "#2a9ae5",
+        "fg": "#020c12",
+        "border": "#020c12"
+    },
+    {
+        "key": "S6394",
+        "label": "COD",
+        "name": "Check Out Day",
+        "bg": "#8d33a3",
+        "fg": "#010c13",
+        "border": "#010c13"
+    },
+    {
+        "key": "S7754",
+        "label": "EOM",
+        "name": "End of Mission",
+        "bg": "#db294d",
+        "fg": "#010e0e",
+        "border": "#db294d"
+    }
+];
+  rebuildShiftLookups();
   users=getDefaultUsers();
   roster={};
   users.forEach(u=>{roster[u.id]=Array(DAYS).fill('OFF');});
