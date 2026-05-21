@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:44:55.405Z",
+  "savedAt": "2026-05-21T09:45:07.384Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -580,11 +580,11 @@
     {
       "id": "u61",
       "name": "Jonathan PLUNKETT",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 4",
+      "station": "Dherinya",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Ireland"
     }
   ],
   "roster": {
