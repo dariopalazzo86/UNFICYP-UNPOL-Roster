@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T05:53:58.799Z",
+  "savedAt": "2026-05-21T05:54:08.417Z",
   "startDate": "2026-05-21",
   "sectors": [
     "SECTOR 1",
@@ -19,7 +19,8 @@
     "HQ Nicosia"
   ],
   "units": [
-    "S1-LINOU-A"
+    "S1-LINOU-A",
+    "S1-LINOU-B"
   ],
   "users": [
     {
