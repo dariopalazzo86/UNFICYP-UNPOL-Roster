@@ -34,7 +34,8 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+      "defaultShift": "OFF",
+       "nationality": ""
     },
     {
       "id": "u1",
@@ -42,7 +43,8 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+      "defaultShift": "OFF",
+       "nationality": ""
     },
     {
       "id": "u2",
@@ -50,7 +52,8 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+      "defaultShift": "OFF",
+       "nationality": ""      
     },
     {
       "id": "u3",
@@ -58,7 +61,8 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+      "defaultShift": "OFF",
+       "nationality": ""
     },
     {
       "id": "u4",
@@ -66,7 +70,7 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u5",
@@ -74,7 +78,7 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u6",
@@ -82,7 +86,7 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u7",
@@ -90,7 +94,7 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u8",
@@ -98,7 +102,7 @@
       "sector": "HQ",
       "station": "HQ Nicosia",
       "unit": "HQ",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u9",
@@ -106,7 +110,7 @@
       "sector": "SECTOR 1",
       "station": "Linou",
       "unit": "S1-LINOU-A",
-      "defaultShift": "D"
+      "defaultShift": "D",  "nationality": ""
     },
     {
       "id": "u10",
@@ -114,7 +118,7 @@
       "sector": "SECTOR 1",
       "station": "Dhenia",
       "unit": "S1-DHENIA-A",
-      "defaultShift": "OFF"
+        "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u11",
@@ -122,7 +126,7 @@
       "sector": "SECTOR 1",
       "station": "Dhenia",
       "unit": "S1-DHENIA-A",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u12",
@@ -130,7 +134,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u13",
@@ -138,7 +142,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u14",
@@ -146,7 +150,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u15",
@@ -154,7 +158,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u16",
@@ -162,7 +166,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u17",
@@ -170,7 +174,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u18",
@@ -178,7 +182,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u19",
@@ -186,7 +190,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u20",
@@ -194,7 +198,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u21",
@@ -202,7 +206,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u22",
@@ -210,7 +214,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u23",
@@ -218,7 +222,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u24",
@@ -226,7 +230,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u25",
@@ -234,7 +238,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u26",
@@ -242,7 +246,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u27",
@@ -250,7 +254,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u28",
@@ -258,7 +262,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u29",
@@ -266,7 +270,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u30",
@@ -274,7 +278,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u31",
@@ -282,7 +286,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u32",
@@ -290,7 +294,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u33",
@@ -298,7 +302,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u34",
@@ -306,7 +310,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u35",
@@ -314,7 +318,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u36",
@@ -322,7 +326,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u37",
@@ -330,7 +334,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u38",
@@ -338,7 +342,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u39",
@@ -346,7 +350,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u40",
@@ -354,7 +358,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u41",
@@ -362,7 +366,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u42",
@@ -370,7 +374,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u43",
@@ -378,7 +382,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u44",
@@ -386,7 +390,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u45",
@@ -394,7 +398,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u46",
@@ -402,7 +406,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u47",
@@ -410,7 +414,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u48",
@@ -418,7 +422,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u49",
@@ -426,7 +430,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u50",
@@ -434,7 +438,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u51",
@@ -442,7 +446,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u52",
@@ -450,7 +454,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u53",
@@ -458,7 +462,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u54",
@@ -466,7 +470,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u55",
@@ -474,7 +478,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u56",
@@ -482,7 +486,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u57",
@@ -490,7 +494,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u58",
@@ -498,7 +502,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u59",
@@ -506,7 +510,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u60",
@@ -514,7 +518,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     },
     {
       "id": "u61",
@@ -522,7 +526,7 @@
       "sector": "",
       "station": "",
       "unit": "",
-      "defaultShift": "OFF"
+       "defaultShift": "OFF", "nationality": ""
     }
   ],
   "roster": {
