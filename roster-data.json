@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:29:05.456Z",
+  "savedAt": "2026-05-21T09:29:20.565Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -238,11 +238,11 @@
     {
       "id": "u23",
       "name": "Benny SARAGIH",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 1",
+      "station": "Kato Pyrgos",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Indonesia"
     },
     {
       "id": "u24",
