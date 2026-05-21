@@ -476,28 +476,42 @@ async function doLogin(){
   const match=admins.find(a=>a.name.toLowerCase()===name.toLowerCase()&&a.hash===expected);
   if(!match){ document.getElementById('loginErr').textContent='Name or password incorrect.'; return; }
 
-  // decrypt token — master key = all admin passwords combined sorted by name
-  // Since we only know this user's password, we decrypt using their contribution
-  // The master key is all passwords joined — we reconstruct it for single-admin case
-  // For multi-admin: each user's token is encrypted with ALL passwords combined.
-  // On login we try decrypting with just this user's password first (single-admin),
-  // then fall back to prompting — but in practice admins share a setup, so the
-  // master key used during setup.html must be re-derived the same way.
-  // Simplification: we store per-user encrypted tokens (one per admin in setup.html).
-  // Check if match has own encryptedToken, else use global one with this password.
   let token;
   try{
-    const encSrc = match.encryptedToken || appConfig.encryptedToken;
-    token = await aesDecrypt(encSrc, pass);
+    const encSrc=match.encryptedToken||appConfig.encryptedToken;
+    token=await aesDecrypt(encSrc,pass);
   }catch(e){
     document.getElementById('loginErr').textContent='Decryption failed — password may have changed. Re-run setup.html.';
     return;
   }
 
-  session = {name: match.name, token, cfg: appConfig};
-  document.getElementById('loggedInAs').textContent = '👤 '+match.name;
+  session={
+    name: match.name,
+    token,
+    cfg: appConfig,
+    role: match.role||'global',          // 'global' or 'sector'
+    sectors: match.sectors||[]           // [] means all for global
+  };
+  const roleLabel=session.role==='global'
+    ?'🌐 Global'
+    :'🏢 '+session.sectors.join(', ');
+  document.getElementById('loggedInAs').textContent='👤 '+match.name+' · '+roleLabel;
   showApp();
   await loadFromGitHub();
+}
+
+/* ── helpers for role-based access ──────────────────────────────
+   isGlobal()         → true if current session is global admin
+   canEditUser(u)     → true if current session can edit this user
+   visibleUsers(list) → filters list to only users this admin can see */
+function isGlobal(){ return !session||session.role==='global'; }
+function canEditUser(u){
+  if(isGlobal()) return true;
+  return session.sectors.includes(u.sector);
+}
+function visibleUsers(list){
+  if(isGlobal()) return list;
+  return list.filter(u=>session.sectors.includes(u.sector));
 }
 
 function doLogout(){
@@ -523,6 +537,9 @@ function showApp(){
     document.getElementById('repoLabel').textContent=
       session.cfg.owner+'/'+session.cfg.repo+' · '+(session.cfg.dataPath||'roster-data.json');
   }
+  // hide config tab for sector admins
+  const cfgTab=document.querySelector('.tab[onclick*="config"]');
+  if(cfgTab) cfgTab.style.display=isGlobal()?'':'none';
 }
 
 /* ══════════════════════════════════════════════════
@@ -660,7 +677,7 @@ function filtered(){
   const fun=document.getElementById('fUni').value;
   const fnat=document.getElementById('fNat').value;
   const fsh=document.getElementById('fShift').value;
-  return users.filter(u=>{
+  return visibleUsers(users).filter(u=>{
     if(s&&!u.name.toLowerCase().includes(s)) return false;
     if(fsc&&u.sector!==fsc) return false;
     if(fst&&u.station!==fst) return false;
@@ -939,6 +956,8 @@ function showCBBadge(msg){
 function hideCBBadge(){ document.getElementById('clipbadge').classList.remove('show'); }
 
 function paint(td,uid,day){
+  const u=users.find(x=>x.id===uid);
+  if(u&&!canEditUser(u))return; // sector admin cannot paint other sectors
   if(!roster[uid]) roster[uid]=Array(DAYS).fill('OFF');
   roster[uid][day]=dragShift;
   const base=new Date(startDate); base.setDate(base.getDate()+day);
@@ -1207,7 +1226,7 @@ function buildUsers(){
   const fst=document.getElementById('ufSta').value;
   const fun=document.getElementById('ufUni').value;
   const fnat=document.getElementById('ufNat').value;
-  const list=users.filter(u=>{
+  const list=visibleUsers(users).filter(u=>{
     if(s&&!u.name.toLowerCase().includes(s))return false;
     if(fsc&&u.sector!==fsc)return false;
     if(fst&&u.station!==fst)return false;
@@ -1222,7 +1241,9 @@ function buildUsers(){
     AL:`background:var(--al-bg);color:var(--al-t);border:1px solid var(--al-b)`,
     OFF:`background:var(--of-bg);color:var(--of-t);border:1px solid var(--of-b)`
   };
-  document.getElementById('uBody').innerHTML=list.map(u=>`<tr>
+  document.getElementById('uBody').innerHTML=list.map(u=>{
+    const editable=canEditUser(u);
+    return `<tr>
     <td style="font-weight:500">${esc(u.name)}</td>
     <td>${u.nationality?`<span class="badge bnat">🌐 ${esc(u.nationality)}</span>`:'—'}</td>
     <td>${u.sector?`<span class="badge bsec">${esc(u.sector)}</span>`:'—'}</td>
@@ -1230,16 +1251,23 @@ function buildUsers(){
     <td>${u.unit?`<span class="badge buni">${esc(u.unit)}</span>`:'—'}</td>
     <td><span style="display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:5px;font-weight:600;${ss[u.defaultShift||'OFF']}">${_NAME[u.defaultShift||'OFF']}</span></td>
     <td style="white-space:nowrap">
-      <button class="btn sm" onclick="openEditUser('${u.id}')">✏ Edit</button>
-      <button class="btn sm dan" onclick="delUser('${u.id}')">✕</button>
+      ${editable?`<button class="btn sm" onclick="openEditUser('${u.id}')">✏ Edit</button>
+      <button class="btn sm dan" onclick="delUser('${u.id}')">✕</button>`
+      :`<span style="font-size:10px;color:var(--text3)">read-only</span>`}
     </td>
-  </tr>`).join('');
+  </tr>`;
+  }).join('');
 }
 function openAddUser(){
+  if(!isGlobal()&&session.sectors.length===0){alert('No sectors assigned to your account.');return;}
   editUID=null; document.getElementById('mTitle').textContent='Add user';
   document.getElementById('mName').value=''; document.getElementById('mShift').value='OFF';
   populateSelects();
   ['mSec','mSta','mUni','mNat'].forEach(id=>document.getElementById(id).value='');
+  // pre-select sector for sector admins with only one sector
+  if(!isGlobal()&&session.sectors.length===1){
+    setTimeout(()=>{document.getElementById('mSec').value=session.sectors[0];},10);
+  }
   document.getElementById('modal').classList.add('open');
 }
 function openEditUser(id){
@@ -1263,13 +1291,26 @@ function saveUser(){
   const unit=document.getElementById('mUni').value;
   const nationality=document.getElementById('mNat').value;
   const ds=document.getElementById('mShift').value;
-  if(editUID){ Object.assign(users.find(x=>x.id===editUID),{name,sector,station,unit,nationality,defaultShift:ds}); }
-  else { const id='u'+Date.now(); users.push({id,name,sector,station,unit,nationality,defaultShift:ds}); roster[id]=Array(DAYS).fill(ds); }
+  // sector admins can only assign users to their sectors
+  if(!isGlobal()&&sector&&!session.sectors.includes(sector)){
+    alert('You can only assign users to your sector(s): '+session.sectors.join(', '));return;
+  }
+  if(editUID){
+    const u=users.find(x=>x.id===editUID);
+    if(!canEditUser(u)){alert('You do not have permission to edit this user.');return;}
+    Object.assign(u,{name,sector,station,unit,nationality,defaultShift:ds});
+  } else {
+    const id='u'+Date.now();
+    users.push({id,name,sector,station,unit,nationality,defaultShift:ds});
+    roster[id]=Array(DAYS).fill(ds);
+  }
   closeModal(); populateSelects(); buildUsers(); buildBody(); queueSave();
 }
 function delUser(id){
+  const u=users.find(x=>x.id===id);
+  if(!canEditUser(u)){alert('You do not have permission to delete this user.');return;}
   if(!confirm('Remove this user from the roster?'))return;
-  users=users.filter(u=>u.id!==id); delete roster[id];
+  users=users.filter(x=>x.id!==id); delete roster[id];
   populateSelects(); buildUsers(); buildBody(); queueSave();
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');}
