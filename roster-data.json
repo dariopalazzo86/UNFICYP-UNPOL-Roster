@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:21:04.244Z",
+  "savedAt": "2026-05-21T10:21:08.755Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4230,9 +4230,9 @@
       "key": "S3802",
       "label": "CCBD",
       "name": "Contin Commander Day",
-      "bg": "#e0f2fe",
+      "bg": "#2a9ae5",
       "fg": "#075985",
-      "border": "#7dd3fc"
+      "border": "#2a9ae5"
     }
   ]
 }
