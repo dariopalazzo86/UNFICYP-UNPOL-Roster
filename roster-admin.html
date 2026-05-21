@@ -124,6 +124,12 @@ td{padding:2px 2px;border:1px solid var(--border);text-align:center;cursor:cross
 .mrow{display:flex;gap:2px;flex-wrap:wrap}
 /* DRAG TIP */
 .dtip{position:fixed;z-index:3000;pointer-events:none;padding:4px 10px;border-radius:var(--r);font-size:12px;font-family:var(--mono);font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none;border:1px solid rgba(0,0,0,.08)}
+/* CLIPBOARD BADGE */
+.clipbadge{position:fixed;bottom:18px;right:18px;z-index:3000;background:var(--accent);color:#fff;font-size:11px;font-family:var(--mono);font-weight:600;padding:6px 12px;border-radius:var(--r);box-shadow:0 4px 14px rgba(59,91,219,.35);display:none;gap:8px;align-items:center;transition:opacity .3s}
+.clipbadge.show{display:flex}
+/* CELL SELECTION */
+td.sel{outline:2px solid var(--accent)!important;outline-offset:-2px;z-index:3;position:relative}
+td.paste-target{outline:2px dashed #16a34a!important;outline-offset:-2px;z-index:3;position:relative}
 /* CONTEXT MENU */
 .cmenu{position:fixed;z-index:2000;background:#fff;border:1px solid var(--border2);border-radius:var(--rl);box-shadow:0 8px 28px rgba(0,0,0,.14);padding:5px;min-width:152px;display:none}
 .cmenu.open{display:block}
@@ -221,6 +227,10 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 </nav>
 
 <div class="dtip" id="dtip"></div>
+<div class="clipbadge" id="clipbadge">
+  <span id="clipbadgeText">📋 Copied</span>
+  <button onclick="clearClipboard()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:14px;padding:0;line-height:1" title="Clear clipboard">×</button>
+</div>
 <div class="cmenu" id="cmenu">
   <div id="cmenuItems"><!-- populated by buildShiftUI() --></div>
   <div class="csep"></div>
@@ -386,6 +396,13 @@ let users=[], roster={}, sectors=[], stations=[], units=[];
 let startDate = new Date();
 let editUID=null, ctxUID=null, ctxDay=null, saveTimer=null;
 let dragging=false, dragShift=null, dragSet=new Set();
+
+/* ── CLIPBOARD / SELECTION ── */
+// clipboard: array of {uid, dayOffset, shift} relative to anchor
+let clipboard = null;          // {rows:[{uid,dayOffset,shift}], numRows, numCols, anchorUID, anchorDay}
+let selection = new Set();     // Set of "uid|day" keys currently selected
+let selAnchorUID=null, selAnchorDay=null;  // anchor for paste target
+let selecting=false, selMode=''; // 'copy-paint' or 'select'
 
 /* ══════════════════════════════════════════════════
    CRYPTO HELPERS
@@ -677,33 +694,195 @@ function buildBody(){
 }
 
 /* ══════════════════════════════════════════════════
-   CELL EVENTS
+   CELL EVENTS  (drag-paint · shift+drag-select · Ctrl+C/V)
 ══════════════════════════════════════════════════ */
 function attachCells(){
   document.querySelectorAll('#rBody td[data-uid]').forEach(td=>{
+
+    // ── right-click → context menu ──────────────────────────────
     td.addEventListener('contextmenu',e=>{
-      e.preventDefault(); if(dragging)return;
+      e.preventDefault(); if(dragging||selecting)return;
       ctxUID=td.dataset.uid; ctxDay=+td.dataset.d;
       const m=document.getElementById('cmenu');
       m.classList.add('open');
       m.style.left=Math.min(e.clientX,innerWidth-160)+'px';
       m.style.top=Math.min(e.clientY,innerHeight-230)+'px';
     });
+
+    // ── mousedown ───────────────────────────────────────────────
     td.addEventListener('mousedown',e=>{
-      if(e.button!==0)return; e.preventDefault(); closeCtx();
+      if(e.button!==0)return;
+      e.preventDefault(); closeCtx();
       const uid=td.dataset.uid, day=+td.dataset.d;
-      const cur=(roster[uid]||[])[day]||'OFF';
-      dragShift=_SHIFTS[(_SHIFTS.indexOf(cur)+1)%_SHIFTS.length];
-      dragging=true; dragSet=new Set();
-      paint(td,uid,day); showTip(e,dragShift);
+
+      if(e.shiftKey){
+        // Shift+click/drag → selection mode
+        selecting=true; selMode='select';
+        clearSelectionUI();
+        selection=new Set();
+        selAnchorUID=uid; selAnchorDay=day;
+        addToSelection(td,uid,day);
+      } else {
+        // normal drag → paint mode
+        const cur=(roster[uid]||[])[day]||'OFF';
+        dragShift=_SHIFTS[(_SHIFTS.indexOf(cur)+1)%_SHIFTS.length];
+        dragging=true; dragSet=new Set();
+        clearSelectionUI(); selection=new Set();
+        paint(td,uid,day); showTip(e,dragShift);
+      }
     });
+
+    // ── mouseenter ──────────────────────────────────────────────
     td.addEventListener('mouseenter',e=>{
-      if(!dragging)return;
       const uid=td.dataset.uid, day=+td.dataset.d;
-      if(!dragSet.has(uid+'|'+day)) paint(td,uid,day);
-      moveTip(e);
+      if(dragging){
+        if(!dragSet.has(uid+'|'+day)) paint(td,uid,day);
+        moveTip(e);
+      } else if(selecting){
+        addToSelection(td,uid,day);
+      }
     });
   });
+}
+
+// ── selection helpers ──────────────────────────────────────────
+function addToSelection(td,uid,day){
+  const key=uid+'|'+day;
+  if(!selection.has(key)){
+    selection.add(key);
+    td.classList.add('sel');
+  }
+}
+
+function clearSelectionUI(){
+  document.querySelectorAll('#rBody td.sel').forEach(t=>t.classList.remove('sel'));
+  document.querySelectorAll('#rBody td.paste-target').forEach(t=>t.classList.remove('paste-target'));
+}
+
+// ── mouseup ────────────────────────────────────────────────────
+document.addEventListener('mouseup',()=>{
+  if(dragging){
+    dragging=false; hideTip();
+    if(dragSet.size){updateStats(filtered());queueSave();}
+    dragShift=null; dragSet=new Set();
+  }
+  if(selecting){
+    selecting=false;
+    // record anchor as top-left of selection
+    if(selection.size){
+      // find the cell that was clicked first as paste anchor
+      selAnchorUID=selAnchorUID; // already set on mousedown
+    }
+  }
+});
+document.addEventListener('mousemove',e=>{if(dragging)moveTip(e);});
+
+// ── Ctrl+C / Ctrl+V / Escape ───────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeCtx(); clearSelectionUI(); selection=new Set(); hideCBBadge(); return; }
+
+  const active=document.activeElement;
+  const inInput=active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.tagName==='SELECT');
+
+  if((e.ctrlKey||e.metaKey) && e.key==='c' && !inInput && selection.size){
+    e.preventDefault();
+    copySelection();
+    return;
+  }
+  if((e.ctrlKey||e.metaKey) && e.key==='v' && !inInput && clipboard){
+    e.preventDefault();
+    pasteClipboard();
+    return;
+  }
+});
+
+function copySelection(){
+  if(!selection.size)return;
+
+  // convert selection keys to {uid, day} and sort
+  const cells=[...selection].map(k=>{const[uid,day]=k.split('|');return{uid,day:+day};});
+
+  // find bounding box
+  const userOrder=filtered().map(u=>u.id);
+  const rows=[...new Set(cells.map(c=>c.uid))].sort((a,b)=>userOrder.indexOf(a)-userOrder.indexOf(b));
+  const days=[...new Set(cells.map(c=>c.day))].sort((a,b)=>a-b);
+  const minRow=rows[0], minDay=days[0];
+
+  // store as 2D grid of shifts (null = not in selection)
+  const grid=rows.map(uid=>
+    days.map(day=>
+      selection.has(uid+'|'+day) ? ((roster[uid]||[])[day]||'OFF') : null
+    )
+  );
+
+  clipboard={grid, rows:rows.length, cols:days.length, anchorUID:minRow, anchorDay:minDay};
+
+  const total=cells.length;
+  showCBBadge(`📋 Copied ${total} cell${total!==1?'s':''} (${rows.length}×${days.length}) — Ctrl+V to paste`);
+}
+
+function pasteClipboard(){
+  if(!clipboard||!selAnchorUID) return;
+
+  const userOrder=filtered().map(u=>u.id);
+  const anchorRowIdx=userOrder.indexOf(selAnchorUID);
+  const anchorDay=selAnchorDay;
+
+  if(anchorRowIdx===-1)return;
+
+  const changed=[];
+
+  clipboard.grid.forEach((rowData,ri)=>{
+    const targetUID=userOrder[anchorRowIdx+ri];
+    if(!targetUID)return;
+    if(!roster[targetUID])roster[targetUID]=Array(DAYS).fill('OFF');
+    rowData.forEach((shift,ci)=>{
+      if(shift===null)return; // gap — skip
+      const targetDay=anchorDay+ci;
+      if(targetDay<0||targetDay>=DAYS)return;
+      roster[targetUID][targetDay]=shift;
+      changed.push({uid:targetUID,day:targetDay,shift});
+    });
+  });
+
+  // re-render affected cells
+  changed.forEach(({uid,day,shift})=>{
+    const td=document.querySelector(`td[data-uid="${uid}"][data-d="${day}"]`);
+    if(td){
+      const base=new Date(startDate);base.setDate(base.getDate()+day);
+      const we=base.getDay()===0||base.getDay()===6;
+      const dateStr=base.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+      td.className=_CLS[shift]+(we?' we':'');
+      td.innerHTML=(_LBL[shift]?`<span class="cell-shift">${_LBL[shift]}</span>`:'')+`<span class="cell-date">${dateStr}</span>`;
+    }
+  });
+
+  // show paste-target highlight briefly
+  clearSelectionUI();
+  changed.forEach(({uid,day})=>{
+    const td=document.querySelector(`td[data-uid="${uid}"][data-d="${day}"]`);
+    if(td)td.classList.add('paste-target');
+  });
+  setTimeout(()=>{document.querySelectorAll('#rBody td.paste-target').forEach(t=>t.classList.remove('paste-target'));},800);
+
+  if(changed.length){updateStats(filtered());queueSave();}
+  showCBBadge(`✅ Pasted ${changed.length} cell${changed.length!==1?'s':''} — Ctrl+V again to repeat`);
+}
+
+function clearClipboard(){
+  clipboard=null;
+  clearSelectionUI();
+  selection=new Set();
+  hideCBBadge();
+}
+
+function showCBBadge(msg){
+  const b=document.getElementById('clipbadge');
+  document.getElementById('clipbadgeText').textContent=msg;
+  b.classList.add('show');
+}
+function hideCBBadge(){
+  document.getElementById('clipbadge').classList.remove('show');
 }
 
 function paint(td,uid,day){
@@ -717,14 +896,6 @@ function paint(td,uid,day){
     +`<span class="cell-date">${dateStr}</span>`;
   dragSet.add(uid+'|'+day);
 }
-
-document.addEventListener('mouseup',()=>{
-  if(!dragging)return;
-  dragging=false; hideTip();
-  if(dragSet.size){updateStats(filtered());queueSave();}
-  dragShift=null; dragSet=new Set();
-});
-document.addEventListener('mousemove',e=>{if(dragging)moveTip(e);});
 
 function showTip(e,s){
   const t=document.getElementById('dtip');
@@ -752,7 +923,6 @@ function applyCtx(s){
 }
 function closeCtx(){document.getElementById('cmenu').classList.remove('open');ctxUID=null;ctxDay=null;}
 document.addEventListener('click',e=>{if(!document.getElementById('cmenu').contains(e.target))closeCtx();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtx();});
 
 /* ══════════════════════════════════════════════════
    BUILD SHIFT UI  (called after shiftDefs changes)
@@ -786,7 +956,7 @@ function buildShiftUI(){
     `<span><span class="lsq" style="background:${s.bg};border-color:${s.border}"></span>${esc(s.label)} = ${esc(s.name)}</span>`
   ).join('')
   +`<span><span class="lsq" style="background:#f8fafc;border-color:#e2e8f0"></span>Off</span>`
-  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b></span>`;
+  +`<span style="margin-left:auto;font-size:10px;color:var(--text3)">Left-click=cycle · Right-click=pick · <b>Drag=paint</b> · <b>Shift+drag=select → Ctrl+C / Ctrl+V</b></span>`;
 
   // stats bar
   const sb=document.getElementById('statsBar');
