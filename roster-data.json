@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:22:02.868Z",
+  "savedAt": "2026-05-21T10:22:17.803Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4238,9 +4238,9 @@
       "key": "S6394",
       "label": "COD",
       "name": "Check Out Day",
-      "bg": "#e0f2fe",
+      "bg": "#f8e1fe",
       "fg": "#075985",
-      "border": "#7dd3fc"
+      "border": "#f8e1fe"
     }
   ]
 }
