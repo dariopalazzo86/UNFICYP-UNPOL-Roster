@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T10:21:02.280Z",
+  "savedAt": "2026-05-21T10:21:04.244Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -4229,7 +4229,7 @@
     {
       "key": "S3802",
       "label": "CCBD",
-      "name": "New Shift",
+      "name": "Contin Commander Day",
       "bg": "#e0f2fe",
       "fg": "#075985",
       "border": "#7dd3fc"
