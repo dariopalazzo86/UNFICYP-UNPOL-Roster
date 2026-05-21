@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:34:55.931Z",
+  "savedAt": "2026-05-21T09:35:22.548Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -310,11 +310,11 @@
     {
       "id": "u31",
       "name": "Niko HEIMOLINNA",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 2",
+      "station": "Ledra",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Finland"
     },
     {
       "id": "u32",
