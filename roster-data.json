@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-21T09:34:33.000Z",
+  "savedAt": "2026-05-21T09:34:55.931Z",
   "startDate": "2026-07-13",
   "sectors": [
     "SECTOR 1",
@@ -301,11 +301,11 @@
     {
       "id": "u30",
       "name": "Nebojsa GRUJIC",
-      "sector": "",
-      "station": "",
+      "sector": "SECTOR 2",
+      "station": "Ledra",
       "unit": "",
       "defaultShift": "OFF",
-      "nationality": ""
+      "nationality": "Serbia"
     },
     {
       "id": "u31",
