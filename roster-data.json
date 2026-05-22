@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-22T10:07:19.936Z",
+  "savedAt": "2026-05-22T10:13:44.711Z",
   "startDate": "2026-05-11",
   "sectors": [
     "SECTOR 1",
@@ -1125,7 +1125,7 @@
       "OFF",
       "RD",
       "RD",
-      "AL",
+      "OFF",
       "OFF",
       "OFF",
       "OFF",
