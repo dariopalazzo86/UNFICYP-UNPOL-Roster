@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "savedAt": "2026-05-22T09:44:45.977Z",
+  "savedAt": "2026-05-22T09:44:56.047Z",
   "startDate": "2026-05-11",
   "sectors": [
     "SECTOR 1",
@@ -643,8 +643,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u1": [
       "D",
@@ -701,8 +701,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u2": [
       "D",
@@ -759,8 +759,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u3": [
       "D",
@@ -817,8 +817,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u4": [
       "D",
@@ -875,8 +875,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u5": [
       "D",
@@ -933,8 +933,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u6": [
       "D",
@@ -991,8 +991,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u7": [
       "D",
@@ -1049,8 +1049,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u8": [
       "D",
@@ -1107,8 +1107,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u9": [
       "OFF",
@@ -1165,8 +1165,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u10": [
       "OFF",
@@ -1223,8 +1223,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u11": [
       "OFF",
@@ -1281,8 +1281,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u12": [
       "OFF",
@@ -1339,8 +1339,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u13": [
       "OFF",
@@ -1397,8 +1397,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u14": [
       "OFF",
@@ -1455,8 +1455,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u15": [
       "OFF",
@@ -1513,8 +1513,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u16": [
       "OFF",
@@ -1571,8 +1571,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u17": [
       "D",
@@ -1629,8 +1629,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u18": [
       "D",
@@ -1687,8 +1687,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u19": [
       "D",
@@ -1745,8 +1745,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u20": [
       "D",
@@ -1803,8 +1803,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u21": [
       "D",
@@ -1861,8 +1861,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u22": [
       "D",
@@ -1919,8 +1919,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u23": [
       "OFF",
@@ -1977,8 +1977,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u24": [
       "OFF",
@@ -2035,8 +2035,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u25": [
       "OFF",
@@ -2093,8 +2093,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u26": [
       "OFF",
@@ -2151,8 +2151,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u27": [
       "OFF",
@@ -2209,8 +2209,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u28": [
       "OFF",
@@ -2267,8 +2267,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u29": [
       "OFF",
@@ -2325,8 +2325,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u30": [
       "OFF",
@@ -2383,8 +2383,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u31": [
       "OFF",
@@ -2441,8 +2441,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u32": [
       "OFF",
@@ -2499,8 +2499,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u33": [
       "OFF",
@@ -2557,8 +2557,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u34": [
       "OFF",
@@ -2615,8 +2615,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u35": [
       "OFF",
@@ -2673,8 +2673,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u36": [
       "OFF",
@@ -2731,8 +2731,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u37": [
       "OFF",
@@ -2789,8 +2789,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u38": [
       "OFF",
@@ -2847,8 +2847,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u39": [
       "OFF",
@@ -2905,8 +2905,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u40": [
       "OFF",
@@ -2963,8 +2963,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u41": [
       "OFF",
@@ -3021,8 +3021,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u42": [
       "OFF",
@@ -3079,8 +3079,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u43": [
       "OFF",
@@ -3137,8 +3137,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u44": [
       "OFF",
@@ -3195,8 +3195,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u45": [
       "OFF",
@@ -3253,8 +3253,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u46": [
       "OFF",
@@ -3311,8 +3311,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u47": [
       "OFF",
@@ -3369,8 +3369,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u48": [
       "OFF",
@@ -3427,8 +3427,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u49": [
       "OFF",
@@ -3485,8 +3485,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u50": [
       "OFF",
@@ -3543,8 +3543,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u51": [
       "OFF",
@@ -3601,8 +3601,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u52": [
       "OFF",
@@ -3659,8 +3659,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u53": [
       "OFF",
@@ -3717,8 +3717,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u54": [
       "OFF",
@@ -3775,8 +3775,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u55": [
       "OFF",
@@ -3833,8 +3833,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u56": [
       "OFF",
@@ -3891,8 +3891,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u57": [
       "OFF",
@@ -3949,8 +3949,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u58": [
       "OFF",
@@ -4007,8 +4007,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u59": [
       "OFF",
@@ -4065,8 +4065,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u60": [
       "OFF",
@@ -4123,8 +4123,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ],
     "u61": [
       "OFF",
@@ -4181,8 +4181,8 @@
       "OFF",
       "OFF",
       "OFF",
-      "OFF",
-      "OFF"
+      "RD",
+      "RD"
     ]
   },
   "shiftDefs": [
