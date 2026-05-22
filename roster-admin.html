@@ -224,14 +224,6 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <div class="hright">
     <div class="sind" id="sind"><span class="sdot"></span><span id="slbl">Loading…</span></div>
     <span id="loggedInAs" style="font-size:11px;color:var(--text3);font-family:var(--mono)"></span>
-    <span style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></span>
-    <label style="font-size:11px;color:var(--text2)">From <input type="date" id="exportFrom" style="font-size:11px;padding:4px 6px;border-color:#c7d2fe"></label>
-    <label style="font-size:11px;color:var(--text2)">To <input type="date" id="exportTo" style="font-size:11px;padding:4px 6px;border-color:#c7d2fe"></label>
-    <button class="btn sm acc" onclick="exportCSV()" title="Export filtered view to CSV">⬇ CSV</button>
-    <button class="btn sm acc" onclick="exportImage()" title="Export filtered view as PNG">🖼 PNG</button>
-    <span id="exportRangeInfo" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
-    <span style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></span>
-    <button class="btn sm dan" onclick="resetData()">↺ Reset</button>
     <button class="btn sm" onclick="doLogout()" title="Sign out">⏻ Sign out</button>
     <span class="rbadge">ADMIN</span>
   </div>
@@ -265,13 +257,19 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
       <select id="fNat" onchange="buildBody()"><option value="">All nationalities</option></select>
       <select id="fShift" onchange="buildBody()"><option value="">All shifts</option></select>
-      <span style="font-size:11px;color:var(--text3)">Bulk:</span>
-      <span id="bulkBtns"><!-- populated by buildShiftUI() --></span>
-      <button class="btn sm" onclick="bulkFill('OFF')">Clear</button>
     </div>
     <div class="legend" id="shiftLegend"><!-- populated by buildShiftUI() --></div>
     <div class="stats" id="statsBar"><!-- populated by buildShiftUI() --></div>
     <div class="twrap"><table><thead id="rHead"></thead><tbody id="rBody"></tbody></table></div>
+    <!-- EXPORT CARD -->
+    <div class="ccard" style="margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px">
+      <span style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">📤 Export</span>
+      <label style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px">From <input type="date" id="exportFrom" style="font-size:11px;padding:4px 6px;border-color:#c7d2fe"></label>
+      <label style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px">To <input type="date" id="exportTo" style="font-size:11px;padding:4px 6px;border-color:#c7d2fe"></label>
+      <button class="btn sm acc" onclick="exportCSV()" title="Export filtered view to CSV">⬇ CSV</button>
+      <button class="btn sm acc" onclick="exportImage()" title="Export filtered view as PNG">🖼 PNG</button>
+      <span id="exportRangeInfo" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
   </div>
 
   <!-- CONFIG -->
@@ -1016,11 +1014,7 @@ function buildShiftUI(){
       +'<option value="OFF">Off / Clear</option>';
   }
 
-  // bulk fill buttons
-  const bb=document.getElementById('bulkBtns');
-  if(bb) bb.innerHTML=shiftDefs.map(s=>
-    `<button class="btn sm" style="background:${s.bg};color:${s.fg};border-color:${s.border}" onclick="bulkFill('${s.key}')">${esc(s.label)}</button>`
-  ).join('');
+  // bulk fill buttons removed — bulk fill via right-click context menu
 
   // legend
   const leg=document.getElementById('shiftLegend');
@@ -1037,7 +1031,7 @@ function buildShiftUI(){
     +shiftDefs.map(s=>
       `<div class="stat" style="border-color:${s.border}"><span class="slbl">${esc(s.label)}</span><span class="sval" id="stat_${s.key}" style="color:${s.fg}">—</span></div>`
     ).join('')
-    +`<div class="stat" style="border-color:#c7d2fe"><span class="slbl">Coverage</span><span class="sval" id="scov" style="color:var(--accent)">—</span></div>`;
+    ;
 
   // default shift select in modal
   const mShift=document.getElementById('mShift');
