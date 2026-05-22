@@ -111,6 +111,11 @@ thead th.we{background:#f0f4f8!important;color:var(--text3)}
 tbody th.uc{position:sticky;left:0;z-index:6;background:var(--bg2);padding:4px 10px;border-right:1px solid var(--border);font-weight:500;white-space:nowrap;min-width:140px;font-family:var(--ui);font-size:11px;color:var(--text)}
 tbody td.ic{position:sticky;left:140px;z-index:5;background:var(--bg2);border-right:1px solid var(--border);padding:3px 4px;min-width:78px;cursor:default}
 tbody tr:hover th.uc,tbody tr:hover td.ic{background:#eff3ff}
+.info-hidden thead th.ic{min-width:24px!important;width:24px!important;padding:0!important;overflow:hidden}
+.info-hidden tbody td.ic{min-width:24px!important;width:24px!important;padding:0!important;overflow:hidden}
+.info-hidden tbody td.ic .mrow{display:none}
+.ic-toggle{cursor:pointer;font-size:11px;user-select:none;padding:2px 4px;border-radius:3px;background:var(--bg3);border:1px solid var(--border2);line-height:1;white-space:nowrap}
+.ic-toggle:hover{background:var(--border2)}
 tbody tr.myrow th.uc{color:var(--accent);font-weight:700}
 tbody tr.myrow td,tbody tr.myrow th.uc,tbody tr.myrow td.ic{background:#eff6ff!important}
 tbody tr.myrow{outline:1px solid #bfdbfe}
@@ -228,6 +233,7 @@ rebuildShiftLookups();
 const NATIONALITIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'].sort();
 
 let users=[], roster={}, sectors=[], stations=[], units=[];
+let infoVisible=true;
 let startDate=new Date();
 let appConfig=null;
 
@@ -337,8 +343,10 @@ function cascadeFilters(){
 
 function buildHead(){
   const base=new Date(startDate);
-  let h='<tr><th class="uc">User</th>'
-    +'<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:78px;text-align:center">Info</th>';
+  const label=infoVisible?'Info ◀':'▶';
+  let h='<tr><th class="uc">IPO</th>'
+    +`<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:${infoVisible?78:24}px;text-align:center">`
+    +`<span class="ic-toggle" onclick="toggleInfo()" title="${infoVisible?'Hide info column':'Show info column'}">${label}</span></th>`;
   for(let i=0;i<DAYS;i++){
     const d=new Date(base);d.setDate(base.getDate()+i);
     const we=d.getDay()===0||d.getDay()===6;
@@ -349,6 +357,13 @@ function buildHead(){
       +`</th>`;
   }
   document.getElementById('rHead').innerHTML=h+'</tr>';
+}
+
+function toggleInfo(){
+  infoVisible=!infoVisible;
+  const twrap=document.querySelector('.twrap');
+  if(twrap) twrap.classList.toggle('info-hidden',!infoVisible);
+  buildHead();
 }
 
 function filtered(){
@@ -528,8 +543,8 @@ function exportImage(){
   if(!list.length){alert('No users match the current filters.');return;}
   const{dayIndices,dates,fromStr,toStr}=getExportRange();
   const nDays=dayIndices.length;
-  const SCALE=2,ROW_H=28,HEAD_H=44,NAME_W=160,INFO_W=80,DAY_W=46,PAD=4,TITLE_H=36,LEGEND_H=26;
-  const totalW=NAME_W+INFO_W+DAY_W*nDays, totalH=TITLE_H+LEGEND_H+HEAD_H+ROW_H*list.length+2;
+  const SCALE=2,ROW_H=28,HEAD_H=44,NAME_W=160,DAY_W=46,PAD=4,TITLE_H=36,LEGEND_H=26;
+  const totalW=NAME_W+DAY_W*nDays, totalH=TITLE_H+LEGEND_H+HEAD_H+ROW_H*list.length+2;
   const canvas=document.createElement('canvas');
   canvas.width=totalW*SCALE;canvas.height=totalH*SCALE;
   const ctx=canvas.getContext('2d');ctx.scale(SCALE,SCALE);
@@ -553,31 +568,29 @@ function exportImage(){
   fill(lx,TITLE_H+7,12,12,'#f8fafc');ctx.strokeStyle='#e2e8f0';ctx.lineWidth=.5;ctx.strokeRect(lx+.25,TITLE_H+7.25,11.5,11.5);txt('Off',lx+16,TITLE_H+LEGEND_H/2,{font:'10px Inter,sans-serif',color:TEXT3});
   // header
   const hy=TITLE_H+LEGEND_H;fill(0,hy,totalW,HEAD_H,'#f8f9fc');hline(hy+HEAD_H);
-  txt('User',PAD+4,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2});
-  txt('Info',NAME_W+INFO_W/2,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2,align:'center'});
+  txt('IPO',PAD+4,hy+HEAD_H/2,{font:'bold 11px Inter,sans-serif',color:TEXT2});
   dayIndices.forEach((di,pos)=>{
-    const d=dates[pos],isWe=d.getDay()===0||d.getDay()===6,cx=NAME_W+INFO_W+pos*DAY_W;
+    const d=dates[pos],isWe=d.getDay()===0||d.getDay()===6,cx=NAME_W+pos*DAY_W;
     if(isWe)fill(cx,hy,DAY_W,HEAD_H,WE_BG);
     txt(String(di+1),cx+DAY_W/2,hy+11,{font:'bold 10px Inter,sans-serif',color:isWe?TEXT3:TEXT2,align:'center'});
     txt(d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),cx+DAY_W/2,hy+27,{font:'9px Inter,sans-serif',color:TEXT3,align:'center'});
     vline(cx,hy,hy+HEAD_H);
   });
-  vline(NAME_W,hy,hy+HEAD_H);vline(NAME_W+INFO_W,hy,hy+HEAD_H);
+  vline(NAME_W,hy,hy+HEAD_H);
   // rows
   list.forEach((u,ri)=>{
     const ry=TITLE_H+LEGEND_H+HEAD_H+ri*ROW_H,rowBg=ri%2===0?'#ffffff':'#f7f9fc';
     fill(0,ry,totalW,ROW_H,rowBg);
     txt(u.name,PAD+4,ry+ROW_H/2,{font:'500 11px Inter,sans-serif',color:TEXT,maxW:NAME_W-8});
-    txt([u.sector,u.station,u.unit].filter(Boolean).join(' · '),NAME_W+4,ry+ROW_H/2,{font:'9px Inter,sans-serif',color:TEXT3,maxW:INFO_W-6});
     const shifts=roster[u.id]||Array(DAYS).fill('OFF');
     dayIndices.forEach((di,pos)=>{
-      const d=dates[pos],isWe=d.getDay()===0||d.getDay()===6,s=shifts[di]||'OFF',cx=NAME_W+INFO_W+pos*DAY_W;
+      const d=dates[pos],isWe=d.getDay()===0||d.getDay()===6,s=shifts[di]||'OFF',cx=NAME_W+pos*DAY_W;
       const def=shiftDefs.find(x=>x.key===s);
       fill(cx,ry,DAY_W,ROW_H,def?(isWe?def.bg+'cc':def.bg):(isWe?WE_BG:rowBg));
       if(def)txt(def.label,cx+DAY_W/2,ry+ROW_H/2,{font:'bold 10px "DM Mono",monospace',color:def.fg,align:'center'});
       vline(cx,ry,ry+ROW_H);
     });
-    hline(ry+ROW_H);vline(NAME_W,ry,ry+ROW_H);vline(NAME_W+INFO_W,ry,ry+ROW_H);
+    hline(ry+ROW_H);vline(NAME_W,ry,ry+ROW_H);
   });
   ctx.strokeStyle='#c8d0e0';ctx.lineWidth=1;ctx.strokeRect(.5,TITLE_H+.5,totalW-1,totalH-TITLE_H-1);
   const fname=['roster_img'];
