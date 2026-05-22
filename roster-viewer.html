@@ -119,7 +119,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <header>
   <div>
-    <div class="logo">ROSTER MANAGER</div>
+    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
     <div class="sub" id="repoLabel">56-day shift planner</div>
   </div>
   <div class="hright">
@@ -131,7 +131,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <main>
   <div class="toolbar">
-    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
+    <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
     <select id="fSec" onchange="cascadeFilters();buildBody()"><option value="">All sectors</option></select>
     <select id="fSta" onchange="cascadeFilters();buildBody()"><option value="">All stations</option></select>
     <select id="fUni" onchange="buildBody()"><option value="">All units</option></select>
@@ -385,7 +385,7 @@ function buildViewerShiftUI(){
   // stats bar — compact pill row
   const sb=document.getElementById('statsBar');
   if(sb) sb.innerHTML=
-    `<div class="stat"><span class="slbl">Users</span><span class="sval" id="su">—</span></div>`
+    `<div class="stat"><span class="slbl">IPOs</span><span class="sval" id="su">—</span></div>`
     +shiftDefs.map(s=>
       `<div class="stat" style="border-color:${s.border}"><span class="slbl">${esc(s.label)}</span><span class="sval" id="stat_${s.key}" style="color:${s.fg}">—</span></div>`
     ).join('')

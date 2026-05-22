@@ -160,7 +160,7 @@ td.handle-fill{outline:1px dashed var(--accent)!important;outline-offset:-1px;}
 .delbtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 4px;line-height:1;transition:color .12s}.delbtn:hover{color:var(--red)}
 .arow{display:flex;gap:6px}.arow input{flex:1}
 .ctip{font-size:11px;color:var(--text3);padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)}
-/* USERS TABLE */
+/* IPOs TABLE */
 .utwrap{overflow:auto;border:1px solid var(--border);border-radius:var(--rl);max-height:calc(100vh - 250px);box-shadow:var(--sh)}
 .utable{width:100%;border-collapse:collapse;font-size:12px}
 .utable thead th{position:sticky;top:0;z-index:5;background:#f8f9fc;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--text3);text-align:left}
@@ -198,7 +198,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 <!-- ═══ LOGIN SCREEN ═══ -->
 <div class="login-screen" id="loginScreen" style="display:none">
   <div class="login-card">
-    <div class="login-logo">ROSTER MANAGER</div>
+    <div class="login-logo">UNFICYP UNPOL ROSTER MANAGER</div>
     <div class="login-sub">Admin access · Sign in to continue</div>
     <div class="lfield">
       <label>Name</label>
@@ -218,7 +218,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <header>
   <div>
-    <div class="logo">ROSTER MANAGER</div>
+    <div class="logo">UNFICYP UNPOL ROSTER MANAGER</div>
     <div class="sub" id="repoLabel">56-day shift planner</div>
   </div>
   <div class="hright">
@@ -232,7 +232,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 <nav>
   <div class="tab active" onclick="switchTab('roster')">📅 Roster</div>
   <div class="tab" onclick="switchTab('config')">⚙️ Sectors / Stations / Units</div>
-  <div class="tab" onclick="switchTab('users')">👥 Users</div>
+  <div class="tab" onclick="switchTab('users')">👥 IPOs</div>
 </nav>
 
 <div class="dtip" id="dtip"></div>
@@ -250,7 +250,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
   <!-- ROSTER -->
   <div id="panel-roster" class="panel active">
     <div class="toolbar">
-      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search user…" style="width:130px" oninput="buildBody()"></div>
+      <div class="sw"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search IPO…" style="width:130px" oninput="buildBody()"></div>
       <label>Start <input type="date" id="startDate" onchange="onDateChange()"></label>
       <select id="fSec" onchange="cascadeFilters('roster');buildBody()"><option value="">All sectors</option></select>
       <select id="fSta" onchange="cascadeFilters('roster');buildBody()"><option value="">All stations</option></select>
@@ -308,10 +308,10 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <button class="btn acc btn-sm" onclick="addShiftDef()">+ Add shift type</button>
       <span style="font-size:11px;color:var(--text3);margin-left:10px">Changes apply immediately to the roster</span>
     </div>
-    <p class="ctip">✦ Assign sectors, stations and units to staff in the <strong>Users</strong> tab.</p>
+    <p class="ctip">✦ Assign sectors, stations and units to IPOs in the <strong>IPOs</strong> tab.</p>
   </div>
 
-  <!-- USERS -->
+  <!-- IPOs -->
   <div id="panel-users" class="panel">
     <div class="toolbar">
       <div class="sw"><span class="si">🔍</span><input type="text" id="usrch" placeholder="Search…" style="width:130px" oninput="buildUsers()"></div>
@@ -319,7 +319,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
       <select id="ufSta" onchange="cascadeFilters('users');buildUsers()"><option value="">All stations</option></select>
       <select id="ufUni" onchange="buildUsers()"><option value="">All units</option></select>
       <select id="ufNat" onchange="buildUsers()"><option value="">All nationalities</option></select>
-      <button class="btn acc" onclick="openAddUser()">+ Add user</button>
+      <button class="btn acc" onclick="openAddUser()">+ Add IPO</button>
     </div>
     <div class="utwrap">
       <table class="utable">
@@ -332,7 +332,7 @@ code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-family:var(--m
 
 <div class="mbg" id="modal">
   <div class="modal">
-    <h3 id="mTitle">Add user</h3>
+    <h3 id="mTitle">Add IPO</h3>
     <div class="mfrow"><label>Full name</label><input type="text" id="mName" placeholder="e.g. Jane Smith"></div>
     <div class="mfrow"><label>Nationality</label><select id="mNat"><option value="">— none —</option></select></div>
     <div class="mfrow"><label>Sector</label><select id="mSec"><option value="">— none —</option></select></div>
@@ -1030,7 +1030,7 @@ function buildShiftUI(){
   // stats bar — compact pill row
   const sb=document.getElementById('statsBar');
   if(sb) sb.innerHTML=
-    `<div class="stat"><span class="slbl">Users</span><span class="sval" id="su">—</span></div>`
+    `<div class="stat"><span class="slbl">IPOs</span><span class="sval" id="su">—</span></div>`
     +shiftDefs.map(s=>
       `<div class="stat" style="border-color:${s.border}"><span class="slbl">${esc(s.label)}</span><span class="sval" id="stat_${s.key}" style="color:${s.fg}">—</span></div>`
     ).join('')
@@ -1272,7 +1272,7 @@ function buildUsers(){
 }
 function openAddUser(){
   if(!isGlobal()&&session.sectors.length===0){alert('No sectors assigned to your account.');return;}
-  editUID=null; document.getElementById('mTitle').textContent='Add user';
+  editUID=null; document.getElementById('mTitle').textContent='Add IPO';
   document.getElementById('mName').value=''; document.getElementById('mShift').value='OFF';
   populateSelects();
   ['mSec','mSta','mUni','mNat'].forEach(id=>document.getElementById(id).value='');
@@ -1284,7 +1284,7 @@ function openAddUser(){
 }
 function openEditUser(id){
   editUID=id; const u=users.find(x=>x.id===id);
-  document.getElementById('mTitle').textContent='Edit user';
+  document.getElementById('mTitle').textContent='Edit IPO';
   document.getElementById('mName').value=u.name;
   document.getElementById('mShift').value=u.defaultShift||'OFF';
   populateSelects();
@@ -1321,7 +1321,7 @@ function saveUser(){
 function delUser(id){
   const u=users.find(x=>x.id===id);
   if(!canEditUser(u)){alert('You do not have permission to delete this user.');return;}
-  if(!confirm('Remove this user from the roster?'))return;
+  if(!confirm('Remove this IPO from the roster?'))return;
   users=users.filter(x=>x.id!==id); delete roster[id];
   populateSelects(); buildUsers(); buildBody(); queueSave();
 }
