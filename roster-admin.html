@@ -475,7 +475,7 @@ let users=[], roster={}, sectors=[], stations=[], units=[];
 let startDate = new Date();
 let editUID=null, ctxUID=null, ctxDay=null, saveTimer=null;
 let dragging=false, dragShift=null, dragSet=new Set();
-let infoVisible=true; // controls visibility of the Info column
+let infoVisible=false; // controls visibility of the Info column
 
 /* ── CLIPBOARD / SELECTION ── */
 // clipboard: array of {uid, dayOffset, shift} relative to anchor
@@ -729,6 +729,9 @@ function switchTab(t){
 function buildHead(){
   const base=new Date(startDate);
   const label=infoVisible?'Info ◀':'▶';
+  // sync twrap class with current state
+  const twrap=document.querySelector('.twrap');
+  if(twrap) twrap.classList.toggle('info-hidden',!infoVisible);
   let h='<tr><th class="uc">IPO</th>'
     +`<th class="ic" style="position:sticky;left:140px;z-index:21;background:#f8f9fc;min-width:${infoVisible?78:24}px;text-align:center">`
     +`<span class="ic-toggle" onclick="toggleInfo()" title="${infoVisible?'Hide info column':'Show info column'}">${label}</span></th>`;
